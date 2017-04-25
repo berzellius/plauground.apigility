@@ -69,7 +69,7 @@ class Oauth_users_controlResource extends AbstractResourceListener
         $identity = $this->getIdentity()->getAuthenticationIdentity();
 
         if($identity['scope'] != 'main'){
-            return new ApiProblem(401, 'Method not allowed! ');
+            return new ApiProblem(401, 'Method not allowed/master! ');
         }
 
         return $this->mapper->fetchAll();
