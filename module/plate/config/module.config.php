@@ -328,6 +328,7 @@ return [
                     ],
                 ],
                 'name' => 'client_id',
+                'field_type' => '',
             ],
         ],
     ],
