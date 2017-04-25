@@ -9,9 +9,20 @@ class Oauth_users_controlResource extends AbstractResourceListener
 {
     protected $mapper;
 
+    const ADMIN_SCOPE_NAME = 'main';
+
     public function __construct(MapperInterface $mapper)
     {
         $this->mapper = $mapper;
+    }
+
+    private function checkAdminPrivileges(){
+        $identity = $this->getIdentity()->getAuthenticationIdentity();
+        return $identity['scope'] == self::ADMIN_SCOPE_NAME;
+    }
+
+    private function notAllowed(){
+        return new ApiProblem(401, 'Method not allowed! ');
     }
 
     /**
@@ -22,7 +33,10 @@ class Oauth_users_controlResource extends AbstractResourceListener
      */
     public function create($data)
     {
-        return new ApiProblem(405, 'The POST method has not been defined');
+        if(!$this->checkAdminPrivileges())
+            return $this->notAllowed();
+
+        return $this->mapper->create($data);
     }
 
     /**
@@ -55,7 +69,10 @@ class Oauth_users_controlResource extends AbstractResourceListener
      */
     public function fetch($id)
     {
-        return new ApiProblem(405, 'The GET method has not been defined for individual resources');
+        if(!$this->checkAdminPrivileges())
+            return $this->notAllowed();
+
+        return $this->mapper->fetch($id);
     }
 
     /**
@@ -66,14 +83,10 @@ class Oauth_users_controlResource extends AbstractResourceListener
      */
     public function fetchAll($params = [])
     {
-        $identity = $this->getIdentity()->getAuthenticationIdentity();
-
-        if($identity['scope'] != 'main1'){
-            return new ApiProblem(401, 'Method not allowed/prototype! ');
-        }
+        if(!$this->checkAdminPrivileges())
+            return $this->notAllowed();
 
         return $this->mapper->fetchAll();
-        //return new ApiProblem(405, 'The GET method has not been defined for collections');
     }
 
     /**
@@ -119,6 +132,9 @@ class Oauth_users_controlResource extends AbstractResourceListener
      */
     public function update($id, $data)
     {
-        return new ApiProblem(405, 'The PUT method has not been defined for individual resources');
+        if(!$this->checkAdminPrivileges())
+            return $this->notAllowed();
+
+        return $this->mapper->update($id, $data);
     }
 }

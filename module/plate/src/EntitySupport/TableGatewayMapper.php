@@ -65,9 +65,7 @@ class TableGatewayMapper implements MapperInterface
         }
 
         //$data['id'] = Uuid::uuid4()->toString();
-        if (! isset($data['timestamp'])) {
-            $data['timestamp'] = time();
-        }
+       
         $this->table->insert($data);
         $id = $this->table->lastInsertValue;
         $idName = $this->getIdFieldName();
@@ -118,14 +116,10 @@ class TableGatewayMapper implements MapperInterface
             $data = (array) $data;
         }
 
-        if (! isset($data['timestamp'])) {
-            $data['timestamp'] = time();
-        }
-
         $idName = $this->getIdFieldName();
         $this->table->update($data, [$idName => $id]);
 
-        $resultSet = $this->table->select(['id' => $id]);
+        $resultSet = $this->table->select([$idName => $id]);
         if (0 === count($resultSet)) {
             throw new DomainException('Update operation failed or result in row deletion', 500);
         }

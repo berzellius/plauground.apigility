@@ -55,7 +55,7 @@ return [
         ],
     ],
     'zf-rest' => [
-        'plate\\V1\\Rest\\Motion\\Controller' => [
+        /*'plate\\V1\\Rest\\Motion\\Controller' => [
             'listener' => \plate\V1\Rest\Motion\MotionResource::class,
             'route_name' => 'plate.rest.motion',
             'route_identifier_name' => 'motion_id',
@@ -143,7 +143,7 @@ return [
             'entity_class' => \StatusLib\Entity::class,
             'collection_class' => \StatusLib\Collection::class,
             'service_name' => 'Status',
-        ],
+        ],*/
     ],
     'zf-content-negotiation' => [
         'controllers' => [

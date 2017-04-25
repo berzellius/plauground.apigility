@@ -6,7 +6,6 @@ return [
     'db' => [
         'adapters' => [
             'dummy' => [],
-            'devices_map_adapter' => [],
             'oauth2_users' => [],
         ],
     ],
