@@ -1,5 +1,5 @@
 <?php
-/** prototype branch **/
+/** prototype branch 2 **/
 return [
     'service_manager' => [
         'factories' => [
