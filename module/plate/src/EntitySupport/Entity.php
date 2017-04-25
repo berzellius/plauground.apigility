@@ -6,7 +6,8 @@
 
 namespace plate\EntitySupport;
 
-class Entity
-{
+use Zend\Stdlib\ArrayObject;
 
+class Entity extends ArrayObject
+{
 }

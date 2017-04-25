@@ -24,9 +24,10 @@ interface MapperInterface
     public function fetch($id);
 
     /**
+     * @param $params
      * @return Collection
      */
-    public function fetchAll();
+    public function fetchAll($params);
 
     /**
      * @param string $id 

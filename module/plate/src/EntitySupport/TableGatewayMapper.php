@@ -95,11 +95,17 @@ class TableGatewayMapper implements MapperInterface
     }
 
     /**
+     * @param $params
      * @return Collection
      */
-    public function fetchAll()
+    public function fetchAll($params)
     {
-        return new Collection(new DbTableGateway($this->table, null));
+        $where = [];
+        foreach ($params as $k=>$v){
+            $where[] = $k . " = '" . $v . "'";
+        }
+
+        return new Collection(new DbTableGateway($this->table, $where));
     }
 
     /**
@@ -160,5 +166,22 @@ class TableGatewayMapper implements MapperInterface
     {
         $this->halEntityProperties = $halEntityProperties;
     }
+
+    /**
+     * @return TableGateway
+     */
+    public function getTable()
+    {
+        return $this->table;
+    }
+
+    /**
+     * @param TableGateway $table
+     */
+    public function setTable($table)
+    {
+        $this->table = $table;
+    }
+
 
 }
