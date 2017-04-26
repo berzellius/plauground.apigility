@@ -72,9 +72,10 @@ class DevicesResource extends CheckPrivilegesAndDataRetrievingResource
             "client_id" => $this->getLoggedInClientId()
         ];
 
-        $aclCnt = $this->getUserAccessListMapper()->fetchAll($params)->getCurrentItemCount();
-
-        if($aclCnt == 0){
+        if(
+            !$this->checkAdminPrivileges() &&
+            $this->getUserAccessListMapper()->fetchAll($params)->getCurrentItemCount() == 0
+        ){
             return $this->notAllowed();
         }
 
@@ -82,28 +83,30 @@ class DevicesResource extends CheckPrivilegesAndDataRetrievingResource
     }
 
     /**
-     * Fetch all or a subset of resources
+     * Получение списка устройств:
+     * 1) по grp_id - порлучение устройств в группе;
+     *      для получения списка необходимо явно предоставленное право пользователя нагруппу устройств в таблице списка доступа devices_acl,
+     *      ибо права администратора
+     * 2) по room_id - получение списка устройств в комнате; (если задан grp_id, room_id игнорируется)
+     *      возвращает  полный список устройств в комнате (для аккаунта адмнистратора)
+     *      возвращает список устройств в комнате, которым явно предосталено разрешение в таблице devices_acl
+     *3) без параметров - только для аккаунта администратора - список всех устройств в системе
      *
      * @param  array $params
      * @return ApiProblem|mixed
      */
     public function fetchAll($params = [])
     {
-        if($this->checkAdminPrivileges()){
-            return $this->getMapper()->fetchAll($params);
-        }
-
-        $clientId =  $this->getLoggedInClientId();
-
         if(isset($params['grp_id'])){
             $params = [
                 "grp_id" => $params['grp_id'],
                 "client_id" => $this->getLoggedInClientId()
             ];
 
-            $aclCnt = $this->userAccessListMapper->fetchAll($params)->getCurrentItemCount();
-
-            if($aclCnt == 0){
+            if(
+                !$this->checkAdminPrivileges() &&
+                $this->userAccessListMapper->fetchAll($params)->getCurrentItemCount() == 0
+            ){
                 return new ApiProblem(403, "Empty list!");
             }
 
@@ -115,31 +118,11 @@ class DevicesResource extends CheckPrivilegesAndDataRetrievingResource
                 "room_id" => $params['room_id']
             ];
 
-            $devicesACLTableName = $this->getUserAccessListMapper()->getTable()->table;
-            $devicesTableName = $this->getMapper()->getTable()->table;
-            $idFieldName = $this->getMapper()->getIdFieldName();
-
-            $select = new Select();
-            $select
-                ->from($devicesACLTableName)
-                ->join(
-                    $devicesTableName,
-                     $devicesTableName . "." . $idFieldName .
-                     " = " .
-                     $devicesACLTableName . ".device_id"
-                )
-                ->columns([])
-                ->where(
-                    $devicesACLTableName . ".client_id = '$clientId'"
-                )
-                ->where(
-                    $devicesTableName . ".room_id = '" . $params['room_id'] . "'"
-                )
-            ;
+            $select = $this->getDevicesByRoomIdSelector($params['room_id']);
 
             $adapter = new Adapter(
                 $this->getMapper()->getTable()->getAdapter()->getDriver(),
-                $this->getMapper()->getTable()->getAdapter()->platform
+                $this->getMapper()->getTable()->getAdapter()->getPlatform()
                 );
 
             $dbSelect = new DbSelect($select, $adapter);
@@ -147,7 +130,52 @@ class DevicesResource extends CheckPrivilegesAndDataRetrievingResource
             return new Collection($dbSelect);
         }
 
+        if($this->checkAdminPrivileges()){
+            return $this->getMapper()->fetchAll($params);
+        }
+
         return new ApiProblem(403, "Fetching all devices allowed only by grp_id or room_id!");
+    }
+
+    protected function getDevicesByRoomIdSelector($roomId){
+        $devicesTableName = $this->getMapper()->getTable()->table;
+        $idFieldName = $this->getMapper()->getIdFieldName();
+
+        if($this->checkAdminPrivileges()) {
+            $select = new Select();
+            $select
+                ->from($devicesTableName)
+                ->where(
+                    $devicesTableName . ".room_id = '" . $roomId . "'"
+                )
+            ;
+
+            return $select;
+        }
+        else{
+            $clientId =  $this->getLoggedInClientId();
+            $devicesACLTableName = $this->getUserAccessListMapper()->getTable()->table;
+
+            $select = new Select();
+            $select
+                ->from($devicesACLTableName)
+                ->join(
+                    $devicesTableName,
+                    $devicesTableName . "." . $idFieldName .
+                    " = " .
+                    $devicesACLTableName . ".device_id"
+                )
+                ->columns([])
+                ->where(
+                    $devicesACLTableName . ".client_id = '$clientId'"
+                )
+                ->where(
+                    $devicesTableName . ".room_id = '" . $roomId . "'"
+                )
+            ;
+
+            return $select;
+        }
     }
 
 

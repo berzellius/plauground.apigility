@@ -9,7 +9,6 @@ namespace plate\EntitySupport;
 use DomainException;
 use InvalidArgumentException;
 use Traversable;
-use Rhumsaa\Uuid\Uuid;
 use Zend\Paginator\Adapter\DbTableGateway;
 use Zend\Stdlib\ArrayUtils;
 
@@ -24,7 +23,7 @@ class TableGatewayMapper implements MapperInterface
     protected $table;
 
     /**
-     * @var section [zf-hal][`entity_name`]
+     * @var array section [zf-hal][`entity_name`]
      */
     protected $halEntityProperties;
 
