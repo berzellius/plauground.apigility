@@ -8,6 +8,11 @@ namespace plate\EntitySupport;
 
 use Zend\Stdlib\ArrayObject;
 
+/**
+ * Class Entity
+ * Класс, который наследуют мапперы сущностей
+ * @package plate\EntitySupport
+ */
 class Entity extends ArrayObject
 {
 }

@@ -12,9 +12,9 @@ use Zend\Db\TableGateway\TableGateway as ZFTableGateway;
 use Zend\Hydrator\ObjectProperty as ObjectPropertyHydrator;
 
 /**
- * Custom TableGateway instance for StatusLib
- *
- * Creates a HydratingResultSet seeded with an ObjectProperty hydrator and EntitySupport instance.
+ * Class TableGateway
+ * Для создания gateway к таблицам БД
+ * @package plate\EntitySupport
  */
 class TableGateway extends ZFTableGateway
 {

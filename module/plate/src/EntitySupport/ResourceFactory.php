@@ -11,9 +11,22 @@ namespace plate\EntitySupport;
 use DomainException;
 use plate\EntitySupport\TableGateway;
 
+/**
+ * Class ResourceFactory
+ * Реализует получение TableGateway и данных из секций module.config.php
+ * Наследуется фабриками ресурсов
+ * @package plate\EntitySupport
+ */
 abstract class ResourceFactory
 {
 
+    /**
+     * Получить TableGateway
+     * @param $services
+     * @param $configPrefix - указывает на секцию в local.php, из которой нужно взять имя талицы БД и имя подключения к БД.
+     * Подключения к БД можно создавать из веб-интерфейса apigility
+     * @return \plate\EntitySupport\TableGateway
+     */
     public function getTableGateway($services, $configPrefix){
 
         $config = $services->get('config');
@@ -42,6 +55,11 @@ abstract class ResourceFactory
         return new TableGateway($table, $services->get($db));
     }
 
+    /**
+     * Содержимое секции zf-hal для данного контроллера
+     * @param $controllerName
+     * @return mixed
+     */
     public function getZfHalEntityProperties($controllerName){
         $controllerSection = $this->getZfRestControllerSectionByControllerName($controllerName);
         $entityClass = $controllerSection['entity_class'];
@@ -51,6 +69,11 @@ abstract class ResourceFactory
         return $zfHalSection;
     }
 
+    /**
+     * Содержимое секции zf-rest для данного контроллера
+     * @param $controllerName
+     * @return mixed
+     */
     private function getZfRestControllerSectionByControllerName($controllerName){
         $moduleConfig =  $this->getConfig();
         $controllerSection = $this->getConfigSection(array("zf-rest", $controllerName), $moduleConfig, "");
@@ -58,6 +81,13 @@ abstract class ResourceFactory
         return $controllerSection;
     }
 
+    /**
+     * Получить данные в конфигурационном файле по пути
+     * @param array $path - путь - массив ключей, по которому на проследовать
+     * @param $initSection - с какой секции начинаем
+     * @param $initPath - с какого пути начинаем [some-key][other-key]..[..]
+     * @return mixed
+     */
     private function getConfigSection(array $path, $initSection, $initPath){
         $currentConfigSection = $initSection;
         $currentPath = $initPath;
@@ -68,12 +98,18 @@ abstract class ResourceFactory
             $currentConfigSection = $currentConfigSection[$part];
             $currentPath = $currentPath . '[' . $part . ']';
 
+            // проверяем содержимое секции
             $this->checkCurrentSection($currentConfigSection, $currentPath);
         }
 
         return $currentConfigSection;
     }
 
+    /**
+     * Если секция не существует, бросаем исключение с описанием
+     * @param $currentConfigSection
+     * @param $currentPath
+     */
     private function checkCurrentSection($currentConfigSection, $currentPath){
         if(!$currentConfigSection){
             throw new DomainException(sprintf(

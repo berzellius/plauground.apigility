@@ -8,7 +8,11 @@
 
 namespace plate\EntitySupport;
 
-
+/**
+ * Class SimpleResult
+ * DTO для простейшего результата, возвращаемого методами rest api
+ * @package plate\EntitySupport
+ */
 class SimpleResult
 {
     protected $status;

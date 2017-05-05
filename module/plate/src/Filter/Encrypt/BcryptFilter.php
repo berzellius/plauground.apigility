@@ -11,6 +11,18 @@ namespace plate\Filter\Encrypt;
 use Zend\Filter\Encrypt\EncryptionAlgorithmInterface;
 use Zend\Crypt\Password\Bcrypt;
 
+/**
+ * Class BcryptFilter
+ * Реализация методики шифрования паролей для использования при создании
+ * пользователей Oauth 2.0
+ * Использование в Apigility: для поля, соотвествующего паролю пользователя, добавить Filter
+ * Zend\Filter\Encrypt, добавить опцию адаптер со значением, соотвествующим пути к данному классу
+ * (plate\Filter\Encrypt сейчас)
+ *
+ *  После этого можно добавлять ouath2 пользователей, пароль при создании отправлять в явном виде -
+ * он будет хеширован автоматически.
+ * @package plate\Filter\Encrypt
+ */
 class BcryptFilter implements EncryptionAlgorithmInterface
 {
 
@@ -22,6 +34,10 @@ class BcryptFilter implements EncryptionAlgorithmInterface
      */
     public function encrypt($value)
     {
+        /* Zend\Crypt\Password\Bcrypt реализует нужный алгоритм.
+         * при необходимости через параметр конструктора можно добавить соль.
+         *
+         */
         $bcrypter = new Bcrypt();
         $encrypted = $bcrypter->create($value);
         return $encrypted;
@@ -29,13 +45,14 @@ class BcryptFilter implements EncryptionAlgorithmInterface
 
     /**
      * Decrypts $value with the defined settings
+     * не реализован
      *
      * @param  string $value Data to decrypt
      * @return string The decrypted data
      */
     public function decrypt($value)
     {
-        // nothing to do with it
+        // не реализован
         return null;
     }
 

@@ -8,7 +8,12 @@
 
 namespace plate\EntitySupport;
 
-
+/**
+ * Class ResourceRetrievingData
+ * Трейт, реализующий метод фильтрации данных в соответствии с заданными Filter во вкладке Fields
+ * интерфейса apigility
+ * @package plate\EntitySupport
+ */
 trait ResourceRetrievingData
 {
     /**

@@ -13,7 +13,9 @@ use Zend\Paginator\Adapter\DbTableGateway;
 use Zend\Stdlib\ArrayUtils;
 
 /**
- * Mapper implementation using a Zend\Db\TableGateway
+ * Class TableGatewayMapper
+ * маппер, реализующий стандартные CRUD методы
+ * @package plate\EntitySupport
  */
 class TableGatewayMapper implements MapperInterface
 {
@@ -35,6 +37,10 @@ class TableGatewayMapper implements MapperInterface
         $this->table = $table;
     }
 
+    /**
+     * Соответствует полю Entity identifier name вкладки General Settings веб-интерфейса Apigility
+     * @return string
+     */
     public function getIdFieldName(){
         if($this->getHalEntityProperties()){
             $idName = $this->getHalEntityProperties()['entity_identifier_name'];
@@ -62,8 +68,6 @@ class TableGatewayMapper implements MapperInterface
                 __METHOD__
             ));
         }
-
-        //$data['id'] = Uuid::uuid4()->toString();
        
         $this->table->insert($data);
         $id = $this->table->lastInsertValue;
@@ -72,6 +76,7 @@ class TableGatewayMapper implements MapperInterface
         if (0 === count($resultSet)) {
             throw new DomainException('Insert operation failed or did not result in new row', 500);
         }
+        // возвращаем только что созданную сущность
         return $resultSet->current();
     }
 
@@ -86,6 +91,7 @@ class TableGatewayMapper implements MapperInterface
         }*/
         $idName = $this->getIdFieldName();
 
+        // параметры поиска: Entity identifier name == $id
         $resultSet = $this->table->select([$idName => $id]);
         if (0 === count($resultSet)) {
             throw new DomainException('Status message not found', 404);
@@ -94,11 +100,14 @@ class TableGatewayMapper implements MapperInterface
     }
 
     /**
+     * Получить все сущности по фильтру.
+     * Единственный реализованный оператор сравнения: ==
      * @param $params
      * @return Collection
      */
     public function fetchAll($params)
     {
+        // преобразуем массив параметров к массиву предикатов для orm
         $where = [];
         foreach ($params as $k=>$v){
             $where[] = $k . " = '" . $v . "'";
@@ -108,15 +117,13 @@ class TableGatewayMapper implements MapperInterface
     }
 
     /**
+     * Обновить сущность с id = $id
      * @param string $id
      * @param array|Traversable|\stdClass $data
      * @return Entity
      */
     public function update($id, $data)
     {
-        /*if (! Uuid::isValid($id)) {
-            throw new DomainException('Invalid identifier provided', 404);
-        }*/
         if (is_object($data)) {
             $data = (array) $data;
         }
@@ -132,6 +139,7 @@ class TableGatewayMapper implements MapperInterface
     }
 
     /**
+     * Удалить сущность с id == $id. В ответ не возвращает данных
      * @param string $id
      * @return bool
      */

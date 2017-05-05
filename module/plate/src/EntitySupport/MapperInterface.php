@@ -7,7 +7,9 @@
 namespace plate\EntitySupport;
 
 /**
- * Interface for StatusLib mappers
+ * Interface MapperInterface
+ * Сигнатуры crud-методов
+ * @package plate\EntitySupport
  */
 interface MapperInterface
 {

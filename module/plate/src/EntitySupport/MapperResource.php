@@ -11,6 +11,10 @@ namespace plate\EntitySupport;
 
 use ZF\Rest\AbstractResourceListener;
 
+/**
+ * Class MapperResource
+ * @package plate\EntitySupport
+ */
 class MapperResource extends AbstractResourceListener
 {
     protected $mapper;

@@ -1,8 +1,8 @@
 <?php
-return [
-    'plate\\V1\\Rest\\Motion\\Controller' => [
-        'collection' => [
-            'GET' => [
+return array(
+    'plate\\V1\\Rest\\Motion\\Controller' => array(
+        'collection' => array(
+            'GET' => array(
                 'description' => 'methods for motion of electro window',
                 'response' => '{
    "_links": {
@@ -35,7 +35,63 @@ return [
        ]
    }
 }',
-            ],
-        ],
-    ],
-];
+            ),
+        ),
+    ),
+    'plate\\V1\\Rest\\Rooms\\Controller' => array(
+        'description' => 'Сервис для получения списка комнат',
+        'collection' => array(
+            'description' => 'Список комнат',
+            'GET' => array(
+                'description' => 'Получить список комнат',
+                'response' => '{
+   "_links": {
+       "self": {
+           "href": "/rooms"
+       },
+       "first": {
+           "href": "/rooms?page={page}"
+       },
+       "prev": {
+           "href": "/rooms?page={page}"
+       },
+       "next": {
+           "href": "/rooms?page={page}"
+       },
+       "last": {
+           "href": "/rooms?page={page}"
+       }
+   }
+   "_embedded": {
+       "rooms": [
+           {
+               "_links": {
+                   "self": {
+                       "href": "/rooms[/:rooms_id]"
+                   }
+               }
+              "room_id": "",
+              "name": ""
+           }
+       ]
+   }
+}',
+            ),
+        ),
+        'entity' => array(
+            'description' => 'Описание комнаты',
+            'GET' => array(
+                'description' => 'Метод для получения данных о комнате',
+                'response' => '{
+   "_links": {
+       "self": {
+           "href": "/rooms[/:rooms_id]"
+       }
+   }
+   "room_id": "",
+   "name": ""
+}',
+            ),
+        ),
+    ),
+);

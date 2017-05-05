@@ -5,10 +5,22 @@ use plate\EntitySupport\CheckPrivilegesAndDataRetrievingResource;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 
+/**
+ * Class RoomsResource
+ * Класс, реализующий маппинг методов обращения к коллециям и сущностям комнат
+ * по запросам rest api /rooms[/:rooms_id]
+ *
+ * Абстрактный класс CheckPrivilegesAndDataRetrievingResource
+ * реализует проверку данных залогиненного пользователя, маппинг к связанной таблице БД,
+ * применение фильтров Apigility.
+ *
+ * @package plate\V1\Rest\Rooms
+ */
 class RoomsResource extends CheckPrivilegesAndDataRetrievingResource
 {
     /**
      * Create a resource
+     * Создание комнат через API не предусмотрено
      *
      * @param  mixed $data
      * @return ApiProblem|mixed
@@ -20,6 +32,7 @@ class RoomsResource extends CheckPrivilegesAndDataRetrievingResource
 
     /**
      * Delete a resource
+     * Удаление комнат через API не предусмотрено
      *
      * @param  mixed $id
      * @return ApiProblem|mixed
@@ -32,6 +45,8 @@ class RoomsResource extends CheckPrivilegesAndDataRetrievingResource
     /**
      * Delete a collection, or members of a collection
      *
+     * Удаление списка комнат через API не предусмотрено
+     *
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
@@ -42,6 +57,8 @@ class RoomsResource extends CheckPrivilegesAndDataRetrievingResource
 
     /**
      * Fetch a resource
+     *
+     * Получить данные о комнате по id
      *
      * @param  mixed $id
      * @return ApiProblem|mixed
@@ -54,6 +71,8 @@ class RoomsResource extends CheckPrivilegesAndDataRetrievingResource
     /**
      * Fetch all or a subset of resources
      *
+     * Получить список комнат
+     *
      * @param  array $params
      * @return ApiProblem|mixed
      */
@@ -64,6 +83,7 @@ class RoomsResource extends CheckPrivilegesAndDataRetrievingResource
 
     /**
      * Patch (partial in-place update) a resource
+     * Частичное обновление сущности комнаты через API не предусмотрено
      *
      * @param  mixed $id
      * @param  mixed $data
@@ -76,6 +96,7 @@ class RoomsResource extends CheckPrivilegesAndDataRetrievingResource
 
     /**
      * Patch (partial in-place update) a collection or members of a collection
+     * Частичное обновление списка комнат через API не предусмотрено
      *
      * @param  mixed $data
      * @return ApiProblem|mixed
@@ -87,6 +108,7 @@ class RoomsResource extends CheckPrivilegesAndDataRetrievingResource
 
     /**
      * Replace a collection or members of a collection
+     * Замена списка комнат через API не предусмотрена
      *
      * @param  mixed $data
      * @return ApiProblem|mixed
@@ -98,6 +120,7 @@ class RoomsResource extends CheckPrivilegesAndDataRetrievingResource
 
     /**
      * Update a resource
+     * Полное обновление комнаты предусмотрено
      *
      * @param  mixed $id
      * @param  mixed $data

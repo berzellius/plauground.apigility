@@ -8,6 +8,11 @@ namespace plate\EntitySupport;
 
 use Zend\Paginator\Paginator;
 
+/**
+ * Class Collection
+ * Этот класс наследуют мапперы коллекций
+ * @package plate\EntitySupport
+ */
 class Collection extends Paginator
 {
 }
