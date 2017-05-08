@@ -11,7 +11,10 @@ use Zend\View\Model\ViewModel;
 use ZF\Apigility\Admin\Module as AdminModule;
 
 /**
- * ignore
+ * assumed as unchaged
+ * $ git update-index --assume-unchanged IndexController.php
+ * to undo
+ * $ git update-index --no-assume-unchanged IndexController.php
  * Class IndexController
  * @package Application\Controller
  */
