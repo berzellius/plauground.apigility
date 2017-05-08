@@ -4,7 +4,7 @@ namespace plate;
 use ZF\Apigility\Provider\ApigilityProviderInterface;
 
 /**
- * Class Module
+ * Class Module 1
  * @package plate
  */
 class Module implements ApigilityProviderInterface
