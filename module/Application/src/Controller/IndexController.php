@@ -11,7 +11,7 @@ use Zend\View\Model\ViewModel;
 use ZF\Apigility\Admin\Module as AdminModule;
 
 /**
- * (must be ignored by git.....)
+ * (must be ignored by git)
  * Class IndexController
  * @package Application\Controller
  */
