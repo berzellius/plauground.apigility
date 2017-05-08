@@ -22,4 +22,4 @@ SET time_zone = "+00:00";
 -- База данных: `motion_test`
 --
 CREATE DATABASE IF NOT EXISTS `motion_test` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-USE `apigility.standalone`;
+USE `motion_test`;
