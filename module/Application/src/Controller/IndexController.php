@@ -11,6 +11,7 @@ use Zend\View\Model\ViewModel;
 use ZF\Apigility\Admin\Module as AdminModule;
 
 /**
+ * ignore
  * Class IndexController
  * @package Application\Controller
  */
