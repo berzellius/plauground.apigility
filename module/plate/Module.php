@@ -5,6 +5,7 @@ use ZF\Apigility\Provider\ApigilityProviderInterface;
 
 /**
  * Class Module
+ * hello berz
  * @package plate
  */
 class Module implements ApigilityProviderInterface
