@@ -10,6 +10,11 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use ZF\Apigility\Admin\Module as AdminModule;
 
+/**
+ * (must be ignored by git)
+ * Class IndexController
+ * @package Application\Controller
+ */
 class IndexController extends AbstractActionController
 {
     public function indexAction()
