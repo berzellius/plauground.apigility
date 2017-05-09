@@ -1,10 +1,10 @@
 <?php
 namespace plate\V1\Rest\Application_clients;
 
+use plate\EntitySupport\CheckPrivilegesAndDataRetrievingResource;
 use ZF\ApiProblem\ApiProblem;
-use ZF\Rest\AbstractResourceListener;
 
-class Application_clientsResource extends AbstractResourceListener
+class Application_clientsResource extends CheckPrivilegesAndDataRetrievingResource
 {
     /**
      * Create a resource
@@ -14,7 +14,8 @@ class Application_clientsResource extends AbstractResourceListener
      */
     public function create($data)
     {
-        return new ApiProblem(405, 'The POST method has not been defined');
+        $data = $this->retrieveData($data);
+        return $this->getMapper()->create($data);
     }
 
     /**
@@ -25,18 +26,7 @@ class Application_clientsResource extends AbstractResourceListener
      */
     public function delete($id)
     {
-        return new ApiProblem(405, 'The DELETE method has not been defined for individual resources');
-    }
-
-    /**
-     * Delete a collection, or members of a collection
-     *
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
-    public function deleteList($data)
-    {
-        return new ApiProblem(405, 'The DELETE method has not been defined for collections');
+        return $this->getMapper()->delete($id);
     }
 
     /**
@@ -47,7 +37,7 @@ class Application_clientsResource extends AbstractResourceListener
      */
     public function fetch($id)
     {
-        return new ApiProblem(405, 'The GET method has not been defined for individual resources');
+        return $this->getMapper()->fetch($id);
     }
 
     /**
@@ -58,7 +48,7 @@ class Application_clientsResource extends AbstractResourceListener
      */
     public function fetchAll($params = [])
     {
-        return new ApiProblem(405, 'The GET method has not been defined for collections');
+        return $this->getMapper()->fetchAll($params);
     }
 
     /**
@@ -70,29 +60,14 @@ class Application_clientsResource extends AbstractResourceListener
      */
     public function patch($id, $data)
     {
-        return new ApiProblem(405, 'The PATCH method has not been defined for individual resources');
-    }
+        $data = $this->retrieveData($data);
 
-    /**
-     * Patch (partial in-place update) a collection or members of a collection
-     *
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
-    public function patchList($data)
-    {
-        return new ApiProblem(405, 'The PATCH method has not been defined for collections');
-    }
+        foreach($data as $k => $v){
+            if($v == null)
+                unset($data[$k]);
+        }
 
-    /**
-     * Replace a collection or members of a collection
-     *
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
-    public function replaceList($data)
-    {
-        return new ApiProblem(405, 'The PUT method has not been defined for collections');
+        return $this->getMapper()->update($id, $data);
     }
 
     /**
@@ -104,6 +79,7 @@ class Application_clientsResource extends AbstractResourceListener
      */
     public function update($id, $data)
     {
-        return new ApiProblem(405, 'The PUT method has not been defined for individual resources');
+        $data = $this->retrieveData($data);
+        return $this->getMapper()->update($id, $data);
     }
 }

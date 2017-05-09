@@ -1,6 +1,8 @@
 <?php
 namespace plate\V1\Rest\Application_clients;
 
-class Application_clientsEntity
+use plate\EntitySupport\Entity;
+
+class Application_clientsEntity extends Entity
 {
 }

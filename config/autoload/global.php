@@ -43,4 +43,8 @@ return array(
         'db' => 'oauth2_users',
         'table' => 'rooms',
     ),
+    'application_clients' => array(
+        'db' => 'oauth2_users',
+        'table' => 'application_clients'
+    )
 );

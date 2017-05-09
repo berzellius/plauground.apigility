@@ -1,10 +1,21 @@
 <?php
 namespace plate\V1\Rest\Application_clients;
 
-class Application_clientsResourceFactory
+use plate\EntitySupport\ResourceFactory;
+use plate\EntitySupport\TableGatewayMapper;
+
+class Application_clientsResourceFactory extends ResourceFactory
 {
     public function __invoke($services)
     {
-        return new Application_clientsResource();
+        $tableGateway = $this->getTableGateway($services, "application_clients");
+        $tableGatewayMapper = new TableGatewayMapper($tableGateway);
+
+        $halEntityProperties = $this->getZfHalEntityProperties("plate\\V1\\Rest\\Application_clients\\Controller");
+        $tableGatewayMapper->setHalEntityProperties($halEntityProperties);
+
+        return new Application_clientsResource(
+            $tableGatewayMapper
+        );
     }
 }
