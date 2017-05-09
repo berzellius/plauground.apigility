@@ -196,6 +196,28 @@ class DevicesResource extends CheckPrivilegesAndDataRetrievingResource
     }
 
     /**
+     * Patch (partial in-place update) a resource
+     *
+     * @param  mixed $id
+     * @param  mixed $data
+     * @return ApiProblem|mixed
+     */
+    public function patch($id, $data)
+    {
+        if(!$this->checkAdminPrivileges())
+            return $this->notAllowed();
+
+        $data = $this->retrieveData($data);
+
+        foreach($data as $k => $v){
+            if($v == null)
+                unset($data[$k]);
+        }
+
+        return $this->mapper->update($id, $data);
+    }
+
+    /**
      * @return TableGatewayMapper
      */
     public function getUserAccessListMapper()

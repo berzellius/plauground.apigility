@@ -90,6 +90,7 @@ return array(
                 0 => 'GET',
                 1 => 'DELETE',
                 2 => 'PUT',
+                3 => 'PATCH',
             ),
             'collection_http_methods' => array(
                 0 => 'GET',
@@ -821,6 +822,42 @@ return array(
                     ),
                 ),
                 'name' => 'connection_type',
+            ),
+            8 => array(
+                'required' => false,
+                'validators' => array(
+                    0 => array(
+                        'name' => 'Zend\\Validator\\StringLength',
+                        'options' => array(
+                            'max' => '100',
+                        ),
+                    ),
+                ),
+                'filters' => array(
+                    0 => array(
+                        'name' => 'Zend\\Filter\\StripTags',
+                        'options' => array(),
+                    ),
+                ),
+                'description' => 'команда, которая была обработана последней',
+                'name' => 'last_command',
+            ),
+            9 => array(
+                'required' => true,
+                'validators' => array(
+                    0 => array(
+                        'name' => 'Zend\\Validator\\Digits',
+                        'options' => array(),
+                    ),
+                ),
+                'filters' => array(
+                    0 => array(
+                        'name' => 'Zend\\Filter\\ToInt',
+                        'options' => array(),
+                    ),
+                ),
+                'name' => 'channel',
+                'description' => 'логический канал устройства',
             ),
         ),
     ),

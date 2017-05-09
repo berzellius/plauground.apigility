@@ -465,7 +465,72 @@ room_id - получение списка устройств в комнате (
 }',
             ),
             'PUT' => array(
-                'description' => 'Полное обновление данных об устройстве.',
+                'description' => 'Полное обновление данных об устройстве. Стоит иметь в виду, что полное обновление переопределяет значение поля last_command, которое обновляется RPC-командами управления устройствами. Для того, чтобы избежать потери значения last_command, следует использовать частичное обновление http методом PATCH.',
+                'request' => '{ 
+  "mac": "94:B1:0A:F8:47:B8",
+  "ip": "192.168.10.101",
+  "channel": "1",
+  "description": "some dev",
+  "group_id": "1",
+  "room_id": "1",
+  "type": "1",
+  "max_amp": "0.25",
+  "connection_type": "1",
+  "last_command": "up" 
+}',
+                'response' => '{
+  "id": "1",
+  "mac": "94:B1:0A:F8:47:B8",
+  "ip": "192.168.10.101",
+  "channel": "1",
+  "description": "some dev",
+  "group_id": "1",
+  "room_id": "1",
+  "type": "1",
+  "max_amp": "0",
+  "connection_type": "1",
+  "last_command": null,
+  "_links": {
+    "self": {
+      "href": "http://localhost:8080/devices/1"
+    }
+  }
+}',
+            ),
+            'DELETE' => array(
+                'description' => 'Удалить запись. Метод не возвращает данных. Http status = 204 (No content) при успешном удалении.',
+            ),
+            'PATCH' => array(
+                'description' => 'Частичное обновление данных об устройстве. Использование метода PATCH при редактировании устройств предпочтительно, так как можно не передавать актуальное состояние поля last_command и оно не будет перезаписано.',
+                'request' => '{ 
+  "mac": "94:B1:0A:F8:47:B8",
+  "ip": "192.168.10.101",
+  "channel": "1",
+  "description": "some dev",
+  "group_id": "1",
+  "room_id": "1",
+  "type": "1",
+  "max_amp": "250",
+  "connection_type": "1"
+}',
+                'response' => '{
+  "id": "1",
+  "mac": "94:B1:0A:F8:47:B8",
+  "ip": "192.168.10.101",
+  "channel": "1",
+  "description": "some dev",
+  "group_id": "1",
+  "room_id": "1",
+  "type": "1",
+  "max_amp": "250",
+  "connection_type": "1",
+  "last_command": "up",
+  "_links": {
+    "self": {
+      "href": "http://localhost:8080/devices/1"
+    }
+  }
+}',
             ),
         ),
     ),
