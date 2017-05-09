@@ -15,4 +15,8 @@ use Zend\Stdlib\ArrayObject;
  */
 class Entity extends ArrayObject
 {
+    public static function asArray($entity)
+    {
+        return json_decode(json_encode($entity), true);
+    }
 }

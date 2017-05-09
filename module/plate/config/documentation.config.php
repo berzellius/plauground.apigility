@@ -534,4 +534,346 @@ room_id - получение списка устройств в комнате (
             ),
         ),
     ),
+    'plate\\V1\\Rest\\Application_clients\\Controller' => array(
+        'description' => 'Сервис для предоставления администраторам информации о мобильных устройствах, на которых установлены приложения для управления устройствами.',
+        'collection' => array(
+            'description' => 'Позволяет работать со списком мобильных устройств.',
+            'GET' => array(
+                'description' => 'Получить список устройств. Параметры не поддерживаются.',
+                'response' => '{
+  "_links": {
+    "self": {
+      "href": "http://localhost:8080/application_clients?page=1"
+    },
+    "first": {
+      "href": "http://localhost:8080/application_clients"
+    },
+    "last": {
+      "href": "http://localhost:8080/application_clients?page=1"
+    }
+  },
+  "_embedded": {
+    "application_clients": [
+      {
+        "id": "1",
+        "mac": "00:25:d1:f5:e8:aa",
+        "ip": "192.168.1.110",
+        "description": "fathers iphone",
+        "hostname": "IvanOl_tel",
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/application_clients/1"
+          }
+        }
+      },
+      {
+        "id": "2",
+        "mac": "df:54:dd:ff:ea:aa",
+        "ip": "192.168.1.111",
+        "description": "mothers iphone6s",
+        "hostname": "Andrea k",
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/application_clients/2"
+          }
+        }
+      }
+    ]
+  },
+  "page_count": 1,
+  "page_size": 25,
+  "total_items": 2,
+  "page": 1
+}',
+            ),
+            'POST' => array(
+                'description' => 'Добавление мобильного устройства.',
+                'request' => '{
+        "mac": "df:54:dd:ff:ea:ab",
+        "ip": "192.168.1.112",
+        "description": "mothers iphone5",
+        "hostname": "Andrea 1k"
+}',
+                'response' => '{
+  "id": "7",
+  "mac": "df:54:dd:ff:ea:ab",
+  "ip": "192.168.1.112",
+  "description": "mothers iphone5",
+  "hostname": "Andrea 1k",
+  "_links": {
+    "self": {
+      "href": "http://localhost:8080/application_clients/7"
+    }
+  }
+}',
+            ),
+        ),
+        'entity' => array(
+            'description' => 'Позволяет работать с мобильным устройством',
+            'GET' => array(
+                'description' => 'Получить информацию о мобильном устройстве',
+                'response' => '{
+  "id": "2",
+  "mac": "df:54:dd:ff:ea:aa",
+  "ip": "192.168.1.111",
+  "description": "mothers iphone6s",
+  "hostname": "Andrea k",
+  "_links": {
+    "self": {
+      "href": "http://localhost:8080/application_clients/2"
+    }
+  }
+}',
+            ),
+            'PATCH' => array(
+                'request' => '{
+        "mac": "df:54:dd:ff:ea:aa",
+        "ip": "192.168.1.111",
+        "description": "mothers iphone6s",
+        "hostname": "Andrea k"
+}',
+                'description' => 'Частичное обновление данных о мобильном устройстве',
+                'response' => '{
+  "id": "2",
+  "mac": "df:54:dd:ff:ea:aa",
+  "ip": "192.168.1.111",
+  "description": "mothers iphone6s",
+  "hostname": "Andrea k",
+  "_links": {
+    "self": {
+      "href": "http://localhost:8080/application_clients/2"
+    }
+  }
+}',
+            ),
+            'PUT' => array(
+                'description' => 'Полное обновление данных о мобильном устройстве',
+                'request' => '{
+        "mac": "df:54:dd:ff:ea:aa",
+        "ip": "192.168.1.111",
+        "description": "mothers iphone6s",
+        "hostname": "Andrea k"
+}',
+                'response' => '{
+  "id": "2",
+  "mac": "df:54:dd:ff:ea:aa",
+  "ip": "192.168.1.111",
+  "description": "mothers iphone6s",
+  "hostname": "Andrea k",
+  "_links": {
+    "self": {
+      "href": "http://localhost:8080/application_clients/2"
+    }
+  }
+}',
+            ),
+            'DELETE' => array(
+                'description' => 'Удалить запись. Метод не возвращает данных. Http status = 204',
+            ),
+        ),
+    ),
+    'plate\\V1\\Rest\\Scheduled_tasks\\Controller' => array(
+        'description' => 'Сервис для работы с назначенными заданиями.',
+        'collection' => array(
+            'description' => 'Работа со списком назначенным заданием.',
+            'GET' => array(
+                'description' => 'Метод для получения списка заданий. Администраторам возвращается полный список заданий. Обычные пользователи видят только те задания, которые привязаны к устройствам или группам, к которым им предоставлен доступ (см. сервис devices)',
+                'response' => '{
+  "_links": {
+    "self": {
+      "href": "http://localhost:8080/scheduled_tasks?page=1"
+    },
+    "first": {
+      "href": "http://localhost:8080/scheduled_tasks"
+    },
+    "last": {
+      "href": "http://localhost:8080/scheduled_tasks?page=1"
+    }
+  },
+  "_embedded": {
+    "scheduled_tasks": [
+      {
+        "id": "2",
+        "state": "ACTIVE",
+        "id_device": "1",
+        "id_group": null,
+        "grp_dev_type": "DEVICE",
+        "period_type": "WEEKLY",
+        "command": "up",
+        "name": "задача#1",
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/scheduled_tasks/2"
+          }
+        }
+      },
+      {
+        "id": "6",
+        "state": "ACTIVE",
+        "id_device": "7",
+        "id_group": null,
+        "grp_dev_type": "DEVICE",
+        "period_type": "WEEKLY",
+        "command": "up",
+        "name": "задача#8",
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/scheduled_tasks/6"
+          }
+        }
+      },
+      {
+        "id": "7",
+        "state": "ACTIVE",
+        "id_device": "7",
+        "id_group": null,
+        "grp_dev_type": "DEVICE",
+        "period_type": "WEEKLY",
+        "command": "up",
+        "name": "задача#7",
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/scheduled_tasks/7"
+          }
+        }
+      },
+      {
+        "id": "3",
+        "state": "ACTIVE",
+        "id_device": "9",
+        "id_group": null,
+        "grp_dev_type": "DEVICE",
+        "period_type": "WEEKLY",
+        "command": "up",
+        "name": "задача#9.1",
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/scheduled_tasks/3"
+          }
+        }
+      },
+      {
+        "id": "1",
+        "state": "ACTIVE",
+        "id_device": null,
+        "id_group": "1",
+        "grp_dev_type": "GROUP",
+        "period_type": "WEEKLY",
+        "command": "up",
+        "name": "задача#0",
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/scheduled_tasks/1"
+          }
+        }
+      },
+      {
+        "id": "4",
+        "state": "ACTIVE",
+        "id_device": null,
+        "id_group": "1",
+        "grp_dev_type": "GROUP",
+        "period_type": "WEEKLY",
+        "command": "up",
+        "name": "задача#гр.1",
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/scheduled_tasks/4"
+          }
+        }
+      },
+      {
+        "id": "5",
+        "state": "ACTIVE",
+        "id_device": null,
+        "id_group": "2",
+        "grp_dev_type": "GROUP",
+        "period_type": "WEEKLY",
+        "command": "up",
+        "name": "задача#гр.1",
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/scheduled_tasks/5"
+          }
+        }
+      }
+    ]
+  },
+  "page_count": 1,
+  "page_size": 25,
+  "total_items": 7,
+  "page": 1
+}',
+            ),
+            'POST' => array(
+                'description' => 'Создать назначенное задание. Задание должно быть привязано либо к устройству (id_device), либо к группе устройств (id_group), при этом к данному устройству/группе у пользователя должен быть доступ. 
+Одновременно передавать и id_device, и id_group нельзя.',
+                'request' => '{
+	"state" : "active",
+	"id_device" : "7",
+	"grp_dev_type" : "DEVICE",
+	"period_type" : "WEEKLY",
+	"command" : "up",
+	"name" : "задача#7"
+}',
+                'response' => '{
+  "id": "7",
+  "state": "ACTIVE",
+  "id_device": "7",
+  "id_group": null,
+  "grp_dev_type": "DEVICE",
+  "period_type": "WEEKLY",
+  "command": "up",
+  "name": "задача#7",
+  "_links": {
+    "self": {
+      "href": "http://localhost:8080/scheduled_tasks/7"
+    }
+  }
+}',
+            ),
+        ),
+        'entity' => array(
+            'description' => 'Работа с записью о назначенном задании.',
+            'GET' => array(
+                'description' => 'Метод для получения записи о назначенном задании.',
+            ),
+            'PATCH' => array(
+                'description' => 'Метод для частичного обновления записи  о назначенном задании.',
+            ),
+            'PUT' => array(
+                'description' => 'Метод для полного обновления записи  о назначенном задании.',
+            ),
+            'DELETE' => array(
+                'description' => 'Метод для удаления о назначенном задании.',
+            ),
+        ),
+    ),
+    'plate\\V1\\Rest\\Scheduled_tasks_timetable\\Controller' => array(
+        'description' => 'Сервис для работы с расписаниями назначенных заданий. Для всех методов права доступа определяются правами доступа к соответствующим назначенным заданиям.',
+        'collection' => array(
+            'description' => 'Работа со списком расписаний назначенных заданий.',
+            'GET' => array(
+                'description' => 'Получить расписания назначенных заданий. Принимает параметр \'scheduling_task_id\' - id назначенного задания, который является обязательным для всех, кроме администраторов.',
+            ),
+            'POST' => array(
+                'description' => 'Создать элемент расписания назначенного задания.',
+            ),
+        ),
+        'entity' => array(
+            'description' => 'Работа со строкой расписания назначенного задания.',
+            'GET' => array(
+                'description' => 'Получить строку расписания.',
+            ),
+            'PATCH' => array(
+                'description' => 'Частичное обновление строки расписания.',
+            ),
+            'PUT' => array(
+                'description' => 'Полное обновление строки расписания.',
+            ),
+            'DELETE' => array(
+                'description' => 'Удаление строки расписания.',
+            ),
+        ),
+    ),
 );

@@ -46,5 +46,13 @@ return array(
     'application_clients' => array(
         'db' => 'oauth2_users',
         'table' => 'application_clients'
+    ),
+    'scheduled_tasks' => array(
+        'db' => 'oauth2_users',
+        'table' => 'scheduled_tasks'
+    ),
+    'scheduled_tasks_timetable' => array(
+        'db' => 'oauth2_users',
+        'table' => 'scheduled_tasks_timetable'
     )
 );
