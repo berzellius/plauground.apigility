@@ -86,7 +86,7 @@ class DevicesResource extends CheckPrivilegesAndDataRetrievingResource
      * Получение списка устройств:
      * 1) по grp_id - порлучение устройств в группе;
      *      для получения списка необходимо явно предоставленное право пользователя нагруппу устройств в таблице списка доступа devices_acl,
-     *      ибо права администратора
+     *      либо права администратора
      * 2) по room_id - получение списка устройств в комнате; (если задан grp_id, room_id игнорируется)
      *      возвращает  полный список устройств в комнате (для аккаунта адмнистратора)
      *      возвращает список устройств в комнате, которым явно предосталено разрешение в таблице devices_acl
@@ -192,6 +192,28 @@ class DevicesResource extends CheckPrivilegesAndDataRetrievingResource
             return $this->notAllowed();
 
         $data = $this->retrieveData($data);
+        return $this->mapper->update($id, $data);
+    }
+
+    /**
+     * Patch (partial in-place update) a resource
+     *
+     * @param  mixed $id
+     * @param  mixed $data
+     * @return ApiProblem|mixed
+     */
+    public function patch($id, $data)
+    {
+        if(!$this->checkAdminPrivileges())
+            return $this->notAllowed();
+
+        $data = $this->retrieveData($data);
+
+        foreach($data as $k => $v){
+            if($v == null)
+                unset($data[$k]);
+        }
+
         return $this->mapper->update($id, $data);
     }
 

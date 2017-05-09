@@ -10,6 +10,14 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use ZF\Apigility\Admin\Module as AdminModule;
 
+/**
+ * assumed as unchaged
+ * $ git update-index --assume-unchanged IndexController.php
+ * to undo
+ * $ git update-index --no-assume-unchanged IndexController.php
+ * Class IndexController
+ * @package Application\Controller
+ */
 class IndexController extends AbstractActionController
 {
     public function indexAction()
