@@ -14,6 +14,9 @@ class Application_clientsResource extends CheckPrivilegesAndDataRetrievingResour
      */
     public function create($data)
     {
+        if(!$this->checkAdminPrivileges())
+            return $this->notAllowed();
+
         $data = $this->retrieveData($data);
         return $this->getMapper()->create($data);
     }
@@ -26,6 +29,9 @@ class Application_clientsResource extends CheckPrivilegesAndDataRetrievingResour
      */
     public function delete($id)
     {
+        if(!$this->checkAdminPrivileges())
+            return $this->notAllowed();
+
         return $this->getMapper()->delete($id);
     }
 
@@ -37,6 +43,9 @@ class Application_clientsResource extends CheckPrivilegesAndDataRetrievingResour
      */
     public function fetch($id)
     {
+        if(!$this->checkAdminPrivileges())
+            return $this->notAllowed();
+
         return $this->getMapper()->fetch($id);
     }
 
@@ -48,6 +57,9 @@ class Application_clientsResource extends CheckPrivilegesAndDataRetrievingResour
      */
     public function fetchAll($params = [])
     {
+        if(!$this->checkAdminPrivileges())
+            return $this->notAllowed();
+
         return $this->getMapper()->fetchAll($params);
     }
 
@@ -60,6 +72,9 @@ class Application_clientsResource extends CheckPrivilegesAndDataRetrievingResour
      */
     public function patch($id, $data)
     {
+        if(!$this->checkAdminPrivileges())
+            return $this->notAllowed();
+
         $data = $this->retrieveData($data);
 
         foreach($data as $k => $v){
@@ -79,6 +94,10 @@ class Application_clientsResource extends CheckPrivilegesAndDataRetrievingResour
      */
     public function update($id, $data)
     {
+        if(!$this->checkAdminPrivileges())
+            return $this->notAllowed();
+
+
         $data = $this->retrieveData($data);
         return $this->getMapper()->update($id, $data);
     }

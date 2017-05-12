@@ -1,6 +1,8 @@
 <?php
 namespace plate\V1\Rest\Scheduled_tasks;
 
-class Scheduled_tasksEntity
+use plate\EntitySupport\Entity;
+
+class Scheduled_tasksEntity extends Entity
 {
 }
