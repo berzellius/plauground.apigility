@@ -2,6 +2,7 @@
 namespace plate\V1\Rest\Scheduled_tasks;
 
 use plate\EntitySupport\CheckPrivilegesAndDataRetrievingResource;
+use plate\EntitySupport\CheckPrivilegesAndDataRetrievingResourceWithAcl;
 use plate\EntitySupport\Collection;
 use plate\EntitySupport\TableGatewayMapper;
 use Zend\Db\Adapter\Adapter;
@@ -10,22 +11,10 @@ use Zend\Db\Sql\Select;
 use Zend\Paginator\Adapter\DbSelect;
 use ZF\ApiProblem\ApiProblem;
 
-class Scheduled_tasksResource extends CheckPrivilegesAndDataRetrievingResource
+class Scheduled_tasksResource extends CheckPrivilegesAndDataRetrievingResourceWithAcl
 {
 
     protected $userAccessListMapper;
-
-    /**
-     * Scheduled_tasksResource constructor.
-     * @param TableGatewayMapper $mapper
-     * @param TableGatewayMapper $userAccessListMapper
-     */
-    public function __construct(TableGatewayMapper $mapper, TableGatewayMapper $userAccessListMapper)
-    {
-        parent::__construct($mapper);
-        $this->userAccessListMapper = $userAccessListMapper;
-    }
-
 
     /**
      * Create a resource
@@ -264,21 +253,5 @@ class Scheduled_tasksResource extends CheckPrivilegesAndDataRetrievingResource
         }
         //die(json_encode($params));
         return ($this->getUserAccessListMapper()->fetchAll($params)->getCurrentItemCount() !== 0);
-    }
-
-    /**
-     * @return TableGatewayMapper
-     */
-    public function getUserAccessListMapper()
-    {
-        return $this->userAccessListMapper;
-    }
-
-    /**
-     * @param TableGatewayMapper $userAccessListMapper
-     */
-    public function setUserAccessListMapper($userAccessListMapper)
-    {
-        $this->userAccessListMapper = $userAccessListMapper;
     }
 }

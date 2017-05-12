@@ -2,6 +2,7 @@
 namespace plate\V1\Rest\Devices;
 
 use plate\EntitySupport\CheckPrivilegesAndDataRetrievingResource;
+use plate\EntitySupport\CheckPrivilegesAndDataRetrievingResourceWithAcl;
 use plate\EntitySupport\Collection;
 use plate\EntitySupport\DataRetrievingResource;
 use plate\EntitySupport\MapperInterface;
@@ -13,22 +14,8 @@ use Zend\Paginator\Adapter\DbSelect;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 
-class DevicesResource extends CheckPrivilegesAndDataRetrievingResource
+class DevicesResource extends CheckPrivilegesAndDataRetrievingResourceWithAcl
 {
-    protected $userAccessListMapper;
-
-    /**
-     * DevicesResource constructor.
-     * @param TableGatewayMapper $mapper
-     * @param TableGatewayMapper $userAccessListMapper
-     */
-    public function __construct(TableGatewayMapper $mapper, TableGatewayMapper $userAccessListMapper)
-    {
-        parent::__construct($mapper);
-        $this->userAccessListMapper = $userAccessListMapper;
-    }
-
-
     /**
      * Create a resource
      *
@@ -109,7 +96,7 @@ class DevicesResource extends CheckPrivilegesAndDataRetrievingResource
             ){
                 return new ApiProblem(403, "Empty list!");
             }
-
+            // todo это предстоит переделать при переходе на промежуточную таблицу группы<->устройства
             return $this->getMapper()->fetchAll(array('group_id' => $params['grp_id']));
         }
 
@@ -131,10 +118,13 @@ class DevicesResource extends CheckPrivilegesAndDataRetrievingResource
         return new Collection($dbSelect);
     }
 
-    protected function getOwnedDevices(){
-
-    }
-
+    /**
+     * Возвращает Zend\Db\Sql\Select из тадлицы устройств с заданным фильтром $params
+     * для обычных пользователей возвращает только те объекты, к которым есть разрешение в acl
+     *
+     * @param $params
+     * @return Select
+     */
     protected function getDevicesBySelector($params){
         $devicesTableName = $this->getMapper()->getTable()->table;
         $idFieldName = $this->getMapper()->getIdFieldName();
@@ -219,23 +209,4 @@ class DevicesResource extends CheckPrivilegesAndDataRetrievingResource
 
         return $this->mapper->update($id, $data);
     }
-
-    /**
-     * @return TableGatewayMapper
-     */
-    public function getUserAccessListMapper()
-    {
-        return $this->userAccessListMapper;
-    }
-
-    /**
-     * @param TableGatewayMapper $userAccessListMapper
-     */
-    public function setUserAccessListMapper($userAccessListMapper)
-    {
-        $this->userAccessListMapper = $userAccessListMapper;
-    }
-
-
-
 }

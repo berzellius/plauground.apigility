@@ -54,5 +54,9 @@ return array(
     'scheduled_tasks_timetable' => array(
         'db' => 'oauth2_users',
         'table' => 'scheduled_tasks_timetable'
+    ),
+    'groups' => array(
+        'db' => 'oauth2_users',
+        'table' => 'groups'
     )
 );
