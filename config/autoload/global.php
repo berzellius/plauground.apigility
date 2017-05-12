@@ -1,50 +1,50 @@
 <?php
-return array(
-    'zf-content-negotiation' => array(
-        'selectors' => array(),
-    ),
-    'db' => array(
-        'adapters' => array(
-            'dummy' => array(),
-            'oauth2_users' => array(),
-        ),
-    ),
-    'router' => array(
-        'routes' => array(
-            'oauth' => array(
-                'options' => array(
+return [
+    'zf-content-negotiation' => [
+        'selectors' => [],
+    ],
+    'db' => [
+        'adapters' => [
+            'dummy' => [],
+            'oauth2_users' => [],
+        ],
+    ],
+    'router' => [
+        'routes' => [
+            'oauth' => [
+                'options' => [
                     'spec' => '%oauth%',
                     'regex' => '(?P<oauth>(/oauth))',
-                ),
+                ],
                 'type' => 'regex',
-            ),
-        ),
-    ),
-    'zf-mvc-auth' => array(
-        'authentication' => array(
-            'map' => array(
+            ],
+        ],
+    ],
+    'zf-mvc-auth' => [
+        'authentication' => [
+            'map' => [
                 'plate\\V1' => 'oauth',
-            ),
-        ),
-    ),
-    'oauth_users_control' => array(
+            ],
+        ],
+    ],
+    'oauth_users_control' => [
         'db' => 'oauth2_users',
         'table' => 'oauth_clients',
-    ),
-    'devices' => array(
+    ],
+    'devices' => [
         'db' => 'oauth2_users',
         'table' => 'devices',
-    ),
-    'devices_acl' => array(
+    ],
+    'devices_acl' => [
         'db' => 'oauth2_users',
         'table' => 'devices_acl',
-    ),
-    'rooms' => array(
+    ],
+    'rooms' => [
         'db' => 'oauth2_users',
         'table' => 'rooms',
-    ),
-    'application_clients' => array(
+    ],
+    'application_clients' => [
         'db' => 'oauth2_users',
-        'table' => 'application_clients'
-    )
-);
+        'table' => 'application_clients',
+    ],
+];

@@ -90,7 +90,7 @@ class DevicesResource extends CheckPrivilegesAndDataRetrievingResource
      * 2) по room_id - получение списка устройств в комнате; (если задан grp_id, room_id игнорируется)
      *      возвращает  полный список устройств в комнате (для аккаунта адмнистратора)
      *      возвращает список устройств в комнате, которым явно предосталено разрешение в таблице devices_acl
-     *3) без параметров - только для аккаунта администратора - список всех устройств в системе
+     *3) без параметров - список всех доступных устройств в системе
      *
      * @param  array $params
      * @return ApiProblem|mixed
@@ -113,42 +113,43 @@ class DevicesResource extends CheckPrivilegesAndDataRetrievingResource
             return $this->getMapper()->fetchAll(array('group_id' => $params['grp_id']));
         }
 
-        if(isset($params['room_id'])){
-            $params = [
-                "room_id" => $params['room_id']
-            ];
-
-            $select = $this->getDevicesByRoomIdSelector($params['room_id']);
-
-            $adapter = new Adapter(
-                $this->getMapper()->getTable()->getAdapter()->getDriver(),
-                $this->getMapper()->getTable()->getAdapter()->getPlatform()
-                );
-
-            $dbSelect = new DbSelect($select, $adapter);
-
-            return new Collection($dbSelect);
-        }
-
         if($this->checkAdminPrivileges()){
             return $this->getMapper()->fetchAll($params);
         }
 
-        return new ApiProblem(403, "Fetching all devices allowed only by grp_id or room_id!");
+        $select = $this->getDevicesBySelector(
+            isset($params['room_id'])? ['room_id' => $params['room_id']] : []
+        );
+
+        $adapter = new Adapter(
+            $this->getMapper()->getTable()->getAdapter()->getDriver(),
+            $this->getMapper()->getTable()->getAdapter()->getPlatform()
+        );
+
+        $dbSelect = new DbSelect($select, $adapter);
+
+        return new Collection($dbSelect);
     }
 
-    protected function getDevicesByRoomIdSelector($roomId){
+    protected function getOwnedDevices(){
+
+    }
+
+    protected function getDevicesBySelector($params){
         $devicesTableName = $this->getMapper()->getTable()->table;
         $idFieldName = $this->getMapper()->getIdFieldName();
 
         if($this->checkAdminPrivileges()) {
             $select = new Select();
             $select
-                ->from($devicesTableName)
-                ->where(
-                    $devicesTableName . ".room_id = '" . $roomId . "'"
-                )
-            ;
+                ->from($devicesTableName);
+
+            foreach ($params as $pname => $pvalue) {
+                $select->
+                where(
+                    $devicesTableName . "." . $pname . " = '" . $pvalue . "'"
+                );
+            }
 
             return $select;
         }
@@ -168,11 +169,13 @@ class DevicesResource extends CheckPrivilegesAndDataRetrievingResource
                 ->columns([])
                 ->where(
                     $devicesACLTableName . ".client_id = '$clientId'"
-                )
-                ->where(
-                    $devicesTableName . ".room_id = '" . $roomId . "'"
-                )
-            ;
+                );
+
+            foreach($params as $pname => $pvalue) {
+                $select->where(
+                    $devicesTableName . "." . $pname . " = '" . $pvalue . "'"
+                );
+            }
 
             return $select;
         }
