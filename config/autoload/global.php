@@ -58,5 +58,9 @@ return array(
     'groups' => array(
         'db' => 'oauth2_users',
         'table' => 'groups'
+    ),
+    'dev2grp' => array(
+        'db' => 'oauth2_users',
+        'table' => 'dev2grp'
     )
 );

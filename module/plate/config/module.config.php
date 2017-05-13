@@ -273,10 +273,7 @@ return [
             'route_identifier_name' => 'dev2grp_id',
             'collection_name' => 'dev2grp',
             'entity_http_methods' => [
-                0 => 'GET',
-                1 => 'PATCH',
-                2 => 'PUT',
-                3 => 'DELETE',
+                0 => 'DELETE',
             ],
             'collection_http_methods' => [
                 0 => 'GET',
@@ -551,6 +548,9 @@ return [
         ],
         'plate\\V1\\Rest\\Groups\\Controller' => [
             'input_filter' => 'plate\\V1\\Rest\\Groups\\Validator',
+        ],
+        'plate\\V1\\Rest\\Dev2grp\\Controller' => [
+            'input_filter' => 'plate\\V1\\Rest\\Dev2grp\\Validator',
         ],
     ],
     'input_filter_specs' => [
@@ -1533,6 +1533,58 @@ return [
                 'description' => 'Имя группы',
             ],
         ],
+        'plate\\V1\\Rest\\Dev2grp\\Validator' => [
+            0 => [
+                'required' => true,
+                'validators' => [
+                    0 => [
+                        'name' => 'ZF\\ContentValidation\\Validator\\DbRecordExists',
+                        'options' => [
+                            'adapter' => 'oauth2_users',
+                            'table' => 'devices',
+                            'field' => 'id',
+                        ],
+                    ],
+                ],
+                'filters' => [
+                    0 => [
+                        'name' => \Zend\Filter\StringTrim::class,
+                        'options' => [],
+                    ],
+                    1 => [
+                        'name' => \Zend\Filter\StripTags::class,
+                        'options' => [],
+                    ],
+                ],
+                'name' => 'device_id',
+                'description' => 'Id устройства',
+            ],
+            1 => [
+                'required' => true,
+                'validators' => [
+                    0 => [
+                        'name' => 'ZF\\ContentValidation\\Validator\\DbRecordExists',
+                        'options' => [
+                            'adapter' => 'oauth2_users',
+                            'table' => 'groups',
+                            'field' => 'id',
+                        ],
+                    ],
+                ],
+                'filters' => [
+                    0 => [
+                        'name' => \Zend\Filter\StringTrim::class,
+                        'options' => [],
+                    ],
+                    1 => [
+                        'name' => \Zend\Filter\StripTags::class,
+                        'options' => [],
+                    ],
+                ],
+                'name' => 'group_id',
+                'description' => 'Id группы',
+            ],
+        ],
     ],
     'zf-mvc-auth' => [
         'authorization' => [
@@ -1660,6 +1712,22 @@ return [
                     'GET' => true,
                     'POST' => false,
                     'PUT' => true,
+                    'PATCH' => false,
+                    'DELETE' => true,
+                ],
+            ],
+            'plate\\V1\\Rest\\Dev2grp\\Controller' => [
+                'collection' => [
+                    'GET' => true,
+                    'POST' => true,
+                    'PUT' => false,
+                    'PATCH' => false,
+                    'DELETE' => false,
+                ],
+                'entity' => [
+                    'GET' => false,
+                    'POST' => false,
+                    'PUT' => false,
                     'PATCH' => false,
                     'DELETE' => true,
                 ],
