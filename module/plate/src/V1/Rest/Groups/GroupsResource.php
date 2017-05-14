@@ -2,6 +2,7 @@
 namespace plate\V1\Rest\Groups;
 
 use plate\EntitySupport\CheckPrivilegesAndDataRetrievingResourceWithAcl;
+use plate\EntitySupport\TableGatewayMapper;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql\Select;
 use Zend\Paginator\Adapter\DbSelect;
@@ -10,6 +11,24 @@ use plate\EntitySupport\Collection;
 
 class GroupsResource extends CheckPrivilegesAndDataRetrievingResourceWithAcl
 {
+    protected   $dev2grpTableGatewayMapper,
+                $devicesTableGatewayMapper;
+
+    /**
+     * GroupsResource constructor.
+     */
+    public function __construct(
+        TableGatewayMapper $mapper,
+        TableGatewayMapper $userAccessListMapper,
+        TableGatewayMapper $dev2grpTableGatewayMapper,
+        TableGatewayMapper $devicesTableGatewayMapper)
+    {
+        parent::__construct($mapper, $userAccessListMapper);
+        $this->setDev2grpTableGatewayMapper($dev2grpTableGatewayMapper);
+        $this->setDevicesTableGatewayMapper($devicesTableGatewayMapper);
+    }
+
+
     /**
      * Create a resource.
      * Обычному пользователю автоматически назначет доступ на созданную группу
@@ -23,6 +42,7 @@ class GroupsResource extends CheckPrivilegesAndDataRetrievingResourceWithAcl
         $cresult = $this->getMapper()->create($data);
         $newGrpId = $cresult->id;
 
+        // даем доступ на созданную группу
         if(!$this->checkAdminPrivileges()) {
             $this->getUserAccessListMapper()->create(
                 [
@@ -110,6 +130,21 @@ class GroupsResource extends CheckPrivilegesAndDataRetrievingResourceWithAcl
      */
     public function fetchAll($params = [])
     {
+
+        if(isset($params['room_id'])){
+            // особый случай - получить группы устройств по комнате
+            $select =$this->getGroupsByRoomIdSelector($params['room_id']);
+
+            $adapter = new Adapter(
+                $this->getMapper()->getTable()->getAdapter()->getDriver(),
+                $this->getMapper()->getTable()->getAdapter()->getPlatform()
+            );
+
+            $dbSelect = new DbSelect($select, $adapter);
+
+            return new Collection($dbSelect);
+        }
+
         if($this->checkAdminPrivileges()){
             return $this->getMapper()->fetchAll($params);
         }
@@ -205,4 +240,83 @@ class GroupsResource extends CheckPrivilegesAndDataRetrievingResourceWithAcl
             return $select;
         }
     }
+
+    protected function getGroupsByRoomIdSelector($room_id)
+    {
+        $groupsTableName = $this->getMapper()->getTable()->table;
+        $aclTableName = $this->getUserAccessListMapper()->getTable()->table;
+        $dev2grpTableName = $this->getDev2grpTableGatewayMapper()->getTable()->table;
+        $devicesTableName = $this->getDevicesTableGatewayMapper()->getTable()->table;
+        $idFieldName = $this->getMapper()->getIdFieldName();
+
+        $select = new Select();
+        $select->from($groupsTableName)
+            ->join(
+                $dev2grpTableName,
+                $dev2grpTableName . ".group_id = " . $groupsTableName . "." . $idFieldName,
+                []
+            )
+            ->join(
+                $devicesTableName,
+                $devicesTableName . ".id = " . $dev2grpTableName . ".device_id",
+                []
+            );
+
+        if($this->checkAdminPrivileges()){
+
+            $select
+                ->where($devicesTableName . ".room_id = '" . $room_id . "'")
+                ->group($groupsTableName . ".id");
+
+
+            return $select;
+        }
+
+
+        $select
+            ->join(
+                $aclTableName,
+                $aclTableName . ".grp_id = " . $groupsTableName . "." . $idFieldName,
+                []
+            )
+            ->where($devicesTableName . ".room_id = '" . $room_id . "'")
+            ->where($aclTableName . ".client_id = '" . $this->getLoggedInClientId() . "'")
+            ->group($groupsTableName . ".id");
+
+        return $select;
+    }
+
+    /**
+     * @return TableGatewayMapper
+     */
+    public function getDev2grpTableGatewayMapper()
+    {
+        return $this->dev2grpTableGatewayMapper;
+    }
+
+    /**
+     * @param TableGatewayMapper $dev2grpTableGatewayMapper
+     */
+    public function setDev2grpTableGatewayMapper($dev2grpTableGatewayMapper)
+    {
+        $this->dev2grpTableGatewayMapper = $dev2grpTableGatewayMapper;
+    }
+
+    /**
+     * @return TableGatewayMapper
+     */
+    public function getDevicesTableGatewayMapper()
+    {
+        return $this->devicesTableGatewayMapper;
+    }
+
+    /**
+     * @param TableGatewayMapper $devicesTableGatewayMapper
+     */
+    public function setDevicesTableGatewayMapper($devicesTableGatewayMapper)
+    {
+        $this->devicesTableGatewayMapper = $devicesTableGatewayMapper;
+    }
+
+
 }

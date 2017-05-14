@@ -16,6 +16,18 @@ use ZF\Rest\AbstractResourceListener;
 
 class DevicesResource extends CheckPrivilegesAndDataRetrievingResourceWithAcl
 {
+    protected $dev2grpTableGatewayMapper;
+
+    /**
+     * DevicesResource constructor.
+     * @param $dev2grpTableGatewayMapper
+     */
+    public function __construct($tableGatewayMapper, $aclTableGatewayMapper, $dev2grpTableGatewayMapper)
+    {
+        parent::__construct($tableGatewayMapper, $aclTableGatewayMapper);
+        $this->dev2grpTableGatewayMapper = $dev2grpTableGatewayMapper;
+    }
+
     /**
      * Create a resource
      *
@@ -96,8 +108,33 @@ class DevicesResource extends CheckPrivilegesAndDataRetrievingResourceWithAcl
             ){
                 return new ApiProblem(403, "Empty list!");
             }
-            // todo это предстоит переделать при переходе на промежуточную таблицу группы<->устройства
-            return $this->getMapper()->fetchAll(array('group_id' => $params['grp_id']));
+
+            $dev2grpTableName = $this->getDev2grpTableGatewayMapper()->getTable()->table;
+            $devicesTableName = $this->getMapper()->getTable()->table;
+            $aclTableName = $this->getUserAccessListMapper()->getTable()->table;
+            $select = new Select();
+            $select
+                ->from($dev2grpTableName)
+                ->join(
+                    $devicesTableName,
+                    $devicesTableName . ".id = " . $dev2grpTableName . ".device_id"
+                )
+                ->join(
+                    $aclTableName,
+                    $aclTableName . ".device_id = " . $devicesTableName . ".id",
+                    []
+                )
+                ->columns([])
+                ->where($dev2grpTableName . ".group_id = " . $params['grp_id'])
+                ->where($aclTableName . ".client_id = '" . $this->getLoggedInClientId() . "'", Predicate::OP_AND);
+
+            $adapter = new Adapter(
+                $this->getMapper()->getTable()->getAdapter()->getDriver(),
+                $this->getMapper()->getTable()->getAdapter()->getPlatform()
+            );
+
+            $dbSelect = new DbSelect($select, $adapter);
+            return new Collection($dbSelect);
         }
 
         if($this->checkAdminPrivileges()){
@@ -209,4 +246,22 @@ class DevicesResource extends CheckPrivilegesAndDataRetrievingResourceWithAcl
 
         return $this->mapper->update($id, $data);
     }
+
+    /**
+     * @return TableGatewayMapper
+     */
+    public function getDev2grpTableGatewayMapper()
+    {
+        return $this->dev2grpTableGatewayMapper;
+    }
+
+    /**
+     * @param TableGatewayMapper $dev2grpTableGatewayMapper
+     */
+    public function setDev2grpTableGatewayMapper($dev2grpTableGatewayMapper)
+    {
+        $this->dev2grpTableGatewayMapper = $dev2grpTableGatewayMapper;
+    }
+
+
 }

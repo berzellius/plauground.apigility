@@ -18,8 +18,14 @@ class GroupsResourceFactory extends ResourceFactory
         $aclTableGatewayMapper = new TableGatewayMapper($aclTableGateway);
 
 
+        $dev2grpTableGateway = $this->getTableGateway($services, "dev2grp");
+        $dev2grpTableGatewayMapper = new TableGatewayMapper($dev2grpTableGateway);
+
+        $devicesTableGateway = $this->getTableGateway($services, "devices");
+        $devicesTableGatewayMapper = new TableGatewayMapper($devicesTableGateway);
+
         return new GroupsResource(
-            $tableGatewayMapper, $aclTableGatewayMapper
+            $tableGatewayMapper, $aclTableGatewayMapper, $dev2grpTableGatewayMapper, $devicesTableGatewayMapper
         );
     }
 }

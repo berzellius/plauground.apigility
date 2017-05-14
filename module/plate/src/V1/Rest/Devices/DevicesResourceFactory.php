@@ -17,9 +17,11 @@ class DevicesResourceFactory extends ResourceFactory
         $aclTableGateway = $this->getTableGateway($services, "devices_acl");
         $aclTableGatewayMapper = new TableGatewayMapper($aclTableGateway);
 
+        $dev2grpTableGateway = $this->getTableGateway($services, "dev2grp");
+        $dev2grpTableGatewayMapper = new TableGatewayMapper($dev2grpTableGateway);
 
         return new DevicesResource(
-            $tableGatewayMapper, $aclTableGatewayMapper
+            $tableGatewayMapper, $aclTableGatewayMapper, $dev2grpTableGatewayMapper
         );
     }
 }

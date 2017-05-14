@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    colors="true"
+    bootstrap="./vendor/autoload.php">
+    <testsuites>
+        <!--testsuite name="zf-apigility-skeleton">
+            <directory>./module/Application/test</directory>
+        </testsuite-->
+        <testsuite name="plate-api-v1-test">
+            <directory>./module/plate/test</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

@@ -73,6 +73,38 @@ class Scheduled_tasksResource extends CheckPrivilegesAndDataRetrievingResourceWi
      */
     public function fetchAll($params = [])
     {
+
+        /**
+         * Случай запроса по room_id
+         * SELECT scheduled_tasks.* FROM
+        (
+        select devices.* from devices
+        join devices_acl
+        on devices_acl.device_id = devices.id
+        where devices.room_id = 1
+        and devices_acl.client_id = 'user2'
+        group by devices.id
+        ) as dt
+        right join
+        scheduled_tasks
+        on dt.id = scheduled_tasks.id
+        left join
+        (
+        select groups.* from groups
+        join dev2grp
+        on groups.id = dev2grp.group_id
+        join devices
+        on devices.id = dev2grp.device_id
+        join devices_acl
+        on devices_acl.grp_id = groups.id
+        where devices.room_id = 1
+        and devices_acl.client_id = 'user2'
+        group by groups.id
+        ) as grt
+        on scheduled_tasks.id_group = grt.id
+        where scheduled_tasks.id is not null
+         */
+
         $clientId =  $this->getLoggedInClientId();
 
         if($this->checkAdminPrivileges()){
@@ -238,7 +270,7 @@ class Scheduled_tasksResource extends CheckPrivilegesAndDataRetrievingResourceWi
         switch ($type){
             case "GROUP":
                 $params = [
-                    "group_id" => $id,
+                    "grp_id" => $id,
                     "client_id" => $this->getLoggedInClientId()
                 ];
                 break;
