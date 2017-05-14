@@ -33,7 +33,7 @@ trait CheckPrivileges
      * Ошибка доступа 403
      * @return ApiProblem
      */
-    protected function notAllowed(){
-        return new ApiProblem(403, 'Method not allowed! ');
+    protected function notAllowed($problem = "Method not allowed!"){
+        return new ApiProblem(403, $problem);
     }
 }
