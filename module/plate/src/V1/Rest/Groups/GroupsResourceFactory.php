@@ -17,7 +17,6 @@ class GroupsResourceFactory extends ResourceFactory
         $aclTableGateway = $this->getTableGateway($services, "devices_acl");
         $aclTableGatewayMapper = new TableGatewayMapper($aclTableGateway);
 
-
         $dev2grpTableGateway = $this->getTableGateway($services, "dev2grp");
         $dev2grpTableGatewayMapper = new TableGatewayMapper($dev2grpTableGateway);
 

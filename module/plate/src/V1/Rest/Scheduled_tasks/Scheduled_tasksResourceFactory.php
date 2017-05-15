@@ -17,8 +17,21 @@ class Scheduled_tasksResourceFactory extends ResourceFactory
         $aclTableGateway = $this->getTableGateway($services, "devices_acl");
         $aclTableGatewayMapper = new TableGatewayMapper($aclTableGateway);
 
+        $devicesTableGateway = $this->getTableGateway($services, "devices");
+        $devicesTableGatewayMapper = new TableGatewayMapper($devicesTableGateway);
+
+        $groupsTableGateway = $this->getTableGateway($services, "groups");
+        $groupsTableGatewayMapper = new TableGatewayMapper($groupsTableGateway);
+
+        $dev2grpTableGateway = $this->getTableGateway($services, "dev2grp");
+        $dev2grpTableGatewayMapper = new TableGatewayMapper($dev2grpTableGateway);
+
         return new Scheduled_tasksResource(
-            $tableGatewayMapper, $aclTableGatewayMapper
+            $tableGatewayMapper,
+            $aclTableGatewayMapper,
+            $devicesTableGatewayMapper,
+            $groupsTableGatewayMapper,
+            $dev2grpTableGatewayMapper
         );
     }
 }

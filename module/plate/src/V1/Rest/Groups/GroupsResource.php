@@ -133,7 +133,7 @@ class GroupsResource extends CheckPrivilegesAndDataRetrievingResourceWithAcl
 
         if(isset($params['room_id'])){
             // особый случай - получить группы устройств по комнате
-            $select =$this->getGroupsByRoomIdSelector($params['room_id']);
+            $select = $this->getGroupsByRoomIdSelector($params['room_id']);
 
             $adapter = new Adapter(
                 $this->getMapper()->getTable()->getAdapter()->getDriver(),

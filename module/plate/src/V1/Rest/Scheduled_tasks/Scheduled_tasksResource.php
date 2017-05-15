@@ -6,15 +6,37 @@ use plate\EntitySupport\CheckPrivilegesAndDataRetrievingResourceWithAcl;
 use plate\EntitySupport\Collection;
 use plate\EntitySupport\TableGatewayMapper;
 use Zend\Db\Adapter\Adapter;
+use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Predicate\Predicate;
 use Zend\Db\Sql\Select;
+use Zend\Db\Sql\TableIdentifier;
 use Zend\Paginator\Adapter\DbSelect;
 use ZF\ApiProblem\ApiProblem;
 
 class Scheduled_tasksResource extends CheckPrivilegesAndDataRetrievingResourceWithAcl
 {
 
-    protected $userAccessListMapper;
+    protected   $devicesTableGateway,
+                $dev2grpTableGatewayMapper,
+                $groupsTableGateway;
+
+    /**
+     * Scheduled_tasksResource constructor.
+     * @param $userAccessListMapper
+     */
+    public function __construct(
+        $tableGatewayMapper,
+        $userAccessListMapper,
+        $devicesTableGatewayMapper,
+        $groupsTableGatewayMapper,
+        $dev2grpTableGatewayMapper
+    )
+    {
+        parent::__construct($tableGatewayMapper, $userAccessListMapper);
+        $this->setDevicesTableGatewayMapper($devicesTableGatewayMapper);
+        $this->setGroupsTableGatewayMapper($groupsTableGatewayMapper);
+        $this->setDev2grpTableGatewayMapper($dev2grpTableGatewayMapper);
+    }
 
     /**
      * Create a resource
@@ -74,37 +96,19 @@ class Scheduled_tasksResource extends CheckPrivilegesAndDataRetrievingResourceWi
     public function fetchAll($params = [])
     {
 
-        /**
-         * Случай запроса по room_id
-         * SELECT scheduled_tasks.* FROM
-        (
-        select devices.* from devices
-        join devices_acl
-        on devices_acl.device_id = devices.id
-        where devices.room_id = 1
-        and devices_acl.client_id = 'user2'
-        group by devices.id
-        ) as dt
-        right join
-        scheduled_tasks
-        on dt.id = scheduled_tasks.id
-        left join
-        (
-        select groups.* from groups
-        join dev2grp
-        on groups.id = dev2grp.group_id
-        join devices
-        on devices.id = dev2grp.device_id
-        join devices_acl
-        on devices_acl.grp_id = groups.id
-        where devices.room_id = 1
-        and devices_acl.client_id = 'user2'
-        group by groups.id
-        ) as grt
-        on scheduled_tasks.id_group = grt.id
-        where scheduled_tasks.id is not null
-         */
+        if(isset($params['room_id'])){
+            // особый случай - выбор назначенных заданий по room_id
+            $select = $this->getScheduledTasksByRoomIdSelector($params['room_id']);
 
+            $adapter = new Adapter(
+                $this->getMapper()->getTable()->getAdapter()->getDriver(),
+                $this->getMapper()->getTable()->getAdapter()->getPlatform()
+            );
+
+            $dbSelect = new DbSelect($select, $adapter);
+
+            return new Collection($dbSelect);
+        }
         $clientId =  $this->getLoggedInClientId();
 
         if($this->checkAdminPrivileges()){
@@ -250,6 +254,8 @@ class Scheduled_tasksResource extends CheckPrivilegesAndDataRetrievingResourceWi
 
             return $this->checkPrivileges($type, $grp);
         }
+
+        return false;
     }
 
     private function checkPrivilegesById($id)
@@ -286,4 +292,155 @@ class Scheduled_tasksResource extends CheckPrivilegesAndDataRetrievingResourceWi
         //die(json_encode($params));
         return ($this->getUserAccessListMapper()->fetchAll($params)->getCurrentItemCount() !== 0);
     }
+
+    protected function getScheduledTasksByRoomIdSelector($room_id)
+    {
+        $scheduledTasksTableName = $this->getMapper()->getTable()->table;
+        $platform = $this->getMapper()->getTable()->getAdapter()->getPlatform();
+
+        $devicesSelect = $this->getDevicesByRoomIdSelect($room_id);
+        $groupsSelect = $this->getGroupsByRoomIdSelect($room_id);
+
+
+        $select = new Select();
+        $select
+            ->from(array('dt' => $devicesSelect))
+            ->join(
+                $scheduledTasksTableName,
+                $scheduledTasksTableName . ".id_device" . " = dt.id",
+                ["id", "grp_dev_type", "id_group", "id_device", "name", "period_type", "state", "command"],
+                Select::JOIN_RIGHT
+            )
+            ->join(
+                array('grt' => $groupsSelect),
+                $scheduledTasksTableName . ".id_group" . " = grt.id",
+                [],
+                Select::JOIN_LEFT
+            )
+            ->columns([])
+            ->where("grt.id is not null")
+            ->where("dt.id is not null", Predicate::OP_OR);
+
+        return $select;
+    }
+
+    protected function getDevicesByRoomIdSelect($room_id){
+        $aclTableName = $this->getUserAccessListMapper()->getTable()->table;
+        $devicesTableName = $this->getDevicesTableGateway()->getTable()->table;
+
+        $select = new Select();
+        $select
+            ->from($devicesTableName);
+
+        if(!$this->checkAdminPrivileges()){
+            $select->join(
+                $aclTableName,
+                $aclTableName . ".device_id = " . $devicesTableName . ".id",
+                []
+            );
+        }
+
+        $select->where($devicesTableName . ".room_id = " . $room_id);
+
+        if(!$this->checkAdminPrivileges()){
+            $select
+                ->where($aclTableName . ".client_id = '" . $this->getLoggedInClientId() . "'");
+        }
+
+        $select->group($devicesTableName . ".id");
+
+        return $select;
+    }
+
+    protected function getGroupsByRoomIdSelect($room_id){
+        $aclTableName = $this->getUserAccessListMapper()->getTable()->table;
+        $devicesTableName = $this->getDevicesTableGateway()->getTable()->table;
+        $groupsTableName = $this->getGroupsTableGateway()->getTable()->table;
+        $dev2grpTableName = $this->getDev2grpTableGatewayMapper()->getTable()->table;
+
+        $select = new Select();
+        $select
+            ->from($groupsTableName)
+            ->join(
+                $dev2grpTableName,
+                $dev2grpTableName . ".group_id = " . $groupsTableName . ".id",
+                []
+            )
+            ->join(
+                $devicesTableName,
+                $dev2grpTableName . ".device_id = " . $devicesTableName . ".id",
+                []
+            )
+            //->columns([])
+        ;
+
+        if(!$this->checkAdminPrivileges()){
+            $select->join(
+                $aclTableName,
+                $aclTableName . ".grp_id = " . $groupsTableName . ".id",
+                []
+            );
+        }
+
+        $select->where($devicesTableName . ".room_id = " . $room_id);
+
+        if(!$this->checkAdminPrivileges()){
+            $select
+                ->where($aclTableName . ".client_id = '" . $this->getLoggedInClientId() . "'");
+        }
+
+        $select->group($groupsTableName . ".id");
+        return $select;
+    }
+
+    /**
+     * @return TableGatewayMapper
+     */
+    public function getDevicesTableGateway()
+    {
+        return $this->devicesTableGateway;
+    }
+
+    /**
+     * @param TableGatewayMapper $devicesTableGateway
+     */
+    public function setDevicesTableGatewayMapper($devicesTableGateway)
+    {
+        $this->devicesTableGateway = $devicesTableGateway;
+    }
+
+    /**
+     * @return TableGatewayMapper
+     */
+    public function getGroupsTableGateway()
+    {
+        return $this->groupsTableGateway;
+    }
+
+    /**
+     * @param TableGatewayMapper $groupsTableGateway
+     */
+    public function setGroupsTableGatewayMapper($groupsTableGateway)
+    {
+        $this->groupsTableGateway = $groupsTableGateway;
+    }
+
+    /**
+     * @return TableGatewayMapper
+     */
+    public function getDev2grpTableGatewayMapper()
+    {
+        return $this->dev2grpTableGatewayMapper;
+    }
+
+    /**
+     * @param TableGatewayMapper $dev2grpTableGatewayMapper
+     */
+    public function setDev2grpTableGatewayMapper($dev2grpTableGatewayMapper)
+    {
+        $this->dev2grpTableGatewayMapper = $dev2grpTableGatewayMapper;
+    }
+
+
+
 }
