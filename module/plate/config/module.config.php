@@ -1045,19 +1045,6 @@ return [
                 'required' => true,
                 'validators' => [
                     0 => [
-                        'name' => \Zend\Validator\Digits::class,
-                        'options' => [],
-                    ],
-                ],
-                'filters' => [],
-                'name' => 'group_id',
-                'description' => 'Id группы устройств',
-                'error_message' => 'Must be 0 or natural',
-            ],
-            4 => [
-                'required' => true,
-                'validators' => [
-                    0 => [
                         'name' => 'ZF\\ContentValidation\\Validator\\DbRecordExists',
                         'options' => [
                             'adapter' => 'oauth2_users',
@@ -1071,7 +1058,7 @@ return [
                 'name' => 'room_id',
                 'description' => 'id комнаты',
             ],
-            5 => [
+            4 => [
                 'required' => true,
                 'validators' => [],
                 'filters' => [
@@ -1087,7 +1074,7 @@ return [
                 'name' => 'type',
                 'description' => 'Тип подключения',
             ],
-            6 => [
+            5 => [
                 'required' => true,
                 'validators' => [],
                 'filters' => [
@@ -1104,7 +1091,7 @@ return [
                 'description' => 'Максимально допустимый ток в цепи питания двигателя в миллиамперах',
                 'field_type' => 'Current, mA',
             ],
-            7 => [
+            6 => [
                 'required' => true,
                 'validators' => [],
                 'filters' => [
@@ -1115,7 +1102,7 @@ return [
                 ],
                 'name' => 'connection_type',
             ],
-            8 => [
+            7 => [
                 'required' => false,
                 'validators' => [
                     0 => [
@@ -1134,7 +1121,7 @@ return [
                 'description' => 'команда, которая была обработана последней',
                 'name' => 'last_command',
             ],
-            9 => [
+            8 => [
                 'required' => true,
                 'validators' => [
                     0 => [
