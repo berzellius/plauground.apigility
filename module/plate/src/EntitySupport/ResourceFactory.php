@@ -9,6 +9,8 @@
 namespace plate\EntitySupport;
 
 use DomainException;
+use plate\EntityServicesSupport\GetITableService;
+use plate\EntityServicesSupport\ITableService;
 use plate\EntitySupport\TableGateway;
 
 /**
@@ -19,6 +21,7 @@ use plate\EntitySupport\TableGateway;
  */
 abstract class ResourceFactory
 {
+    use GetITableService;
 
     /**
      * Получить TableGateway

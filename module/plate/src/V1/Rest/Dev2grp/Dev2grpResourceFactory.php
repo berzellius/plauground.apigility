@@ -14,6 +14,9 @@ class Dev2grpResourceFactory extends ResourceFactory
         $halEntityProperties = $this->getZfHalEntityProperties("plate\\V1\\Rest\\Dev2grp\\Controller");
         $tableGatewayMapper->setHalEntityProperties($halEntityProperties);
 
+        $this->getITableService($services)->registerTableMapper(Dev2grpResource::class, $tableGatewayMapper);
+        //$this->getITableService($services)->registerTableMapper("dev2grp", $tableGatewayMapper);
+
         $aclTableGateway = $this->getTableGateway($services, "devices_acl");
         $aclTableGatewayMapper = new TableGatewayMapper($aclTableGateway);
 

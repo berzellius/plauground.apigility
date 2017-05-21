@@ -1,12 +1,15 @@
 <?php
 namespace plate\V1\Rest\Devices;
 
+use Interop\Container\ContainerInterface;
+use plate\EntityServicesSupport\ITableService;
 use plate\EntitySupport\ResourceFactory;
 use plate\EntitySupport\TableGatewayMapper;
+use plate\V1\Rest\Dev2grp\Dev2grpResource;
 
 class DevicesResourceFactory extends ResourceFactory
 {
-    public function __invoke($services)
+    public function __invoke(ContainerInterface $services)
     {
         $tableGateway = $this->getTableGateway($services, "devices");
         $tableGatewayMapper = new TableGatewayMapper($tableGateway);
@@ -14,14 +17,20 @@ class DevicesResourceFactory extends ResourceFactory
         $halEntityProperties = $this->getZfHalEntityProperties("plate\\V1\\Rest\\Devices\\Controller");
         $tableGatewayMapper->setHalEntityProperties($halEntityProperties);
 
-        $aclTableGateway = $this->getTableGateway($services, "devices_acl");
-        $aclTableGatewayMapper = new TableGatewayMapper($aclTableGateway);
-
-        $dev2grpTableGateway = $this->getTableGateway($services, "dev2grp");
-        $dev2grpTableGatewayMapper = new TableGatewayMapper($dev2grpTableGateway);
+        $this->getITableService($services)->registerTableMapper(DevicesResource::class, $tableGatewayMapper);
 
         return new DevicesResource(
-            $tableGatewayMapper, $aclTableGatewayMapper, $dev2grpTableGatewayMapper
+            $this->getDevicesService($services),
+            $tableGatewayMapper
         );
+    }
+
+    /**
+     * @param $services
+     * @return DevicesService
+     */
+    protected function getDevicesService(ContainerInterface $services){
+        $devicesService =  $services->get(DevicesService::class);
+        return $devicesService;
     }
 }

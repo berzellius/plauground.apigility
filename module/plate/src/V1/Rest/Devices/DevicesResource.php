@@ -1,6 +1,7 @@
 <?php
 namespace plate\V1\Rest\Devices;
 
+use Foo\Bar\TestClassInBar;
 use plate\EntitySupport\CheckPrivilegesAndDataRetrievingResource;
 use plate\EntitySupport\CheckPrivilegesAndDataRetrievingResourceWithAcl;
 use plate\EntitySupport\Collection;
@@ -14,18 +15,19 @@ use Zend\Paginator\Adapter\DbSelect;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 
-class DevicesResource extends CheckPrivilegesAndDataRetrievingResourceWithAcl
+class DevicesResource extends DataRetrievingResource
 {
-    protected $dev2grpTableGatewayMapper;
+    protected $devicesService;
 
     /**
      * DevicesResource constructor.
-     * @param $dev2grpTableGatewayMapper
+     * @param DevicesService $devicesService
+     * @param TableGatewayMapper $tableGatewayMapper
      */
-    public function __construct($tableGatewayMapper, $aclTableGatewayMapper, $dev2grpTableGatewayMapper)
+    public function __construct($devicesService, $tableGatewayMapper)
     {
-        parent::__construct($tableGatewayMapper, $aclTableGatewayMapper);
-        $this->dev2grpTableGatewayMapper = $dev2grpTableGatewayMapper;
+        parent::__construct($tableGatewayMapper);
+        $this->devicesService = $devicesService;
     }
 
     /**
@@ -36,12 +38,9 @@ class DevicesResource extends CheckPrivilegesAndDataRetrievingResourceWithAcl
      */
     public function create($data)
     {
-        if(!$this->checkAdminPrivileges())
-            return $this->notAllowed();
+        $retrievedData = $this->retrieveData($data);
 
-        $data = $this->retrieveData($data);
-
-        return $this->getMapper()->create($data);
+        return $this->getDevicesService()->create($data, $retrievedData);
     }
 
     /**
@@ -52,10 +51,7 @@ class DevicesResource extends CheckPrivilegesAndDataRetrievingResourceWithAcl
      */
     public function delete($id)
     {
-        if(!$this->checkAdminPrivileges())
-            return $this->notAllowed();
-
-        return $this->getMapper()->delete($id);
+        return $this->getDevicesService()->delete($id);
     }
 
     /**
@@ -66,19 +62,7 @@ class DevicesResource extends CheckPrivilegesAndDataRetrievingResourceWithAcl
      */
     public function fetch($id)
     {
-        $params = [
-            "device_id" => $id,
-            "client_id" => $this->getLoggedInClientId()
-        ];
-
-        if(
-            !$this->checkAdminPrivileges() &&
-            $this->getUserAccessListMapper()->fetchAll($params)->getCurrentItemCount() == 0
-        ){
-            return $this->notAllowed();
-        }
-
-        return $this->getMapper()->fetch($id);
+        return $this->getDevicesService()->fetch($id);
     }
 
     /**
@@ -96,118 +80,8 @@ class DevicesResource extends CheckPrivilegesAndDataRetrievingResourceWithAcl
      */
     public function fetchAll($params = [])
     {
-        if(isset($params['grp_id'])){
-            $params = [
-                "grp_id" => $params['grp_id'],
-                "client_id" => $this->getLoggedInClientId()
-            ];
-
-            if(
-                !$this->checkAdminPrivileges() &&
-                $this->userAccessListMapper->fetchAll($params)->getCurrentItemCount() == 0
-            ){
-                return new ApiProblem(403, "Empty list!");
-            }
-
-            $dev2grpTableName = $this->getDev2grpTableGatewayMapper()->getTable()->table;
-            $devicesTableName = $this->getMapper()->getTable()->table;
-            $aclTableName = $this->getUserAccessListMapper()->getTable()->table;
-            $select = new Select();
-            $select
-                ->from($dev2grpTableName)
-                ->join(
-                    $devicesTableName,
-                    $devicesTableName . ".id = " . $dev2grpTableName . ".device_id"
-                )
-                ->join(
-                    $aclTableName,
-                    $aclTableName . ".device_id = " . $devicesTableName . ".id",
-                    []
-                )
-                ->columns([])
-                ->where($dev2grpTableName . ".group_id = " . $params['grp_id'])
-                ->where($aclTableName . ".client_id = '" . $this->getLoggedInClientId() . "'", Predicate::OP_AND);
-
-            $adapter = new Adapter(
-                $this->getMapper()->getTable()->getAdapter()->getDriver(),
-                $this->getMapper()->getTable()->getAdapter()->getPlatform()
-            );
-
-            $dbSelect = new DbSelect($select, $adapter);
-            return new Collection($dbSelect);
-        }
-
-        if($this->checkAdminPrivileges()){
-            return $this->getMapper()->fetchAll($params);
-        }
-
-        $select = $this->getDevicesBySelector(
-            isset($params['room_id'])? ['room_id' => $params['room_id']] : []
-        );
-
-        $adapter = new Adapter(
-            $this->getMapper()->getTable()->getAdapter()->getDriver(),
-            $this->getMapper()->getTable()->getAdapter()->getPlatform()
-        );
-
-        $dbSelect = new DbSelect($select, $adapter);
-
-        return new Collection($dbSelect);
+        return $this->getDevicesService()->fetchAll($params);
     }
-
-    /**
-     * Возвращает Zend\Db\Sql\Select из тадлицы устройств с заданным фильтром $params
-     * для обычных пользователей возвращает только те объекты, к которым есть разрешение в acl
-     *
-     * @param $params
-     * @return Select
-     */
-    protected function getDevicesBySelector($params){
-        $devicesTableName = $this->getMapper()->getTable()->table;
-        $idFieldName = $this->getMapper()->getIdFieldName();
-
-        if($this->checkAdminPrivileges()) {
-            $select = new Select();
-            $select
-                ->from($devicesTableName);
-
-            foreach ($params as $pname => $pvalue) {
-                $select->
-                where(
-                    $devicesTableName . "." . $pname . " = '" . $pvalue . "'"
-                );
-            }
-
-            return $select;
-        }
-        else{
-            $clientId =  $this->getLoggedInClientId();
-            $devicesACLTableName = $this->getUserAccessListMapper()->getTable()->table;
-
-            $select = new Select();
-            $select
-                ->from($devicesACLTableName)
-                ->join(
-                    $devicesTableName,
-                    $devicesTableName . "." . $idFieldName .
-                    " = " .
-                    $devicesACLTableName . ".device_id"
-                )
-                ->columns([])
-                ->where(
-                    $devicesACLTableName . ".client_id = '$clientId'"
-                );
-
-            foreach($params as $pname => $pvalue) {
-                $select->where(
-                    $devicesTableName . "." . $pname . " = '" . $pvalue . "'"
-                );
-            }
-
-            return $select;
-        }
-    }
-
 
     /**
      * Update a resource
@@ -218,11 +92,8 @@ class DevicesResource extends CheckPrivilegesAndDataRetrievingResourceWithAcl
      */
     public function update($id, $data)
     {
-        if(!$this->checkAdminPrivileges())
-            return $this->notAllowed();
-
-        $data = $this->retrieveData($data);
-        return $this->mapper->update($id, $data);
+        $retrievedData = $this->retrieveData($data);
+        return $this->getDevicesService()->update($id, $data, $retrievedData);
     }
 
     /**
@@ -234,34 +105,23 @@ class DevicesResource extends CheckPrivilegesAndDataRetrievingResourceWithAcl
      */
     public function patch($id, $data)
     {
-        if(!$this->checkAdminPrivileges())
-            return $this->notAllowed();
-
-        $data = $this->retrieveData($data);
-
-        foreach($data as $k => $v){
-            if($v == null)
-                unset($data[$k]);
-        }
-
-        return $this->mapper->update($id, $data);
+        $retrievedData = $this->retrieveData($data);
+        return $this->getDevicesService()->patch($id, $data, $retrievedData);
     }
 
     /**
-     * @return TableGatewayMapper
+     * @return DevicesService
      */
-    public function getDev2grpTableGatewayMapper()
+    public function getDevicesService()
     {
-        return $this->dev2grpTableGatewayMapper;
+        return $this->devicesService;
     }
 
     /**
-     * @param TableGatewayMapper $dev2grpTableGatewayMapper
+     * @param DevicesService $devicesService
      */
-    public function setDev2grpTableGatewayMapper($dev2grpTableGatewayMapper)
+    public function setDevicesService($devicesService)
     {
-        $this->dev2grpTableGatewayMapper = $dev2grpTableGatewayMapper;
+        $this->devicesService = $devicesService;
     }
-
-
 }

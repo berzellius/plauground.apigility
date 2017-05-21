@@ -106,7 +106,6 @@ class TableGatewayMapper implements MapperInterface
 
     /**
      * Получить все сущности по фильтру.
-     * Единственный реализованный оператор сравнения: ==
      * @param $params
      * @return Collection
      */

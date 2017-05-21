@@ -2,13 +2,17 @@
 return [
     'service_manager' => [
         'factories' => [
+            \plate\Auth\AuthUtils::class => \plate\Auth\AuthUtilFactory::class,
+            \plate\EntityServicesSupport\ITableService::class => \plate\EntityServicesSupport\ITableServiceFactory::class,
+            \plate\V1\Rest\Dev2grp\Dev2grpResource::class => \plate\V1\Rest\Dev2grp\Dev2grpResourceFactory::class,
             \plate\V1\Rest\Oauth_users_control\Oauth_users_controlResource::class => \plate\V1\Rest\Oauth_users_control\Oauth_users_controlResourceFactory::class,
             \plate\V1\Rest\Devices\DevicesResource::class => \plate\V1\Rest\Devices\DevicesResourceFactory::class,
+            \plate\V1\Rest\Devices\DevicesService::class => \plate\V1\Rest\Devices\DevicesServiceFactory::class,
+            \plate\V1\Rest\DevicesAcl\DevicesAclResource::class => \plate\V1\Rest\DevicesAcl\DevicesAclResourceFactory::class,
             \plate\V1\Rest\Rooms\RoomsResource::class => \plate\V1\Rest\Rooms\RoomsResourceFactory::class,
             \plate\V1\Rest\Application_clients\Application_clientsResource::class => \plate\V1\Rest\Application_clients\Application_clientsResourceFactory::class,
             \plate\V1\Rest\Scheduled_tasks\Scheduled_tasksResource::class => \plate\V1\Rest\Scheduled_tasks\Scheduled_tasksResourceFactory::class,
             \plate\V1\Rest\Scheduled_tasks_timetable\Scheduled_tasks_timetableResource::class => \plate\V1\Rest\Scheduled_tasks_timetable\Scheduled_tasks_timetableResourceFactory::class,
-            \plate\V1\Rest\Dev2grp\Dev2grpResource::class => \plate\V1\Rest\Dev2grp\Dev2grpResourceFactory::class,
             \plate\V1\Rest\Groups\GroupsResource::class => \plate\V1\Rest\Groups\GroupsResourceFactory::class,
         ],
     ],
@@ -95,6 +99,26 @@ return [
                     ],
                 ],
             ],
+            'plate.rpc.commands2devices' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/com2dev',
+                    'defaults' => [
+                        'controller' => 'plate\\V1\\Rpc\\Commands2devices\\Controller',
+                        'action' => 'commands2devices',
+                    ],
+                ],
+            ],
+            'plate.rpc.commands2dev-groups' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/com2grp',
+                    'defaults' => [
+                        'controller' => 'plate\\V1\\Rpc\\Commands2devGroups\\Controller',
+                        'action' => 'commands2devGroups',
+                    ],
+                ],
+            ],
         ],
     ],
     'zf-versioning' => [
@@ -109,6 +133,8 @@ return [
             11 => 'plate.rest.scheduled_tasks_timetable',
             12 => 'plate.rest.dev2grp',
             13 => 'plate.rest.groups',
+            14 => 'plate.rpc.commands2devices',
+            15 => 'plate.rpc.commands2dev-groups',
         ],
     ],
     'zf-rest' => [
@@ -326,6 +352,8 @@ return [
             'plate\\V1\\Rest\\Scheduled_tasks_timetable\\Controller' => 'HalJson',
             'plate\\V1\\Rest\\Dev2grp\\Controller' => 'HalJson',
             'plate\\V1\\Rest\\Groups\\Controller' => 'HalJson',
+            'plate\\V1\\Rpc\\Commands2devices\\Controller' => 'HalJson',
+            'plate\\V1\\Rpc\\Commands2devGroups\\Controller' => 'HalJson',
         ],
         'accept_whitelist' => [
             'plate\\V1\\Rest\\Oauth_users_control\\Controller' => [
@@ -373,6 +401,16 @@ return [
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ],
+            'plate\\V1\\Rpc\\Commands2devices\\Controller' => [
+                0 => 'application/vnd.plate.v1+json',
+                1 => 'application/json',
+                2 => 'application/*+json',
+            ],
+            'plate\\V1\\Rpc\\Commands2devGroups\\Controller' => [
+                0 => 'application/vnd.plate.v1+json',
+                1 => 'application/json',
+                2 => 'application/*+json',
+            ],
         ],
         'content_type_whitelist' => [
             'plate\\V1\\Rest\\Oauth_users_control\\Controller' => [
@@ -408,6 +446,14 @@ return [
                 1 => 'application/json',
             ],
             'plate\\V1\\Rest\\Groups\\Controller' => [
+                0 => 'application/vnd.plate.v1+json',
+                1 => 'application/json',
+            ],
+            'plate\\V1\\Rpc\\Commands2devices\\Controller' => [
+                0 => 'application/vnd.plate.v1+json',
+                1 => 'application/json',
+            ],
+            'plate\\V1\\Rpc\\Commands2devGroups\\Controller' => [
                 0 => 'application/vnd.plate.v1+json',
                 1 => 'application/json',
             ],
@@ -558,6 +604,12 @@ return [
         ],
         'plate\\V1\\Rest\\Dev2grp\\Controller' => [
             'input_filter' => 'plate\\V1\\Rest\\Dev2grp\\Validator',
+        ],
+        'plate\\V1\\Rpc\\Commands2devices\\Controller' => [
+            'input_filter' => 'plate\\V1\\Rpc\\Commands2devices\\Validator',
+        ],
+        'plate\\V1\\Rpc\\Commands2devGroups\\Controller' => [
+            'input_filter' => 'plate\\V1\\Rpc\\Commands2devGroups\\Validator',
         ],
     ],
     'input_filter_specs' => [
@@ -1579,6 +1631,92 @@ return [
                 'description' => 'Id группы',
             ],
         ],
+        'plate\\V1\\Rpc\\Commands2devices\\Validator' => [
+            0 => [
+                'required' => true,
+                'validators' => [
+                    0 => [
+                        'name' => 'ZF\\ContentValidation\\Validator\\DbRecordExists',
+                        'options' => [
+                            'adapter' => 'oauth2_users',
+                            'table' => 'devices',
+                            'field' => 'id',
+                        ],
+                    ],
+                ],
+                'filters' => [
+                    0 => [
+                        'name' => \Zend\Filter\StringTrim::class,
+                        'options' => [],
+                    ],
+                    1 => [
+                        'name' => \Zend\Filter\StripTags::class,
+                        'options' => [],
+                    ],
+                ],
+                'name' => 'device',
+                'description' => 'id устройства, на которое подается команда',
+            ],
+            1 => [
+                'required' => true,
+                'validators' => [],
+                'filters' => [
+                    0 => [
+                        'name' => \Zend\Filter\StripTags::class,
+                        'options' => [],
+                    ],
+                    1 => [
+                        'name' => \Zend\Filter\StringTrim::class,
+                        'options' => [],
+                    ],
+                ],
+                'name' => 'command',
+                'description' => 'команда, которую нужно отправить',
+            ],
+        ],
+        'plate\\V1\\Rpc\\Commands2devGroups\\Validator' => [
+            0 => [
+                'required' => true,
+                'validators' => [
+                    0 => [
+                        'name' => 'ZF\\ContentValidation\\Validator\\DbRecordExists',
+                        'options' => [
+                            'adapter' => 'oauth2_users',
+                            'table' => 'groups',
+                            'field' => 'id',
+                        ],
+                    ],
+                ],
+                'filters' => [
+                    0 => [
+                        'name' => \Zend\Filter\StringTrim::class,
+                        'options' => [],
+                    ],
+                    1 => [
+                        'name' => \Zend\Filter\StripTags::class,
+                        'options' => [],
+                    ],
+                ],
+                'name' => 'group',
+                'description' => 'Id группы, которой нужно отправить команду',
+            ],
+            1 => [
+                'required' => true,
+                'validators' => [],
+                'filters' => [
+                    0 => [
+                        'name' => \Zend\Filter\StringTrim::class,
+                        'options' => [],
+                    ],
+                    1 => [
+                        'name' => \Zend\Filter\StripTags::class,
+                        'options' => [],
+                    ],
+                ],
+                'name' => 'command',
+                'description' => 'Команда',
+            ],
+        ],
     ],
     'zf-mvc-auth' => [
         'authorization' => [
@@ -1726,6 +1864,28 @@ return [
                     'DELETE' => true,
                 ],
             ],
+            'plate\\V1\\Rpc\\Commands2devices\\Controller' => [
+                'actions' => [
+                    'Commands2devices' => [
+                        'GET' => false,
+                        'POST' => true,
+                        'PUT' => false,
+                        'PATCH' => false,
+                        'DELETE' => false,
+                    ],
+                ],
+            ],
+            'plate\\V1\\Rpc\\Commands2devGroups\\Controller' => [
+                'actions' => [
+                    'Commands2devGroups' => [
+                        'GET' => false,
+                        'POST' => true,
+                        'PUT' => false,
+                        'PATCH' => false,
+                        'DELETE' => false,
+                    ],
+                ],
+            ],
         ],
     ],
     'zf-apigility' => [
@@ -1738,6 +1898,28 @@ return [
                 'entity_identifier_name' => 'id',
                 'table_service' => 'plate\\V1\\Rest\\Floors\\FloorsResource\\Table',
             ],
+        ],
+    ],
+    'controllers' => [
+        'factories' => [
+            'plate\\V1\\Rpc\\Commands2devices\\Controller' => \plate\V1\Rpc\Commands2devices\Commands2devicesControllerFactory::class,
+            'plate\\V1\\Rpc\\Commands2devGroups\\Controller' => \plate\V1\Rpc\Commands2devGroups\Commands2devGroupsControllerFactory::class,
+        ],
+    ],
+    'zf-rpc' => [
+        'plate\\V1\\Rpc\\Commands2devices\\Controller' => [
+            'service_name' => 'commands2devices',
+            'http_methods' => [
+                0 => 'POST',
+            ],
+            'route_name' => 'plate.rpc.commands2devices',
+        ],
+        'plate\\V1\\Rpc\\Commands2devGroups\\Controller' => [
+            'service_name' => 'commands2devGroups',
+            'http_methods' => [
+                0 => 'POST',
+            ],
+            'route_name' => 'plate.rpc.commands2dev-groups',
         ],
     ],
 ];
