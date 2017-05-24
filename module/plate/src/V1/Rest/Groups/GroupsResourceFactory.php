@@ -1,6 +1,7 @@
 <?php
 namespace plate\V1\Rest\Groups;
 
+use Interop\Container\ContainerInterface;
 use plate\EntitySupport\ResourceFactory;
 use plate\EntitySupport\TableGatewayMapper;
 
@@ -14,17 +15,19 @@ class GroupsResourceFactory extends ResourceFactory
         $halEntityProperties = $this->getZfHalEntityProperties("plate\\V1\\Rest\\Groups\\Controller");
         $tableGatewayMapper->setHalEntityProperties($halEntityProperties);
 
-        $aclTableGateway = $this->getTableGateway($services, "devices_acl");
-        $aclTableGatewayMapper = new TableGatewayMapper($aclTableGateway);
-
-        $dev2grpTableGateway = $this->getTableGateway($services, "dev2grp");
-        $dev2grpTableGatewayMapper = new TableGatewayMapper($dev2grpTableGateway);
-
-        $devicesTableGateway = $this->getTableGateway($services, "devices");
-        $devicesTableGatewayMapper = new TableGatewayMapper($devicesTableGateway);
+        $this->getITableService($services)->registerTableMapper(GroupsResource::class, $tableGatewayMapper);
 
         return new GroupsResource(
-            $tableGatewayMapper, $aclTableGatewayMapper, $dev2grpTableGatewayMapper, $devicesTableGatewayMapper
+            $tableGatewayMapper, $this->getGroupsService($services)
         );
     }
+    /**
+     * @param $services
+     * @return GroupsService
+     */
+    protected function getGroupsService(ContainerInterface $services){
+        $groupsService =  $services->get(GroupsService::class);
+        return $groupsService;
+    }
+
 }

@@ -14,6 +14,7 @@ return [
             \plate\V1\Rest\Scheduled_tasks\Scheduled_tasksResource::class => \plate\V1\Rest\Scheduled_tasks\Scheduled_tasksResourceFactory::class,
             \plate\V1\Rest\Scheduled_tasks_timetable\Scheduled_tasks_timetableResource::class => \plate\V1\Rest\Scheduled_tasks_timetable\Scheduled_tasks_timetableResourceFactory::class,
             \plate\V1\Rest\Groups\GroupsResource::class => \plate\V1\Rest\Groups\GroupsResourceFactory::class,
+            \plate\V1\Rest\Groups\GroupsService::class => \plate\V1\Rest\Groups\GroupsServiceFactory::class,
         ],
     ],
     'router' => [
@@ -324,8 +325,8 @@ return [
             'collection_name' => 'groups',
             'entity_http_methods' => [
                 0 => 'GET',
-                1 => 'PUT',
-                2 => 'DELETE',
+                1 => 'DELETE',
+                2 => 'PATCH',
             ],
             'collection_http_methods' => [
                 0 => 'GET',
@@ -1578,6 +1579,29 @@ return [
                 'name' => 'name',
                 'description' => 'Имя группы',
             ],
+            1 => [
+                'required' => false,
+                'validators' => [
+                    0 => [
+                        'name' => \Zend\Validator\StringLength::class,
+                        'options' => [
+                            'max' => '100',
+                        ],
+                    ],
+                ],
+                'filters' => [
+                    0 => [
+                        'name' => \Zend\Filter\StripTags::class,
+                        'options' => [],
+                    ],
+                    1 => [
+                        'name' => \Zend\Filter\StringTrim::class,
+                        'options' => [],
+                    ],
+                ],
+                'name' => 'last_command',
+                'description' => 'команда, которая была обработана последней',
+            ],
         ],
         'plate\\V1\\Rest\\Dev2grp\\Validator' => [
             0 => [
@@ -1844,7 +1868,7 @@ return [
                     'GET' => true,
                     'POST' => false,
                     'PUT' => true,
-                    'PATCH' => false,
+                    'PATCH' => true,
                     'DELETE' => true,
                 ],
             ],

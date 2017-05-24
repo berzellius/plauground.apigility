@@ -4,21 +4,25 @@ namespace plate\V1\Rpc\Commands2devGroups;
 use plate\EntitySupport\Entity;
 use plate\EntitySupport\SimpleResult;
 use plate\V1\Rest\Devices\DevicesService;
+use plate\V1\Rest\Groups\GroupsService;
+use plate\V1\Rest\Groups\GroupsServiceFactory;
 use Zend\Mvc\Controller\AbstractActionController;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ContentNegotiation\ViewModel;
 
 class Commands2devGroupsController extends AbstractActionController
 {
-    protected $devicesService;
+    protected   $devicesService,
+                $groupsService;
 
     /**
      * Commands2devGroupsController constructor.
      * @param DevicesService $devicesService
      */
-    public function __construct(DevicesService $devicesService)
+    public function __construct(DevicesService $devicesService, GroupsService $groupsService)
     {
-        $this->devicesService = $devicesService;
+        $this->setDevicesService($devicesService);
+        $this->setGroupsService($groupsService);
     }
 
 
@@ -53,11 +57,15 @@ class Commands2devGroupsController extends AbstractActionController
             $updatedDevices[] = $updatedDevice;
         }
 
+        $group = $this->getGroupsService()->fetch($groupId);
+        $updatedGroup = $this->getGroupsService()->patch($groupId, $group, ['last_command' => $command]);
+
         return new ViewModel(
             array_merge(
                 (new SimpleResult("ok", "command sent"))->toArray(),
                 [
-                    'devices' => Entity::asArray($updatedDevices)
+                    'devices' => Entity::asArray($updatedDevices),
+                    'group' => Entity::asArray($updatedGroup)
                 ]
             )
         );
@@ -79,7 +87,19 @@ class Commands2devGroupsController extends AbstractActionController
         $this->devicesService = $devicesService;
     }
 
+    /**
+     * @return GroupsService
+     */
+    public function getGroupsService()
+    {
+        return $this->groupsService;
+    }
 
-
-
+    /**
+     * @param GroupsService $groupsService
+     */
+    public function setGroupsService($groupsService)
+    {
+        $this->groupsService = $groupsService;
+    }
 }
