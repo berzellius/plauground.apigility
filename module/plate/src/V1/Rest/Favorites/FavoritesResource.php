@@ -1,10 +1,11 @@
 <?php
 namespace plate\V1\Rest\Favorites;
 
+use plate\EntitySupport\DataRetrievingResource;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 
-class FavoritesResource extends AbstractResourceListener
+class FavoritesResource extends DataRetrievingResource
 {
     /**
      * Create a resource
@@ -47,7 +48,8 @@ class FavoritesResource extends AbstractResourceListener
      */
     public function fetch($id)
     {
-        return new ApiProblem(405, 'The GET method has not been defined for individual resources');
+        return $this->getMapper()->fetch($id);
+        //return new ApiProblem(405, 'The GET method has not been defined for individual resources');
     }
 
     /**

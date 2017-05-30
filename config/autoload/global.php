@@ -62,5 +62,9 @@ return array(
     'dev2grp' => array(
         'db' => 'oauth2_users',
         'table' => 'dev2grp'
+    ),
+    'favorites' => array(
+        'db' => 'oauth2_users',
+        'table' => 'favorites'
     )
 );
