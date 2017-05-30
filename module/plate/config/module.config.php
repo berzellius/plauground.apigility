@@ -15,6 +15,7 @@ return [
             \plate\V1\Rest\Scheduled_tasks_timetable\Scheduled_tasks_timetableResource::class => \plate\V1\Rest\Scheduled_tasks_timetable\Scheduled_tasks_timetableResourceFactory::class,
             \plate\V1\Rest\Groups\GroupsResource::class => \plate\V1\Rest\Groups\GroupsResourceFactory::class,
             \plate\V1\Rest\Groups\GroupsService::class => \plate\V1\Rest\Groups\GroupsServiceFactory::class,
+            \plate\V1\Rest\Favorites\FavoritesResource::class => \plate\V1\Rest\Favorites\FavoritesResourceFactory::class,
         ],
     ],
     'router' => [
@@ -120,6 +121,15 @@ return [
                     ],
                 ],
             ],
+            'plate.rest.favorites' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/favorites[/:favorites_id]',
+                    'defaults' => [
+                        'controller' => 'plate\\V1\\Rest\\Favorites\\Controller',
+                    ],
+                ],
+            ],
         ],
     ],
     'zf-versioning' => [
@@ -136,6 +146,7 @@ return [
             13 => 'plate.rest.groups',
             14 => 'plate.rpc.commands2devices',
             15 => 'plate.rpc.commands2dev-groups',
+            16 => 'plate.rest.favorites',
         ],
     ],
     'zf-rest' => [
@@ -341,6 +352,28 @@ return [
             'collection_class' => \plate\V1\Rest\Groups\GroupsCollection::class,
             'service_name' => 'groups',
         ],
+        'plate\\V1\\Rest\\Favorites\\Controller' => [
+            'listener' => \plate\V1\Rest\Favorites\FavoritesResource::class,
+            'route_name' => 'plate.rest.favorites',
+            'route_identifier_name' => 'favorites_id',
+            'collection_name' => 'favorites',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \plate\V1\Rest\Favorites\FavoritesEntity::class,
+            'collection_class' => \plate\V1\Rest\Favorites\FavoritesCollection::class,
+            'service_name' => 'favorites',
+        ],
     ],
     'zf-content-negotiation' => [
         'controllers' => [
@@ -355,6 +388,7 @@ return [
             'plate\\V1\\Rest\\Groups\\Controller' => 'HalJson',
             'plate\\V1\\Rpc\\Commands2devices\\Controller' => 'HalJson',
             'plate\\V1\\Rpc\\Commands2devGroups\\Controller' => 'HalJson',
+            'plate\\V1\\Rest\\Favorites\\Controller' => 'HalJson',
         ],
         'accept_whitelist' => [
             'plate\\V1\\Rest\\Oauth_users_control\\Controller' => [
@@ -412,6 +446,11 @@ return [
                 1 => 'application/json',
                 2 => 'application/*+json',
             ],
+            'plate\\V1\\Rest\\Favorites\\Controller' => [
+                0 => 'application/vnd.plate.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
         ],
         'content_type_whitelist' => [
             'plate\\V1\\Rest\\Oauth_users_control\\Controller' => [
@@ -455,6 +494,10 @@ return [
                 1 => 'application/json',
             ],
             'plate\\V1\\Rpc\\Commands2devGroups\\Controller' => [
+                0 => 'application/vnd.plate.v1+json',
+                1 => 'application/json',
+            ],
+            'plate\\V1\\Rest\\Favorites\\Controller' => [
                 0 => 'application/vnd.plate.v1+json',
                 1 => 'application/json',
             ],
@@ -574,6 +617,18 @@ return [
                 'entity_identifier_name' => 'id',
                 'route_name' => 'plate.rest.groups',
                 'route_identifier_name' => 'groups_id',
+                'is_collection' => true,
+            ],
+            \plate\V1\Rest\Favorites\FavoritesEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'plate.rest.favorites',
+                'route_identifier_name' => 'favorites_id',
+                'hydrator' => \Zend\Hydrator\ArraySerializable::class,
+            ],
+            \plate\V1\Rest\Favorites\FavoritesCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'plate.rest.favorites',
+                'route_identifier_name' => 'favorites_id',
                 'is_collection' => true,
             ],
         ],
