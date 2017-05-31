@@ -2,11 +2,30 @@
 namespace plate\V1\Rest\Favorites;
 
 use plate\EntitySupport\DataRetrievingResource;
+use plate\EntitySupport\TableGatewayMapper;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 
 class FavoritesResource extends DataRetrievingResource
 {
+    /**
+     * @var FavoritesService
+     */
+    protected $favoritesService;
+
+    /**
+     * FavoritesResource constructor.
+     */
+    public function __construct(
+        TableGatewayMapper $mapper,
+        FavoritesService $service
+    )
+    {
+        parent::__construct($mapper);
+        $this->setFavoritesService($service);
+    }
+
+
     /**
      * Create a resource
      *
@@ -15,7 +34,8 @@ class FavoritesResource extends DataRetrievingResource
      */
     public function create($data)
     {
-        return new ApiProblem(405, 'The POST method has not been defined');
+        $retrievedData = $this->retrieveData($data);
+        return $this->getFavoritesService()->create($data, $retrievedData);
     }
 
     /**
@@ -48,8 +68,7 @@ class FavoritesResource extends DataRetrievingResource
      */
     public function fetch($id)
     {
-        return $this->getMapper()->fetch($id);
-        //return new ApiProblem(405, 'The GET method has not been defined for individual resources');
+        return $this->getFavoritesService()->fetch($id);
     }
 
     /**
@@ -107,5 +126,21 @@ class FavoritesResource extends DataRetrievingResource
     public function update($id, $data)
     {
         return new ApiProblem(405, 'The PUT method has not been defined for individual resources');
+    }
+
+    /**
+     * @return FavoritesService
+     */
+    public function getFavoritesService()
+    {
+        return $this->favoritesService;
+    }
+
+    /**
+     * @param FavoritesService $favoritesService
+     */
+    public function setFavoritesService($favoritesService)
+    {
+        $this->favoritesService = $favoritesService;
     }
 }

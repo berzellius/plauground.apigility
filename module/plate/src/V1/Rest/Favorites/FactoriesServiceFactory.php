@@ -2,20 +2,18 @@
 /**
  * Created by PhpStorm.
  * User: berz
- * Date: 21.05.2017
- * Time: 15:58
+ * Date: 31.05.2017
+ * Time: 20:42
  */
 
-namespace plate\V1\Rest\Devices;
+namespace plate\V1\Rest\Favorites;
 
 
 use Interop\Container\ContainerInterface;
 use plate\Auth\GetAuthUtils;
 use plate\EntityServicesSupport\GetITableService;
-use plate\V1\Rest\Favorites\FavoritesResource;
-use plate\V1\Rest\Favorites\FavoritesService;
 
-class DevicesServiceFactory
+class FactoriesServiceFactory
 {
     use GetITableService,
         GetAuthUtils;
@@ -23,9 +21,9 @@ class DevicesServiceFactory
     public function __invoke(ContainerInterface $services)
     {
         $iTableService = $this->getITableService($services);
-        $mapper = $iTableService->getTableMapperByKey(DevicesResource::class);
+        $mapper = $iTableService->getTableMapperByKey(FavoritesResource::class);
         $authUtils = $this->getAuthUtils($services);
 
-        return new DevicesService($authUtils, $iTableService, $mapper);
+        return new FavoritesService($authUtils, $iTableService, $mapper);
     }
 }
