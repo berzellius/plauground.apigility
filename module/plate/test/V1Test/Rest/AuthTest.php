@@ -15,7 +15,7 @@ use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
 
 class AuthTest extends AbstractHttpControllerTestCase
 {
-    protected $authCode = "ef0f2f4cd59f5d86fde44f65069739ba37051767";
+    protected $authCode = "c7e269608c3ec6c23948df6956b6cd84348e3d72";
 
     public function setUp()
     {
@@ -69,7 +69,9 @@ class AuthTest extends AbstractHttpControllerTestCase
         $this->getRequest()->setHeaders($headers);
         $this->dispatch("/devices");
         $result = json_decode($this->getResponse()->getContent());
-        echo $this->getResponse()->getContent() . "\n\n";
+        echo "devices: " . $this->getResponse()->getContent() . "\n\n";
+
+        var_dump($this->getResponse()->getStatusCode());
     }
 
     public function testSome2(){
