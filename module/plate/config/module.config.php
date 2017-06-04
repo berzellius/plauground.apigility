@@ -17,6 +17,7 @@ return array(
             'plate\\V1\\Rest\\Groups\\GroupsService' => 'plate\\V1\\Rest\\Groups\\GroupsServiceFactory',
             'plate\\V1\\Rest\\Favorites\\FavoritesResource' => 'plate\\V1\\Rest\\Favorites\\FavoritesResourceFactory',
             'plate\\V1\\Rest\\Favorites\\FavoritesService' => 'plate\\V1\\Rest\\Favorites\\FactoriesServiceFactory',
+            'plate\\V1\\Rest\\Scheduled_tasks\\ScheduledTasksService' => 'plate\\V1\\Rest\\Scheduled_tasks\\ScheduledTasksServiceFactory',
         ),
     ),
     'router' => array(
@@ -359,16 +360,15 @@ return array(
             'route_identifier_name' => 'favorites_id',
             'collection_name' => 'favorites',
             'entity_http_methods' => array(
-                0 => 'GET',
-                1 => 'PATCH',
-                2 => 'PUT',
-                3 => 'DELETE',
+                0 => 'DELETE',
             ),
             'collection_http_methods' => array(
                 0 => 'GET',
                 1 => 'POST',
             ),
-            'collection_query_whitelist' => array(),
+            'collection_query_whitelist' => array(
+                0 => 'entity_type',
+            ),
             'page_size' => 25,
             'page_size_param' => null,
             'entity_class' => 'plate\\V1\\Rest\\Favorites\\FavoritesEntity',
@@ -1670,6 +1670,7 @@ return array(
                 ),
                 'name' => 'last_command',
                 'description' => 'команда, которая была обработана последней',
+                'allow_empty' => false,
             ),
         ),
         'plate\\V1\\Rest\\Dev2grp\\Validator' => array(
@@ -1812,33 +1813,6 @@ return array(
         ),
         'plate\\V1\\Rest\\Favorites\\Validator' => array(
             0 => array(
-                'required' => true,
-                'validators' => array(
-                    0 => array(
-                        'name' => 'Zend\\Validator\\StringLength',
-                        'options' => array(),
-                    ),
-                    1 => array(
-                        'name' => 'Zend\\Validator\\Regex',
-                        'options' => array(
-                            'pattern' => '/^(DEVICE|GROUP)$/',
-                            'message' => 'entityType must be DEVICE or GROUP',
-                        ),
-                    ),
-                ),
-                'filters' => array(
-                    0 => array(
-                        'name' => 'Zend\\Filter\\StripTags',
-                        'options' => array(),
-                    ),
-                    1 => array(
-                        'name' => 'Zend\\Filter\\StringTrim',
-                        'options' => array(),
-                    ),
-                ),
-                'name' => 'entityType',
-            ),
-            1 => array(
                 'required' => false,
                 'validators' => array(
                     0 => array(
@@ -1856,12 +1830,16 @@ return array(
                         'name' => 'Zend\\Filter\\StripTags',
                         'options' => array(),
                     ),
+                    1 => array(
+                        'name' => 'Zend\\Filter\\StringTrim',
+                        'options' => array(),
+                    ),
                 ),
                 'name' => 'id_device',
                 'allow_empty' => true,
                 'continue_if_empty' => true,
             ),
-            2 => array(
+            1 => array(
                 'required' => false,
                 'validators' => array(
                     0 => array(
@@ -1879,13 +1857,17 @@ return array(
                         'name' => 'Zend\\Filter\\StripTags',
                         'options' => array(),
                     ),
+                    1 => array(
+                        'name' => 'Zend\\Filter\\StringTrim',
+                        'options' => array(),
+                    ),
                 ),
                 'name' => 'id_group',
                 'allow_empty' => true,
                 'continue_if_empty' => true,
             ),
-            3 => array(
-                'required' => true,
+            2 => array(
+                'required' => false,
                 'validators' => array(
                     0 => array(
                         'name' => 'Zend\\Validator\\StringLength',
@@ -1908,8 +1890,63 @@ return array(
                         'name' => 'Zend\\Filter\\StripTags',
                         'options' => array(),
                     ),
+                    1 => array(
+                        'name' => 'Zend\\Filter\\StringTrim',
+                        'options' => array(),
+                    ),
                 ),
                 'name' => 'user',
+            ),
+            3 => array(
+                'required' => true,
+                'validators' => array(
+                    0 => array(
+                        'name' => 'Zend\\Validator\\Regex',
+                        'options' => array(
+                            'pattern' => '/^(DEVICE|GROUP|SCHEDULED)$/',
+                            'message' => 'entity type must be DEVICE, GROUP or SCHEDULED',
+                        ),
+                    ),
+                ),
+                'filters' => array(
+                    0 => array(
+                        'name' => 'Zend\\Filter\\StripTags',
+                        'options' => array(),
+                    ),
+                    1 => array(
+                        'name' => 'Zend\\Filter\\StringTrim',
+                        'options' => array(),
+                    ),
+                ),
+                'name' => 'entity_type',
+                'allow_empty' => false,
+                'description' => 'Тип сущности, добавляемой в Избранное. Устройство, группа или назначенное задание.',
+            ),
+            4 => array(
+                'required' => false,
+                'validators' => array(
+                    0 => array(
+                        'name' => 'ZF\\ContentValidation\\Validator\\DbRecordExists',
+                        'options' => array(
+                            'adapter' => 'oauth2_users',
+                            'table' => 'scheduled_tasks',
+                            'field' => 'id',
+                        ),
+                    ),
+                ),
+                'filters' => array(
+                    0 => array(
+                        'name' => 'Zend\\Filter\\StripTags',
+                        'options' => array(),
+                    ),
+                    1 => array(
+                        'name' => 'Zend\\Filter\\StringTrim',
+                        'options' => array(),
+                    ),
+                ),
+                'name' => 'id_scheduled_task',
+                'continue_if_empty' => true,
+                'allow_empty' => true,
             ),
         ),
     ),
