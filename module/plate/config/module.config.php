@@ -132,23 +132,23 @@ return [
                     ],
                 ],
             ],
-            'plate.rpc.devices_acl' => [
+            'plate.rpc.devices-acl' => [
                 'type' => 'Segment',
                 'options' => [
                     'route' => '/devices_acl',
                     'defaults' => [
-                        'controller' => 'plate\\V1\\Rpc\\Devices_acl\\Controller',
-                        'action' => 'devices_acl',
+                        'controller' => 'plate\\V1\\Rpc\\DevicesAcl\\Controller',
+                        'action' => 'devicesAcl',
                     ],
                 ],
             ],
-            'plate.rpc.groups_acl' => [
+            'plate.rpc.groups-acl' => [
                 'type' => 'Segment',
                 'options' => [
                     'route' => '/groups_acl',
                     'defaults' => [
-                        'controller' => 'plate\\V1\\Rpc\\Groups_acl\\Controller',
-                        'action' => 'groups_acl',
+                        'controller' => 'plate\\V1\\Rpc\\GroupsAcl\\Controller',
+                        'action' => 'groupsAcl',
                     ],
                 ],
             ],
@@ -169,8 +169,8 @@ return [
             14 => 'plate.rpc.commands2devices',
             15 => 'plate.rpc.commands2dev-groups',
             16 => 'plate.rest.favorites',
-            17 => 'plate.rpc.devices_acl',
-            18 => 'plate.rpc.groups_acl',
+            17 => 'plate.rpc.devices-acl',
+            18 => 'plate.rpc.groups-acl',
         ],
     ],
     'zf-rest' => [
@@ -412,8 +412,8 @@ return [
             'plate\\V1\\Rpc\\Commands2devices\\Controller' => 'HalJson',
             'plate\\V1\\Rpc\\Commands2devGroups\\Controller' => 'HalJson',
             'plate\\V1\\Rest\\Favorites\\Controller' => 'HalJson',
-            'plate\\V1\\Rpc\\Devices_acl\\Controller' => 'HalJson',
-            'plate\\V1\\Rpc\\Groups_acl\\Controller' => 'HalJson',
+            'plate\\V1\\Rpc\\DevicesAcl\\Controller' => 'Json',
+            'plate\\V1\\Rpc\\GroupsAcl\\Controller' => 'Json',
         ],
         'accept_whitelist' => [
             'plate\\V1\\Rest\\Oauth_users_control\\Controller' => [
@@ -476,12 +476,12 @@ return [
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ],
-            'plate\\V1\\Rpc\\Devices_acl\\Controller' => [
+            'plate\\V1\\Rpc\\DevicesAcl\\Controller' => [
                 0 => 'application/vnd.plate.v1+json',
                 1 => 'application/json',
                 2 => 'application/*+json',
             ],
-            'plate\\V1\\Rpc\\Groups_acl\\Controller' => [
+            'plate\\V1\\Rpc\\GroupsAcl\\Controller' => [
                 0 => 'application/vnd.plate.v1+json',
                 1 => 'application/json',
                 2 => 'application/*+json',
@@ -536,11 +536,11 @@ return [
                 0 => 'application/vnd.plate.v1+json',
                 1 => 'application/json',
             ],
-            'plate\\V1\\Rpc\\Devices_acl\\Controller' => [
+            'plate\\V1\\Rpc\\DevicesAcl\\Controller' => [
                 0 => 'application/vnd.plate.v1+json',
                 1 => 'application/json',
             ],
-            'plate\\V1\\Rpc\\Groups_acl\\Controller' => [
+            'plate\\V1\\Rpc\\GroupsAcl\\Controller' => [
                 0 => 'application/vnd.plate.v1+json',
                 1 => 'application/json',
             ],
@@ -2178,8 +2178,8 @@ return [
         'factories' => [
             'plate\\V1\\Rpc\\Commands2devices\\Controller' => \plate\V1\Rpc\Commands2devices\Commands2devicesControllerFactory::class,
             'plate\\V1\\Rpc\\Commands2devGroups\\Controller' => \plate\V1\Rpc\Commands2devGroups\Commands2devGroupsControllerFactory::class,
-            'plate\\V1\\Rpc\\Devices_acl\\Controller' => \plate\V1\Rpc\Devices_acl\Devices_aclControllerFactory::class,
-            'plate\\V1\\Rpc\\Groups_acl\\Controller' => \plate\V1\Rpc\Groups_acl\Groups_aclControllerFactory::class,
+            'plate\\V1\\Rpc\\DevicesAcl\\Controller' => \plate\V1\Rpc\DevicesAcl\DevicesAclControllerFactory::class,
+            'plate\\V1\\Rpc\\GroupsAcl\\Controller' => \plate\V1\Rpc\GroupsAcl\GroupsAclControllerFactory::class,
         ],
     ],
     'zf-rpc' => [
@@ -2197,21 +2197,19 @@ return [
             ],
             'route_name' => 'plate.rpc.commands2dev-groups',
         ],
-        'plate\\V1\\Rpc\\Devices_acl\\Controller' => [
-            'service_name' => 'devices_acl',
+        'plate\\V1\\Rpc\\DevicesAcl\\Controller' => [
+            'service_name' => 'DevicesAcl',
             'http_methods' => [
-                0 => 'POST',
-                1 => 'DELETE',
+                0 => 'GET',
             ],
-            'route_name' => 'plate.rpc.devices_acl',
+            'route_name' => 'plate.rpc.devices-acl',
         ],
-        'plate\\V1\\Rpc\\Groups_acl\\Controller' => [
-            'service_name' => 'groups_acl',
+        'plate\\V1\\Rpc\\GroupsAcl\\Controller' => [
+            'service_name' => 'GroupsAcl',
             'http_methods' => [
-                0 => 'POST',
-                1 => 'DELETE',
+                0 => 'GET',
             ],
-            'route_name' => 'plate.rpc.groups_acl',
+            'route_name' => 'plate.rpc.groups-acl',
         ],
     ],
 ];
