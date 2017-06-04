@@ -1,11 +1,31 @@
 <?php
 namespace plate\V1\Rest\Favorites;
 
+use plate\EntitySupport\DataRetrievingResource;
+use plate\EntitySupport\TableGatewayMapper;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 
-class FavoritesResource extends AbstractResourceListener
+class FavoritesResource extends DataRetrievingResource
 {
+    /**
+     * @var FavoritesService
+     */
+    protected $favoritesService;
+
+    /**
+     * FavoritesResource constructor.
+     */
+    public function __construct(
+        TableGatewayMapper $mapper,
+        FavoritesService $service
+    )
+    {
+        parent::__construct($mapper);
+        $this->setFavoritesService($service);
+    }
+
+
     /**
      * Create a resource
      *
@@ -14,7 +34,8 @@ class FavoritesResource extends AbstractResourceListener
      */
     public function create($data)
     {
-        return new ApiProblem(405, 'The POST method has not been defined');
+        $retrievedData = $this->retrieveData($data);
+        return $this->getFavoritesService()->create($data, $retrievedData);
     }
 
     /**
@@ -25,29 +46,8 @@ class FavoritesResource extends AbstractResourceListener
      */
     public function delete($id)
     {
-        return new ApiProblem(405, 'The DELETE method has not been defined for individual resources');
-    }
-
-    /**
-     * Delete a collection, or members of a collection
-     *
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
-    public function deleteList($data)
-    {
-        return new ApiProblem(405, 'The DELETE method has not been defined for collections');
-    }
-
-    /**
-     * Fetch a resource
-     *
-     * @param  mixed $id
-     * @return ApiProblem|mixed
-     */
-    public function fetch($id)
-    {
-        return new ApiProblem(405, 'The GET method has not been defined for individual resources');
+        // todo RPC удаления по типу и id привязанной сущности
+        return $this->getFavoritesService()->delete($id);
     }
 
     /**
@@ -58,52 +58,22 @@ class FavoritesResource extends AbstractResourceListener
      */
     public function fetchAll($params = [])
     {
-        return new ApiProblem(405, 'The GET method has not been defined for collections');
+        return $this->getFavoritesService()->fetchAll($params);
     }
 
     /**
-     * Patch (partial in-place update) a resource
-     *
-     * @param  mixed $id
-     * @param  mixed $data
-     * @return ApiProblem|mixed
+     * @return FavoritesService
      */
-    public function patch($id, $data)
+    public function getFavoritesService()
     {
-        return new ApiProblem(405, 'The PATCH method has not been defined for individual resources');
+        return $this->favoritesService;
     }
 
     /**
-     * Patch (partial in-place update) a collection or members of a collection
-     *
-     * @param  mixed $data
-     * @return ApiProblem|mixed
+     * @param FavoritesService $favoritesService
      */
-    public function patchList($data)
+    public function setFavoritesService($favoritesService)
     {
-        return new ApiProblem(405, 'The PATCH method has not been defined for collections');
-    }
-
-    /**
-     * Replace a collection or members of a collection
-     *
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
-    public function replaceList($data)
-    {
-        return new ApiProblem(405, 'The PUT method has not been defined for collections');
-    }
-
-    /**
-     * Update a resource
-     *
-     * @param  mixed $id
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
-    public function update($id, $data)
-    {
-        return new ApiProblem(405, 'The PUT method has not been defined for individual resources');
+        $this->favoritesService = $favoritesService;
     }
 }

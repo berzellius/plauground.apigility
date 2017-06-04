@@ -99,7 +99,7 @@ class TableGatewayMapper implements MapperInterface
         // параметры поиска: Entity identifier name == $id
         $resultSet = $this->table->select([$idName => $id]);
         if (0 === count($resultSet)) {
-            throw new DomainException('Status message not found', 404);
+            throw new DomainException('Entity not found', 404);
         }
         return $resultSet->current();
     }

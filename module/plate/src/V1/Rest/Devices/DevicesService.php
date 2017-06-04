@@ -144,8 +144,18 @@ class DevicesService extends EntityService{
 
         return $this->notAllowed();
     }
+
+    public function addToDevicesAcl($user, $deviceId){
+        $data = [
+            "client_id" => $user,
+            "device_id" => $deviceId
+        ];
+
+        $this->getUserAccessListMapper()->create($data);
+    }
+
     /**
-     * Возвращает Zend\Db\Sql\Select из тадлицы устройств с привязкой к группе устройств @grpId
+     * Возвращает Zend\Db\Sql\Select из таблицы устройств с привязкой к группе устройств @grpId
      * для обычных пользователей возвращает только те объекты, к которым есть разрешение в acl
      * @param $grpId
      * @return Select

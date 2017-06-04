@@ -14,6 +14,8 @@ class Scheduled_tasksResourceFactory extends ResourceFactory
         $halEntityProperties = $this->getZfHalEntityProperties("plate\\V1\\Rest\\Scheduled_tasks\\Controller");
         $tableGatewayMapper->setHalEntityProperties($halEntityProperties);
 
+        $this->getITableService($services)->registerTableMapper(Scheduled_tasksResource::class, $tableGatewayMapper);
+
         $aclTableGateway = $this->getTableGateway($services, "devices_acl");
         $aclTableGatewayMapper = new TableGatewayMapper($aclTableGateway);
 

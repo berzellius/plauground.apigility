@@ -1,6 +1,8 @@
 <?php
 namespace plate\V1\Rest\Favorites;
 
-class FavoritesEntity
+use StatusLib\Entity;
+
+class FavoritesEntity extends Entity
 {
 }

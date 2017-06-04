@@ -1,8 +1,8 @@
 <?php
 namespace plate\V1\Rest\Favorites;
 
+use plate\EntitySupport\Collection;
 use Zend\Paginator\Paginator;
-//2
-class FavoritesCollection extends Paginator
+class FavoritesCollection extends Collection
 {
 }
