@@ -18,6 +18,7 @@ return array(
             'plate\\V1\\Rest\\Favorites\\FavoritesResource' => 'plate\\V1\\Rest\\Favorites\\FavoritesResourceFactory',
             'plate\\V1\\Rest\\Favorites\\FavoritesService' => 'plate\\V1\\Rest\\Favorites\\FactoriesServiceFactory',
             'plate\\V1\\Rest\\Scheduled_tasks\\ScheduledTasksService' => 'plate\\V1\\Rest\\Scheduled_tasks\\ScheduledTasksServiceFactory',
+            'plate\\V1\\Rest\\DevicesAcl\\DevicesAclService' => 'plate\\V1\\Rest\\DevicesAcl\\DevicesAclServiceFactory',
         ),
     ),
     'router' => array(
@@ -712,6 +713,12 @@ return array(
         ),
         'plate\\V1\\Rest\\Favorites\\Controller' => array(
             'input_filter' => 'plate\\V1\\Rest\\Favorites\\Validator',
+        ),
+        'plate\\V1\\Rpc\\DevicesAcl\\Controller' => array(
+            'input_filter' => 'plate\\V1\\Rpc\\DevicesAcl\\Validator',
+        ),
+        'plate\\V1\\Rpc\\GroupsAcl\\Controller' => array(
+            'input_filter' => 'plate\\V1\\Rpc\\GroupsAcl\\Validator',
         ),
     ),
     'input_filter_specs' => array(
@@ -1991,6 +1998,110 @@ return array(
                 'allow_empty' => true,
             ),
         ),
+        'plate\\V1\\Rpc\\DevicesAcl\\Validator' => array(
+            0 => array(
+                'required' => true,
+                'validators' => array(
+                    0 => array(
+                        'name' => 'ZF\\ContentValidation\\Validator\\DbRecordExists',
+                        'options' => array(
+                            'adapter' => 'oauth2_users',
+                            'table' => 'devices',
+                            'field' => 'id',
+                        ),
+                    ),
+                ),
+                'filters' => array(
+                    0 => array(
+                        'name' => 'Zend\\Filter\\StripTags',
+                        'options' => array(),
+                    ),
+                    1 => array(
+                        'name' => 'Zend\\Filter\\StringTrim',
+                        'options' => array(),
+                    ),
+                ),
+                'name' => 'device_id',
+                'description' => 'Id устройства, к которому предоставляем доступ',
+            ),
+            1 => array(
+                'required' => true,
+                'validators' => array(
+                    0 => array(
+                        'name' => 'ZF\\ContentValidation\\Validator\\DbRecordExists',
+                        'options' => array(
+                            'adapter' => 'oauth2_users',
+                            'table' => 'oauth_clients',
+                            'field' => 'client_id',
+                        ),
+                    ),
+                ),
+                'filters' => array(
+                    0 => array(
+                        'name' => 'Zend\\Filter\\StringTrim',
+                        'options' => array(),
+                    ),
+                    1 => array(
+                        'name' => 'Zend\\Filter\\StripTags',
+                        'options' => array(),
+                    ),
+                ),
+                'name' => 'client_id',
+                'description' => 'Имя пользователя, которому нужно предоставить разрешения',
+            ),
+        ),
+        'plate\\V1\\Rpc\\GroupsAcl\\Validator' => array(
+            0 => array(
+                'required' => true,
+                'validators' => array(
+                    0 => array(
+                        'name' => 'ZF\\ContentValidation\\Validator\\DbRecordExists',
+                        'options' => array(
+                            'adapter' => 'oauth2_users',
+                            'table' => 'oauth_clients',
+                            'field' => 'client_id',
+                        ),
+                    ),
+                ),
+                'filters' => array(
+                    0 => array(
+                        'name' => 'Zend\\Filter\\StringTrim',
+                        'options' => array(),
+                    ),
+                    1 => array(
+                        'name' => 'Zend\\Filter\\StripTags',
+                        'options' => array(),
+                    ),
+                ),
+                'name' => 'client_id',
+                'description' => 'Имя пользователя, которому нужно предоставить доступ',
+            ),
+            1 => array(
+                'required' => true,
+                'validators' => array(
+                    0 => array(
+                        'name' => 'ZF\\ContentValidation\\Validator\\DbRecordExists',
+                        'options' => array(
+                            'adapter' => 'oauth2_users',
+                            'table' => 'groups',
+                            'field' => 'id',
+                        ),
+                    ),
+                ),
+                'filters' => array(
+                    0 => array(
+                        'name' => 'Zend\\Filter\\StringTrim',
+                        'options' => array(),
+                    ),
+                    1 => array(
+                        'name' => 'Zend\\Filter\\StripTags',
+                        'options' => array(),
+                    ),
+                ),
+                'name' => 'group_id',
+                'description' => 'Id группы, к которой нужно предоставить доступ',
+            ),
+        ),
     ),
     'zf-mvc-auth' => array(
         'authorization' => array(
@@ -2160,6 +2271,44 @@ return array(
                     ),
                 ),
             ),
+            'plate\\V1\\Rpc\\DevicesAcl\\Controller' => array(
+                'actions' => array(
+                    'DevicesAcl' => array(
+                        'GET' => false,
+                        'POST' => true,
+                        'PUT' => false,
+                        'PATCH' => false,
+                        'DELETE' => false,
+                    ),
+                ),
+            ),
+            'plate\\V1\\Rpc\\GroupsAcl\\Controller' => array(
+                'actions' => array(
+                    'GroupsAcl' => array(
+                        'GET' => false,
+                        'POST' => true,
+                        'PUT' => false,
+                        'PATCH' => false,
+                        'DELETE' => false,
+                    ),
+                ),
+            ),
+            'plate\\V1\\Rest\\Favorites\\Controller' => array(
+                'collection' => array(
+                    'GET' => true,
+                    'POST' => true,
+                    'PUT' => false,
+                    'PATCH' => false,
+                    'DELETE' => false,
+                ),
+                'entity' => array(
+                    'GET' => false,
+                    'POST' => false,
+                    'PUT' => false,
+                    'PATCH' => false,
+                    'DELETE' => true,
+                ),
+            ),
         ),
     ),
     'zf-apigility' => array(
@@ -2178,7 +2327,8 @@ return array(
         'factories' => array(
             'plate\\V1\\Rpc\\Commands2devices\\Controller' => 'plate\\V1\\Rpc\\Commands2devices\\Commands2devicesControllerFactory',
             'plate\\V1\\Rpc\\Commands2devGroups\\Controller' => 'plate\\V1\\Rpc\\Commands2devGroups\\Commands2devGroupsControllerFactory',
-            'plate\\V1\\Rpc\\DevicesAcl\\Controller' => 'plate\\V1\\Rpc\\DevicesAcl\\DevicesAclController'
+            'plate\\V1\\Rpc\\DevicesAcl\\Controller' => 'plate\\V1\\Rpc\\DevicesAcl\\DevicesAclControllerFactory',
+            'plate\\V1\\Rpc\\GroupsAcl\\Controller' => 'plate\\V1\\Rpc\\GroupsAcl\\GroupsAclControllerFactory',
         ),
     ),
     'zf-rpc' => array(
@@ -2199,14 +2349,14 @@ return array(
         'plate\\V1\\Rpc\\DevicesAcl\\Controller' => array(
             'service_name' => 'DevicesAcl',
             'http_methods' => array(
-                0 => 'GET',
+                0 => 'POST',
             ),
             'route_name' => 'plate.rpc.devices-acl',
         ),
         'plate\\V1\\Rpc\\GroupsAcl\\Controller' => array(
             'service_name' => 'GroupsAcl',
             'http_methods' => array(
-                0 => 'GET',
+                0 => 'POST',
             ),
             'route_name' => 'plate.rpc.groups-acl',
         ),

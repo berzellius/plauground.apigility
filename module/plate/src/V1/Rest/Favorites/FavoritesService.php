@@ -10,12 +10,20 @@ namespace plate\V1\Rest\Favorites;
 
 
 use plate\EntityServicesSupport\EntityService;
+use plate\EntitySupport\Collection;
 use plate\EntitySupport\Entity;
+use plate\V1\Rest\Devices\DevicesResource;
 use plate\V1\Rest\DevicesAcl\UserAccessUtilsForServices;
+use plate\V1\Rest\Groups\GroupsResource;
 use plate\V1\Rest\Scheduled_tasks\Scheduled_tasksEntity;
 use plate\V1\Rest\Scheduled_tasks\Scheduled_tasksResource;
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\Sql\Join;
+use Zend\Db\Sql\Select;
+use Zend\Paginator\Adapter\DbSelect;
 use ZF\Apigility\Documentation\Api;
 use ZF\ApiProblem\ApiProblem;
+use Zend\Paginator\Paginator;
 
 class FavoritesService extends EntityService
 {
@@ -146,7 +154,8 @@ class FavoritesService extends EntityService
     public function deleteByEntityTypeAndId($entity_type, $entity_id)
     {
         $data = array(
-            'entity_type' => $entity_type
+            'entity_type' => $entity_type,
+            'user' => $this->getAuthUtils()->getClientId()
         );
 
         switch ($entity_type){
@@ -187,5 +196,86 @@ class FavoritesService extends EntityService
     public function fetchAll($params)
     {
         return $this->getTableMapper()->fetchAll($params);
+    }
+
+    /**
+     * Получить избранное пользователя
+     * @param $client_id - пользователь
+     * @return Collection
+     */
+    public function fetchAllFavoritesByUser($client_id){
+        $devicesTable = $this->getDevicesTableName();
+        $devicesIdField = $this->getDevicesIdFieldName();
+
+        $groupsTable = $this->getGroupsTableName();
+        $groupsIdField = $this->getGroupsIdFieldName();
+
+        $scheduledTasksTable = $this->getScheduledTasksTableName();
+        $scheduledTasksIdField = $this->getScheduledTasksIdFieldName();
+
+        $table = $this->getTableName();
+        $idField = $this->getIdFieldName();
+
+        $select = new Select();
+        $select
+            ->from(array("d" => $devicesTable))
+            ->join(
+                array("f" => $table),
+                "d." . $devicesIdField . " = f.id_device",
+                Select::SQL_STAR,
+                Join::JOIN_RIGHT
+            )
+            ->join(
+                array("g" => $groupsTable),
+                "g." . $groupsIdField . " = f.id_group",
+                Select::SQL_STAR,
+                Join::JOIN_LEFT
+            )
+            ->join(
+                array("st" => $scheduledTasksTable),
+                "st." . $scheduledTasksIdField . " = f.id_scheduled_task",
+                Select::SQL_STAR,
+                Join::JOIN_LEFT
+            )
+            ->where(
+                "f.user = '" . $client_id . "'",
+                "d.id IS NOT NULL OR
+                 g.id IS NOT NULL OR
+                 st.id IS NOT NULL"
+            )
+        ;
+
+        $adapter = new Adapter(
+            $this->getTableMapper()->getTable()->getAdapter()->getDriver(),
+            $this->getTableMapper()->getTable()->getAdapter()->getPlatform()
+        );
+
+        $dbSelect = new DbSelect($select, $adapter);
+
+        return new Collection($dbSelect);
+    }
+
+    protected function getDevicesIdFieldName(){
+        return $this->getITableService()->getTableIdFieldName(DevicesResource::class);
+    }
+
+    protected function getDevicesTableName(){
+        return $this->getITableService()->getTableNameByKey(DevicesResource::class);
+    }
+
+    protected function getGroupsTableName(){
+        return $this->getITableService()->getTableNameByKey(GroupsResource::class);
+    }
+
+    protected function getGroupsIdFieldName(){
+        return $this->getITableService()->getTableIdFieldName(GroupsResource::class);
+    }
+
+    protected function getScheduledTasksTableName(){
+        return $this->getITableService()->getTableNameByKey(Scheduled_tasksResource::class);
+    }
+
+    protected function getScheduledTasksIdFieldName(){
+        return $this->getITableService()->getTableIdFieldName(Scheduled_tasksResource::class);
     }
 }

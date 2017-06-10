@@ -8,6 +8,70 @@
  */
 class TestDatasetsPart1
 {
+    public static function forFavoritesSet(){
+        return [
+            \V1Test\Rest\testData\DevicesTestEntity::class =>
+                [
+                    [
+                        "mac" => "98:BE:A4:EE:25:00",
+                        "ip" => "10.121.0.101",
+                        "channel" => "1",
+                        "description" => "устройство для откладки #1",
+                        "room_id" => "1",
+                        "type" => "1",
+                        "max_amp" => "250",
+                        "connection_type" => "1"
+                    ],
+                    [
+                        "mac" => "98:BE:A4:EE:25:02",
+                        "ip" => "10.121.0.101",
+                        "channel" => "2",
+                        "description" => "устройство для откладки #2",
+                        "room_id" => "1",
+                        "type" => "1",
+                        "max_amp" => "250",
+                        "connection_type" => "1"
+                    ],
+                    [
+                        "mac" => "98:BE:A4:EE:25:03",
+                        "ip" => "10.121.0.101",
+                        "channel" => "3",
+                        "description" => "устройство для откладки #3",
+                        "room_id" => "1",
+                        "type" => "1",
+                        "max_amp" => "250",
+                        "connection_type" => "1"
+                    ],
+                    [
+                        "mac" => "98:BE:A4:EE:25:04",
+                        "ip" => "10.121.0.101",
+                        "channel" => "4",
+                        "description" => "устройство для откладки #4",
+                        "room_id" => "1",
+                        "type" => "1",
+                        "max_amp" => "250",
+                        "connection_type" => "1"
+                    ],
+                    [
+                        "mac" => "98:BE:A4:EE:25:05",
+                        "ip" => "10.121.0.101",
+                        "channel" => "5",
+                        "description" => "устройство для откладки #5",
+                        "room_id" => "1",
+                        "type" => "1",
+                        "max_amp" => "250",
+                        "connection_type" => "1"
+                    ],
+                ],
+            \V1Test\Rest\testData\GroupsTestEntity::class =>
+                [
+                    ["name" => "группа для отладки#1"],
+                    ["name" => "группа для отладки #2"],
+                    ["name" => "группа для отладки #3"],
+                ]
+            ];
+    }
+
     public static function basicSet(){
         return [
             \V1Test\Rest\testData\DevicesTestEntity::class =>

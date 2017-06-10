@@ -91,6 +91,13 @@ abstract class TestEntity
     }
 
     /**
+     * @return bool
+     */
+    public function deleteOnCleanUp(){
+        return true;
+    }
+
+    /**
      * @return string - url объекта
      */
     public function getUrl(){

@@ -9,6 +9,7 @@
 namespace V1Test\Rest;
 
 
+use Herrera\Json\Exception\Exception;
 use plate\EntitySupport\Entity;
 use plate\V1\Rest\Devices\DevicesService;
 use V1Test\Rest\testData\DevicesTestEntity;
@@ -157,17 +158,55 @@ class BasicTest extends AbstractHttpControllerTestCase
         return $result;
     }
 
+    public function ____test4loadDebbugingTest(){
+        $this->loadEntitiesSet(\TestDatasetsPart1::forFavoritesSet());
+        /*$devicesIds = [421, 422, 423, 424, 425];
+        $groupsIds = [107, 108, 109];
+
+        foreach($devicesIds as $k => $deviceId){
+            if($k < 3) {
+                $this->addRightsToDeviceWithCheck($deviceId, "testUser1");
+                $this->addDeviceToGroup($deviceId, $groupsIds[0]);
+                $this->addDeviceToFavorite($deviceId, "testUser1");
+            }
+
+            if($k == 3){
+                $this->addRightsToDeviceWithCheck($deviceId, "testUser1");
+                $this->addRightsToDeviceWithCheck($deviceId, "testUser2");
+                $this->addDeviceToGroup($deviceId, $groupsIds[1]);
+            }
+
+            if($k > 3) {
+                $this->addRightsToDeviceWithCheck($deviceId, "testUser2");
+                $this->addDeviceToGroup($deviceId, $groupsIds[2]);
+                $this->addDeviceToFavorite($deviceId, "testUser2");
+            }
+        }
+
+        $this->addRightsToGroupWithCheck($groupsIds[0], "testUser1");
+        $this->addRightsToGroupWithCheck($groupsIds[1], "testUser1");
+        $this->addRightsToGroupWithCheck($groupsIds[1], "testUser2");
+        $this->addRightsToGroupWithCheck($groupsIds[2], "testUser2");
+
+        $this->addGroupToFavorite($groupsIds[0], "testUser1");
+        $this->addGroupToFavorite($groupsIds[2], "testUser2");*/
+    }
+
     public function testDevicesAndGroups(){
-        foreach (\TestDatasetsPart1::basicSet() as $class => $set) {
+        $this->loadEntitiesSet(\TestDatasetsPart1::basicSet());
+        $this->basicGroupsDistribution();
+        $this->addToFavorites();
+
+        $this->cleanUp();
+    }
+
+    protected function loadEntitiesSet(array $eset){
+        foreach ($eset as $class => $set) {
             /** @var DevicesTestEntity $item */
             foreach ($set as $item) {
                 $this->createEntityInstance($class, $item, self::ADMIN_SCOPE, $this->getAdminUsername());
             }
         }
-
-        $this->basicGroupsDistribution();
-
-        $this->cleanUp();
     }
 
     protected function getGroupInRegistryIDs(){
@@ -210,41 +249,93 @@ class BasicTest extends AbstractHttpControllerTestCase
 
         $i = 0;
         foreach ($devices as $id){
-            if($i < 4){
-                $dev2grp = [
-                    "group_id" => $groups[0],
-                    "device_id" => $id
-                ];
-
-                echo "Добавляется устройство #" . $id . " в группу #" . $groups[0] . "\r\n";
-                $this->createEntityInstance(\Dev2grpTestEntity::class, $dev2grp, self::ADMIN_SCOPE, $this->getAdminUsername());
-                echo "\r\n";
+            if($i < 2){
+                $this->addDeviceToGroup($id, $groups[0]);
+                $this->addRightsToDeviceWithCheck($id, "testUser1");
             }
 
             if(2 <= $i and $i < 8){
-                $dev2grp = [
-                    "group_id" => $groups[1],
-                    "device_id" => $id
-                ];
+                $this->addDeviceToGroup($id, $groups[0]);
+                $this->addDeviceToGroup($id, $groups[1]);
 
-                echo "Добавляется устройство #" . $id . " в группу #" . $groups[1] . "\r\n";
-                $this->createEntityInstance(\Dev2grpTestEntity::class, $dev2grp, self::ADMIN_SCOPE, $this->getAdminUsername());
-                echo "\r\n";
+                $this->addRightsToDeviceWithCheck($id, "testUser1");
+                $this->addRightsToDeviceWithCheck($id, "testUser2");
             }
 
             if($i >= 8){
-                $dev2grp = [
-                    "group_id" => $groups[2],
-                    "device_id" => $id
-                ];
-
-                echo "Добавляется устройство #" . $id . " в группу #" . $groups[2] . "\r\n";
-                $this->createEntityInstance(\Dev2grpTestEntity::class, $dev2grp, self::ADMIN_SCOPE, $this->getAdminUsername());
-                echo "\r\n";
+                $this->addDeviceToGroup($id, $groups[2]);
+                $this->addRightsToDeviceWithCheck($id, "testUser2");
             }
 
             $i++;
         }
+
+        $this->addRightsToGroupWithCheck($groups[0], "testUser1");
+        $this->addRightsToGroupWithCheck($groups[1], "testUser1");
+        $this->addRightsToGroupWithCheck($groups[1], "testUser2");
+        $this->addRightsToGroupWithCheck($groups[2], "testUser2");
+    }
+
+    protected function addDeviceToGroup($devId, $grpId){
+        $dev2grp = [
+            "group_id" => $grpId,
+            "device_id" => $devId
+        ];
+
+        echo "Добавляется устройство #" . $devId . " в группу #" . $grpId . "\r\n";
+        $this->createEntityInstance(\Dev2grpTestEntity::class, $dev2grp, self::ADMIN_SCOPE, $this->getAdminUsername());
+        echo "\r\n";
+    }
+
+
+    /**
+     * Тест добавления в избранное
+     * Первый тестовый пользователь - 1 группа; устройства 1, 2, 6, 7.
+     * Второй тестовый пользователь - 3 группа; устройства 3, 4, 9, 10.
+     */
+    protected function addToFavorites()
+    {
+        $groups = $this->getGroupInRegistryIDs();
+        $devices = $this->getDevicesInRegistryIDs();
+
+        $devIds = [
+            [0, 1, 5, 6],
+            [2, 3, 8, 9]
+        ];
+
+        $groupIds = [[0], [2]];
+
+        $users = ["testUser1", "testUser2"];
+
+        foreach ($users as $k => $user) {
+            foreach ($devIds[$k] as $deviceId) {
+                $this->addDeviceToFavorite($devices[$deviceId], $user);
+            }
+
+            foreach ($groupIds[$k] as $groupId) {
+                $this->addGroupToFavorite($groups[$groupId], $user);
+            }
+        }
+    }
+
+    protected function addDeviceToFavorite($devId, $user){
+        $devToFav = [
+            "id_device" => $devId,
+            "entity_type" => "DEVICE"
+        ];
+
+        echo "Добавляется в избранное устройство #" . $devId . " для пользователя " . $user;
+        $this->createEntityInstance(FavoritesTestEntity::class, $devToFav, "", $user);
+    }
+
+    protected function addGroupToFavorite($grpId, $user){
+        $grpToFav = [
+            "id_group" => $grpId,
+            "entity_type" => "GROUP"
+        ];
+
+        echo "Добавляется в избранное группа #" . $grpId . " для пользователя " . $user;
+        $this->createEntityInstance(FavoritesTestEntity::class, $grpToFav, "", $user);
     }
 
     public function _testFavorites(){
@@ -260,7 +351,7 @@ class BasicTest extends AbstractHttpControllerTestCase
 
         foreach ($this->getRegistry() as $clazz => $items) {
             /** @var TestEntity $item */
-            foreach ($items as $item) {
+            foreach ($items as $item) if($item->deleteOnCleanUp()) {
                 $url = $item->getUrl();
                 echo $url . "\r\n";
                 if($item->getScope() == self::ADMIN_SCOPE){
@@ -337,4 +428,57 @@ class BasicTest extends AbstractHttpControllerTestCase
         $this->adminUsername = $adminUsername;
     }
 
+    protected function checkGettingsDevice($id, $user)
+    {
+        $resGettingDevice = $this->dispatchRequest("/devices/" . $id, "GET", [], $user);
+        echo "Результат запроса устройства #" . $id . " пользователем " . $user . ": " . $resGettingDevice['content'] . " \r\n";
+        $resGettingDevice = Entity::asArray(json_decode($resGettingDevice['content']));
+        if(!($resGettingDevice['id'] == $id)){
+            throw new Exception("Пользователь не получил данные устройства, обладая правами на него \r\n");
+        }
+        else{
+            echo "Успешно \r\n";
+        }
+    }
+
+    protected function addRightsToDeviceWithCheck($id, $user)
+    {
+        $acl = [
+            "client_id" => $user,
+            "device_id" => $id
+        ];
+
+        echo "Устанавливаются права на устройство #" . $id . "\r\n";
+        $this->createEntityInstance(\DevicesAclRpcTestEntity::class, $acl, "", $user);
+        echo "\r\n";
+
+        $this->checkGettingsDevice($id, $user);
+    }
+
+    protected function addRightsToGroupWithCheck($id, $user)
+    {
+        $acl = [
+            "client_id" => $user,
+            "group_id" => $id
+        ];
+
+        echo "Устанавливаются права на группу #" . $id . "\r\n";
+        $this->createEntityInstance(\GroupsAclRpcTestEntity::class, $acl, "", $user);
+        echo "\r\n";
+
+        $this->checkGettingsGroup($id, $user);
+    }
+
+    protected function checkGettingsGroup($id, $user)
+    {
+        $resGettingDevice = $this->dispatchRequest("/groups/" . $id, "GET", [], $user);
+        echo "Результат запроса группы #" . $id . " пользователем " . $user . ": " . $resGettingDevice['content'] . " \r\n";
+        $resGettingDevice = Entity::asArray(json_decode($resGettingDevice['content']));
+        if(!($resGettingDevice['id'] == $id)){
+            throw new Exception("Пользователь не получил данные группы, обладая правами на неё \r\n");
+        }
+        else{
+            echo "Успешно \r\n";
+        }
+    }
 }
