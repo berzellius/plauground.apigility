@@ -75,6 +75,7 @@ class ScheduledTasksController extends RpcController
     /**
      * Включение и отключение назначенного задания
      * @param $queryParams
+     * @return \plate\EntitySupport\Entity|ApiProblem
      */
     public function turnScheduled($queryParams)
     {
