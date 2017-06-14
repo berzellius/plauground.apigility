@@ -1,10 +1,16 @@
 <?php
 namespace plate\V1\Rpc\ScheduledTasks;
 
+use Interop\Container\ContainerInterface;
+use plate\V1\Rest\Scheduled_tasks\ScheduledTasksService;
+
 class ScheduledTasksControllerFactory
 {
-    public function __invoke($controllers)
+    public function __invoke(ContainerInterface $container)
     {
-        return new ScheduledTasksController();
+
+        /** @var ScheduledTasksService $scheduledTasksService */
+        $scheduledTasksService = $container->get(ScheduledTasksService::class);
+        return new ScheduledTasksController($scheduledTasksService);
     }
 }

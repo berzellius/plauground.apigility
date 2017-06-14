@@ -1,8 +1,8 @@
 <?php
-return [
-    'plate\\V1\\Rest\\Motion\\Controller' => [
-        'collection' => [
-            'GET' => [
+return array(
+    'plate\\V1\\Rest\\Motion\\Controller' => array(
+        'collection' => array(
+            'GET' => array(
                 'description' => 'methods for motion of electro window',
                 'response' => '{
    "_links": {
@@ -35,14 +35,14 @@ return [
        ]
    }
 }',
-            ],
-        ],
-    ],
-    'plate\\V1\\Rest\\Rooms\\Controller' => [
+            ),
+        ),
+    ),
+    'plate\\V1\\Rest\\Rooms\\Controller' => array(
         'description' => 'Сервис для получения списка комнат',
-        'collection' => [
+        'collection' => array(
             'description' => 'Список комнат',
-            'GET' => [
+            'GET' => array(
                 'description' => 'Получить список комнат.
 Возвращает полный список комнат одинаково для любого авторизованного пользователя.',
                 'response' => '{
@@ -186,11 +186,11 @@ return [
   "total_items": 12,
   "page": 1
 }',
-            ],
-        ],
-        'entity' => [
+            ),
+        ),
+        'entity' => array(
             'description' => 'Описание комнаты',
-            'GET' => [
+            'GET' => array(
                 'description' => 'Метод для получения данных о комнате',
                 'response' => '{
   "id": "1",
@@ -202,15 +202,15 @@ return [
     }
   }
 }',
-            ],
-        ],
-    ],
-    'plate\\V1\\Rest\\Floors\\Controller' => [
+            ),
+        ),
+    ),
+    'plate\\V1\\Rest\\Floors\\Controller' => array(
         'description' => 'Сервис для получения списка этажей. Предоставляется только авторизованным пользователям, позволяет читать информацию об этажах здания.
 url: /floors[/:floors_id]',
-        'collection' => [
+        'collection' => array(
             'description' => 'Метод позволяет получать список этажей.',
-            'GET' => [
+            'GET' => array(
                 'description' => 'Получить список этажей',
                 'response' => '{
   "_links": {
@@ -269,11 +269,11 @@ url: /floors[/:floors_id]',
   "total_items": 4,
   "page": 1
 }',
-            ],
-        ],
-        'entity' => [
+            ),
+        ),
+        'entity' => array(
             'description' => 'Метод позволяет получить информацию по конкретному этажу.',
-            'GET' => [
+            'GET' => array(
                 'response' => '{
   "id": "4",
   "name": "Четвертый этаж",
@@ -284,16 +284,16 @@ url: /floors[/:floors_id]',
   }
 }',
                 'description' => 'Получить информацию по этажу.',
-            ],
-        ],
-    ],
-    'plate\\V1\\Rest\\Devices\\Controller' => [
+            ),
+        ),
+    ),
+    'plate\\V1\\Rest\\Devices\\Controller' => array(
         'description' => 'Сервис для предоставления авторизованным пользователям информации об устройствах, которыми можно управлять (электрокарнизы, окна, шторы и т.д.) и группах устройств. 
 Авторизованным пользователям позволяет читать список устройств и подробную информацию по устройству. При этом в списках будут отображаться только устройства, к которым политиками безопасности для авторизованного пользователя предоставлены разрешения.
 Пользователям, авторизованным под учетной записью администратора, позволяет также добавлять, удалять, изменять устройства.
 
 Url: /devices[/:devices_id]',
-        'collection' => [
+        'collection' => array(
             'description' => 'Метод позволяет получить список доступных устройств для управления ими. Список можно запрашивать с параметрами:
 grp_id - получение устройств в группе.
       для получения списка необходимо явно предоставленное право пользователя на группу устройств в таблице списках доступа, либо права администратора;
@@ -301,7 +301,7 @@ room_id - получение списка устройств в комнате (
      *      возвращает  полный список устройств в комнате (для аккаунта администратора);
      *      возвращает список устройств в комнате, которым явно предоставлено разрешение в таблице devices_acl.
 Без параметров - только для аккаунта администратора - список всех устройств в системе.',
-            'GET' => [
+            'GET' => array(
                 'description' => 'Получить список устройств. В качестве параметров запроса доступны grp_id, room_id.',
                 'response' => '{
   "_links": {
@@ -409,8 +409,8 @@ room_id - получение списка устройств в комнате (
   "total_items": 5,
   "page": 1
 }',
-            ],
-            'POST' => [
+            ),
+            'POST' => array(
                 'request' => '{
         "mac": "94:B1:0A:F8:47:B8",
         "ip": "192.168.10.112",
@@ -440,11 +440,11 @@ room_id - получение списка устройств в комнате (
     }
   }
 }',
-            ],
-        ],
-        'entity' => [
+            ),
+        ),
+        'entity' => array(
             'description' => 'Метод позволяет получить данные по конкретному устройству, обновить их, а также удалить устройство',
-            'GET' => [
+            'GET' => array(
                 'description' => 'Получить данные',
                 'response' => '{
   "id": "9",
@@ -463,8 +463,8 @@ room_id - получение списка устройств в комнате (
     }
   }
 }',
-            ],
-            'PUT' => [
+            ),
+            'PUT' => array(
                 'description' => 'Полное обновление данных об устройстве. Стоит иметь в виду, что полное обновление переопределяет значение поля last_command, которое обновляется RPC-командами управления устройствами. Для того, чтобы избежать потери значения last_command, следует использовать частичное обновление http методом PATCH.',
                 'request' => '{ 
   "mac": "94:B1:0A:F8:47:B8",
@@ -496,11 +496,11 @@ room_id - получение списка устройств в комнате (
     }
   }
 }',
-            ],
-            'DELETE' => [
+            ),
+            'DELETE' => array(
                 'description' => 'Удалить запись. Метод не возвращает данных. Http status = 204 (No content) при успешном удалении.',
-            ],
-            'PATCH' => [
+            ),
+            'PATCH' => array(
                 'description' => 'Частичное обновление данных об устройстве. Использование метода PATCH при редактировании устройств предпочтительно, так как можно не передавать актуальное состояние поля last_command и оно не будет перезаписано.',
                 'request' => '{ 
   "mac": "94:B1:0A:F8:47:B8",
@@ -531,14 +531,14 @@ room_id - получение списка устройств в комнате (
     }
   }
 }',
-            ],
-        ],
-    ],
-    'plate\\V1\\Rest\\Application_clients\\Controller' => [
+            ),
+        ),
+    ),
+    'plate\\V1\\Rest\\Application_clients\\Controller' => array(
         'description' => 'Сервис для предоставления администраторам информации о мобильных устройствах, на которых установлены приложения для управления устройствами.',
-        'collection' => [
+        'collection' => array(
             'description' => 'Позволяет работать со списком мобильных устройств.',
-            'GET' => [
+            'GET' => array(
                 'description' => 'Получить список устройств. Параметры не поддерживаются.',
                 'response' => '{
   "_links": {
@@ -585,8 +585,8 @@ room_id - получение списка устройств в комнате (
   "total_items": 2,
   "page": 1
 }',
-            ],
-            'POST' => [
+            ),
+            'POST' => array(
                 'description' => 'Добавление мобильного устройства.',
                 'request' => '{
         "mac": "df:54:dd:ff:ea:ab",
@@ -606,11 +606,11 @@ room_id - получение списка устройств в комнате (
     }
   }
 }',
-            ],
-        ],
-        'entity' => [
+            ),
+        ),
+        'entity' => array(
             'description' => 'Позволяет работать с мобильным устройством',
-            'GET' => [
+            'GET' => array(
                 'description' => 'Получить информацию о мобильном устройстве',
                 'response' => '{
   "id": "2",
@@ -624,8 +624,8 @@ room_id - получение списка устройств в комнате (
     }
   }
 }',
-            ],
-            'PATCH' => [
+            ),
+            'PATCH' => array(
                 'request' => '{
         "mac": "df:54:dd:ff:ea:aa",
         "ip": "192.168.1.111",
@@ -645,8 +645,8 @@ room_id - получение списка устройств в комнате (
     }
   }
 }',
-            ],
-            'PUT' => [
+            ),
+            'PUT' => array(
                 'description' => 'Полное обновление данных о мобильном устройстве',
                 'request' => '{
         "mac": "df:54:dd:ff:ea:aa",
@@ -666,17 +666,529 @@ room_id - получение списка устройств в комнате (
     }
   }
 }',
-            ],
-            'DELETE' => [
+            ),
+            'DELETE' => array(
                 'description' => 'Удалить запись. Метод не возвращает данных. Http status = 204',
-            ],
-        ],
+            ),
+        ),
+    ),
+    'plate\\V1\\Rest\\Scheduled_tasks_timetable\\Controller' => array(
+        'description' => 'Сервис для работы с расписаниями назначенных заданий. Для всех методов права доступа определяются правами доступа к соответствующим назначенным заданиям.',
+        'collection' => array(
+            'description' => 'Работа со списком расписаний назначенных заданий.',
+            'GET' => array(
+                'description' => 'Получить расписания назначенных заданий. Принимает параметр \'scheduling_task_id\' - id назначенного задания, который является обязательным для всех, кроме администраторов.',
+            ),
+            'POST' => array(
+                'description' => 'Создать элемент расписания назначенного задания.',
+            ),
+        ),
+        'entity' => array(
+            'description' => 'Работа со строкой расписания назначенного задания.',
+            'GET' => array(
+                'description' => 'Получить строку расписания.',
+            ),
+            'PATCH' => array(
+                'description' => 'Частичное обновление строки расписания.',
+            ),
+            'PUT' => array(
+                'description' => 'Полное обновление строки расписания.',
+            ),
+            'DELETE' => array(
+                'description' => 'Удаление строки расписания.',
+            ),
+        ),
+    ),
+    'plate\\V1\\Rpc\\Commands2devGroups\\Controller' => array(
+        'POST' => array(
+            'request' => '{
+   "group": "Id группы, которой нужно отправить команду",
+   "command": "Команда"
+}',
+            'response' => '{
+  "status": "ok",
+  "message": "command sent",
+  "device": [
+    {
+      "id": "1",
+      "mac": "94:B1:0A:F8:47:B8",
+      "ip": "192.168.10.101",
+      "channel": "1",
+      "description": "some dev",
+      "group_id": "1",
+      "room_id": "1",
+      "type": "1",
+      "max_amp": "0.25",
+      "connection_type": "1",
+      "last_command": "up"
+    },
+    {
+      "id": "2",
+      "mac": "D0:E7:82:6E:B8:09",
+      "ip": "192.168.10.101",
+      "channel": "2",
+      "description": "some other dev",
+      "group_id": "1",
+      "room_id": "1",
+      "type": "1",
+      "max_amp": "0.6",
+      "connection_type": "2",
+      "last_command": "up"
+    }
+  ]
+}',
+            'description' => 'используется только метод POST',
+        ),
+        'description' => 'Сервис для отправки команды ("up", "down") группе устройств',
+    ),
+    'plate\\V1\\Rpc\\Commands2devices\\Controller' => array(
+        'POST' => array(
+            'request' => '{
+   "device": "id устройства, на которое подается команда",
+   "command": "команда, которую нужно отправить"
+}',
+            'response' => '{
+  "status": "ok",
+  "message": "command sent",
+  "device": {
+    "id": "1",
+    "mac": "94:B1:0A:F8:47:B8",
+    "ip": "192.168.10.101",
+    "channel": "1",
+    "description": "some dev",
+    "group_id": "1",
+    "room_id": "1",
+    "type": "1",
+    "max_amp": "0.25",
+    "connection_type": "1",
+    "last_command": "down"
+  }
+}',
+            'description' => 'используется только метод POST',
+        ),
+        'description' => 'Позволяет отправлять команды ("up", "down") устройствам',
+    ),
+    'plate\\V1\\Rest\\Dev2grp\\Controller' => array(
+        'description' => 'Управление распределением устройств по группам',
+        'collection' => array(
+            'description' => 'Управление списком элементов',
+            'GET' => array(
+                'description' => 'Получить записи соответствия устройство->группа  с учетом доступа к устройствам и группам. Подразумевается, что если пользователь имеет доступ к группе устройств, то он имеет доступ и ко все устройствам в этой группе.',
+                'response' => '{
+   "_links": {
+       "self": {
+           "href": "/dev2grp"
+       },
+       "first": {
+           "href": "/dev2grp?page={page}"
+       },
+       "prev": {
+           "href": "/dev2grp?page={page}"
+       },
+       "next": {
+           "href": "/dev2grp?page={page}"
+       },
+       "last": {
+           "href": "/dev2grp?page={page}"
+       }
+   }
+   "_embedded": {
+       "dev2grp": [
+           {
+               "_links": {
+                   "self": {
+                       "href": "/dev2grp[/:dev2grp_id]"
+                   }
+               }
+              "device_id": "Id устройства",
+              "group_id": "Id группы"
+           }
+       ]
+   }
+}',
+            ),
+            'POST' => array(
+                'description' => 'Добавить соответствие устройство->группа. При этом должны быть выполнены условия: 1) пользователь имеет право доступа к устройству; 2) пользователь имеет право доступа к группе; 3) в системе нет пользователей, которые имеют доступ к группе, но не имеют доступа к устройству.',
+                'request' => '{
+   "device_id": "Id устройства",
+   "group_id": "Id группы"
+}',
+                'response' => '{
+   "_links": {
+       "self": {
+           "href": "/dev2grp[/:dev2grp_id]"
+       }
+   }
+   "device_id": "Id устройства",
+   "group_id": "Id группы"
+}',
+            ),
+        ),
+        'entity' => array(
+            'description' => 'Управление записью устройство->группа. Доступно только удаление',
+            'DELETE' => array(
+                'description' => 'Удаление записи устройство->группа. Как устройство, так и группа должны быть доступны пользователю.',
+                'request' => '{
+   "device_id": "Id устройства",
+   "group_id": "Id группы"
+}',
+            ),
+        ),
+    ),
+    'plate\\V1\\Rest\\Groups\\Controller' => array(
+        'description' => 'Управление группами устройств',
+        'collection' => array(
+            'description' => 'Управление списком групп устройств',
+            'GET' => array(
+                'response' => '{
+   "_links": {
+       "self": {
+           "href": "/groups"
+       },
+       "first": {
+           "href": "/groups?page={page}"
+       },
+       "prev": {
+           "href": "/groups?page={page}"
+       },
+       "next": {
+           "href": "/groups?page={page}"
+       },
+       "last": {
+           "href": "/groups?page={page}"
+       }
+   }
+   "_embedded": {
+       "groups": [
+           {
+               "_links": {
+                   "self": {
+                       "href": "/groups[/:groups_id]"
+                   }
+               }
+              "name": "Имя группы"
+           }
+       ]
+   }
+}',
+                'description' => 'Получить список групп. Обычный пользователь получит все группы, к которым у него есть доступ, администратор - полный список групп',
+            ),
+            'POST' => array(
+                'description' => 'Создать группу. Доступно как администратору, так и обычному пользователю. Обычному пользователю автоматически добавляет созданную группу в список доступа.',
+                'request' => '{
+   "name": "Имя группы"
+}',
+                'response' => '{
+   "_links": {
+       "self": {
+           "href": "/groups[/:groups_id]"
+       }
+   }
+   "name": "Имя группы"
+}',
+            ),
+        ),
+        'entity' => array(
+            'description' => 'Управление группой',
+            'GET' => array(
+                'description' => 'Получить группу. Для обычного пользователя должен быть предоставлен доступ.',
+                'response' => '{
+   "_links": {
+       "self": {
+           "href": "/groups[/:groups_id]"
+       }
+   }
+   "name": "Имя группы"
+}',
+            ),
+            'PUT' => array(
+                'description' => 'Обновить группу. Для обычного пользователя должен быть предоставлен доступ.',
+                'request' => '{
+   "name": "Имя группы"
+}',
+                'response' => '{
+   "_links": {
+       "self": {
+           "href": "/groups[/:groups_id]"
+       }
+   }
+   "name": "Имя группы"
+}',
+            ),
+            'DELETE' => array(
+                'description' => 'Удалить группу. Для обычного пользователя должен быть предоставлен доступ.',
+                'request' => '{
+   "name": "Имя группы"
+}',
+                'response' => '',
+            ),
+            'PATCH' => array(
+                'description' => 'Частичное обновление группы. Для обычного пользователя должен быть предоставлен доступ.',
+                'request' => '{
+   "name": "Имя группы",
+   "last_command": "команда, которая была обработана последней"
+}',
+                'response' => '{
+   "_links": {
+       "self": {
+           "href": "/groups[/:groups_id]"
+       }
+   }
+   "name": "Имя группы",
+   "last_command": "команда, которая была обработана последней"
+}',
+            ),
+        ),
+    ),
+    'plate\\V1\\Rest\\Favorites\\Controller' => array(
+        'description' => 'Сервис для добавления элемента в избранное и удаления из избранного',
+        'collection' => array(
+            'POST' => array(
+                'request' => '{
+   "id_device": "",
+   "id_group": "",
+   "user": "",
+   "entity_type": "Тип сущности, добавляемой в Избранное. Устройство, группа или назначенное задание.",
+   "id_scheduled_task": ""
+}',
+                'response' => '{
+   "_links": {
+       "self": {
+           "href": "/favorites[/:favorites_id]"
+       }
+   }
+   "id_device": "",
+   "id_group": "",
+   "user": "",
+   "entity_type": "Тип сущности, добавляемой в Избранное. Устройство, группа или назначенное задание.",
+   "id_scheduled_task": ""
+}',
+                'description' => 'Поле user можно не передавать; entity_type должно содержать одно из трех значений: DEVICE, GROUP, SCHEDULED в зависимости от того, что мы добавляем в избранное. Соответственно, в зависимости от entity_type должно быть заполнено одно из полей id_device, id_group, id_scheduled_task',
+            ),
+            'description' => 'Для получения всех объектов из избранного используется RPC-метод GET /favorites_rpc, см. ссылку FavoritesRpc в левой колонке',
+        ),
+        'entity' => array(
+            'DELETE' => array(
+                'request' => '',
+                'response' => '{
+   "_links": {
+       "self": {
+           "href": "/favorites[/:favorites_id]"
+       }
+   }
+   "id_device": "",
+   "id_group": "",
+   "user": "",
+   "entity_type": "Тип сущности, добавляемой в Избранное. Устройство, группа или назначенное задание.",
+   "id_scheduled_task": ""
+}',
+                'description' => 'DELETE /favorites/[id] удаляет элемент по id - идентификатор объекта из избранного',
+            ),
+        ),
+    ),
+    'plate\\V1\\Rpc\\FavoritesRpc\\Controller' => array(
+        'description' => 'Получение всех объектов из избранного',
+        'GET' => array(
+            'response' => '{
+    "devices": [
+        {
+            "id": "421",
+            "mac": "98:BE:A4:EE:25:00",
+            "ip": "10.121.0.101",
+            "channel": "1",
+            "description": "устройство для откладки #1",
+            "room_id": "1",
+            "type": "1",
+            "max_amp": "250",
+            "connection_type": "1",
+            "last_command": null
+        },
+        {
+            "id": "422",
+            "mac": "98:BE:A4:EE:25:02",
+            "ip": "10.121.0.101",
+            "channel": "2",
+            "description": "устройство для откладки #2",
+            "room_id": "2",
+            "type": "1",
+            "max_amp": "250",
+            "connection_type": "1",
+            "last_command": null
+        },
+        {
+            "id": "423",
+            "mac": "98:BE:A4:EE:25:03",
+            "ip": "10.121.0.101",
+            "channel": "3",
+            "description": "устройство для откладки #3",
+            "room_id": "1",
+            "type": "1",
+            "max_amp": "250",
+            "connection_type": "1",
+            "last_command": null
+        }
     ],
-    'plate\\V1\\Rest\\Scheduled_tasks\\Controller' => [
+    "groups": [
+        {
+            "id": "107",
+            "name": "группа для отладки#1",
+            "last_command": null
+        }
+    ],
+    "scheduled": [
+        {
+            "stamps": "f,f1",
+            "id": "2",
+            "state": "ACTIVE",
+            "command": "up",
+            "name": "задача#1",
+            "time": null,
+            "devices": [
+                {
+                    "id": "3",
+                    "mac": "60:A4:4C:32:11:C3",
+                    "ip": "192.168.10.102",
+                    "channel": "1",
+                    "description": "dev01 on 102",
+                    "room_id": "2",
+                    "type": "1",
+                    "max_amp": "170",
+                    "connection_type": "1",
+                    "last_command": null
+                },
+                {
+                    "id": "423",
+                    "mac": "98:BE:A4:EE:25:03",
+                    "ip": "10.121.0.101",
+                    "channel": "3",
+                    "description": "устройство для откладки #3",
+                    "room_id": "1",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                },
+                {
+                    "id": "425",
+                    "mac": "98:BE:A4:EE:25:05",
+                    "ip": "10.121.0.101",
+                    "channel": "5",
+                    "description": "устройство для откладки #5",
+                    "room_id": "1",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                }
+            ],
+            "groups": [
+                {
+                    "id": "108",
+                    "name": "группа для отладки #2",
+                    "last_command": null
+                },
+                {
+                    "id": "119",
+                    "name": "всякие девайсы",
+                    "last_command": null
+                },
+                {
+                    "id": "2",
+                    "name": "мои шторы",
+                    "last_command": null
+                }
+            ]
+        },
+        {
+            "stamps": "TUESDAY",
+            "id": "30",
+            "state": "ACTIVE",
+            "command": "up",
+            "name": "test#1",
+            "time": "17:10:00",
+            "devices": [
+                {
+                    "id": "422",
+                    "mac": "98:BE:A4:EE:25:02",
+                    "ip": "10.121.0.101",
+                    "channel": "2",
+                    "description": "устройство для откладки #2",
+                    "room_id": "2",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                },
+                {
+                    "id": "424",
+                    "mac": "98:BE:A4:EE:25:04",
+                    "ip": "10.121.0.101",
+                    "channel": "4",
+                    "description": "устройство для откладки #4",
+                    "room_id": "3",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                }
+            ],
+            "groups": [
+                {
+                    "id": "108",
+                    "name": "группа для отладки #2",
+                    "last_command": null
+                },
+                {
+                    "id": "107",
+                    "name": "группа для отладки#1",
+                    "last_command": null
+                }
+            ]
+        }
+    ]
+}',
+            'description' => 'Для получения всех объектов из избранного нужно выполнить запрос GET /favorites_rpc
+Результатом будет json объект с 3 полями в корне: devices, groups, scheduled со списками, соответственно, устройств, групп, назначенных заданий. Каждое назначенное задание, в свою очередь, также имеет поля  devices и groups, в которых лежат списки устройств и групп, которые включены в данное задание.',
+        ),
+    ),
+    'plate\\V1\\Rpc\\ScheduledTasks\\Controller' => array(
+        'description' => 'Сервис для специальных действий с назначенными заданиями: включение/отключение задания, включение/отключение дней в еженедельных заданиях, изменение времени срабатывания.',
+        'POST' => array(
+            'description' => 'Все действия выполняются POST-запросом.
+Обязательные поля:
+scheduled_task_id - id задания, к которому нужно применить действие;
+action - тип действия: 
+    turn_scheduled - включение/выключение задания; требует дополнительного параметра turn=on/off;
+    change_time - изменить время; требует дополнительного параметра time в формате hh:mm, например, 15:45;
+    change_week_days - включение/выключение дней недели; требует дополнительных параметров:
+        weekday - день недели - MONDAY, TUESDAY, ....
+        turn=on/off - включить/выключить',
+            'request' => '{
+	"action" : "change_week_days",
+	"scheduled_task_id" : "30",
+	"weekday" : "TUESDAY",
+	"turn" : "on"
+}
+
+
+{
+	"action" : "change_time",
+	"scheduled_task_id" : 30,
+	"time" : "17:10"
+}
+
+{
+	"action" : "turn_scheduled",
+	"scheduled_task_id" : 30,
+	"turn" : "on"
+}',
+        ),
+    ),
+    'plate\\V1\\Rest\\Scheduled_tasks\\Controller' => array(
         'description' => 'Сервис для работы с назначенными заданиями.',
-        'collection' => [
+        'collection' => array(
             'description' => 'Работа со списком назначенным заданием.',
-            'GET' => [
+            'GET' => array(
                 'description' => 'Метод для получения списка заданий. Администраторам возвращается полный список заданий. Обычные пользователи видят только те задания, которые привязаны к устройствам или группам, к которым им предоставлен доступ (см. сервис devices)',
                 'response' => '{
   "_links": {
@@ -804,317 +1316,91 @@ room_id - получение списка устройств в комнате (
   "total_items": 7,
   "page": 1
 }',
-            ],
-            'POST' => [
-                'description' => 'Создать назначенное задание. Задание должно быть привязано либо к устройству (id_device), либо к группе устройств (id_group), при этом к данному устройству/группе у пользователя должен быть доступ. 
-Одновременно передавать и id_device, и id_group нельзя.',
+            ),
+            'POST' => array(
+                'description' => 'Создать назначенное задание. 
+Нужно передать поля назначенного задания, а также
+stamps - перечень отметок (для еженедельных заданий это дни недели) через запятую - например, MONDAY, FRIDAY, SUNDAY если задание должно выполняться в понедельник, пятницу, воскресенье
+devices_ids - идентификаторы устройств, которые нужно привязать к заданию
+groups_ids - идентификаторы устройств, которые нужно привязать к заданию',
                 'request' => '{
-	"state" : "active",
-	"id_device" : "7",
-	"grp_dev_type" : "DEVICE",
+	"state" : "ACTIVE",
 	"period_type" : "WEEKLY",
 	"command" : "up",
-	"name" : "задача#7"
+	"name" : "test#2",
+	"stamps" : "  MONDAY,wedww    ,  wef",
+	"devices_ids" : "422,424",
+	"groups_ids" : "108,107",
+	"time" : "23:59"
 }',
                 'response' => '{
-  "id": "7",
-  "state": "ACTIVE",
-  "id_device": "7",
-  "id_group": null,
-  "grp_dev_type": "DEVICE",
-  "period_type": "WEEKLY",
-  "command": "up",
-  "name": "задача#7",
-  "_links": {
-    "self": {
-      "href": "http://localhost:8080/scheduled_tasks/7"
+    "id": "32",
+    "name": "test#2",
+    "state": "ACTIVE",
+    "command": "up",
+    "period_type": "WEEKLY",
+    "stamps": "MONDAY",
+    "time": "23:59:00",
+    "devices": [
+        {
+            "id": "422",
+            "mac": "98:BE:A4:EE:25:02",
+            "ip": "10.121.0.101",
+            "channel": "2",
+            "description": "устройство для откладки #2",
+            "room_id": "2",
+            "type": "1",
+            "max_amp": "250",
+            "connection_type": "1",
+            "last_command": null
+        },
+        {
+            "id": "424",
+            "mac": "98:BE:A4:EE:25:04",
+            "ip": "10.121.0.101",
+            "channel": "4",
+            "description": "устройство для откладки #4",
+            "room_id": "3",
+            "type": "1",
+            "max_amp": "250",
+            "connection_type": "1",
+            "last_command": null
+        }
+    ],
+    "groups": [
+        {
+            "id": "108",
+            "name": "группа для отладки #2",
+            "last_command": null
+        },
+        {
+            "id": "107",
+            "name": "группа для отладки#1",
+            "last_command": null
+        }
+    ],
+    "_links": {
+        "self": {
+            "href": "http://localhost:8080/scheduled_tasks/32"
+        }
     }
-  }
 }',
-            ],
-        ],
-        'entity' => [
+            ),
+        ),
+        'entity' => array(
             'description' => 'Работа с записью о назначенном задании.',
-            'GET' => [
+            'GET' => array(
                 'description' => 'Метод для получения записи о назначенном задании.',
-            ],
-            'PATCH' => [
+            ),
+            'PATCH' => array(
                 'description' => 'Метод для частичного обновления записи  о назначенном задании.',
-            ],
-            'PUT' => [
+            ),
+            'PUT' => array(
                 'description' => 'Метод для полного обновления записи  о назначенном задании.',
-            ],
-            'DELETE' => [
+            ),
+            'DELETE' => array(
                 'description' => 'Метод для удаления о назначенном задании.',
-            ],
-        ],
-    ],
-    'plate\\V1\\Rest\\Scheduled_tasks_timetable\\Controller' => [
-        'description' => 'Сервис для работы с расписаниями назначенных заданий. Для всех методов права доступа определяются правами доступа к соответствующим назначенным заданиям.',
-        'collection' => [
-            'description' => 'Работа со списком расписаний назначенных заданий.',
-            'GET' => [
-                'description' => 'Получить расписания назначенных заданий. Принимает параметр \'scheduling_task_id\' - id назначенного задания, который является обязательным для всех, кроме администраторов.',
-            ],
-            'POST' => [
-                'description' => 'Создать элемент расписания назначенного задания.',
-            ],
-        ],
-        'entity' => [
-            'description' => 'Работа со строкой расписания назначенного задания.',
-            'GET' => [
-                'description' => 'Получить строку расписания.',
-            ],
-            'PATCH' => [
-                'description' => 'Частичное обновление строки расписания.',
-            ],
-            'PUT' => [
-                'description' => 'Полное обновление строки расписания.',
-            ],
-            'DELETE' => [
-                'description' => 'Удаление строки расписания.',
-            ],
-        ],
-    ],
-    'plate\\V1\\Rpc\\Commands2devGroups\\Controller' => [
-        'POST' => [
-            'request' => '{
-   "group": "Id группы, которой нужно отправить команду",
-   "command": "Команда"
-}',
-            'response' => '{
-  "status": "ok",
-  "message": "command sent",
-  "device": [
-    {
-      "id": "1",
-      "mac": "94:B1:0A:F8:47:B8",
-      "ip": "192.168.10.101",
-      "channel": "1",
-      "description": "some dev",
-      "group_id": "1",
-      "room_id": "1",
-      "type": "1",
-      "max_amp": "0.25",
-      "connection_type": "1",
-      "last_command": "up"
-    },
-    {
-      "id": "2",
-      "mac": "D0:E7:82:6E:B8:09",
-      "ip": "192.168.10.101",
-      "channel": "2",
-      "description": "some other dev",
-      "group_id": "1",
-      "room_id": "1",
-      "type": "1",
-      "max_amp": "0.6",
-      "connection_type": "2",
-      "last_command": "up"
-    }
-  ]
-}',
-            'description' => 'используется только метод POST',
-        ],
-        'description' => 'Сервис для отправки команды ("up", "down") группе устройств',
-    ],
-    'plate\\V1\\Rpc\\Commands2devices\\Controller' => [
-        'POST' => [
-            'request' => '{
-   "device": "id устройства, на которое подается команда",
-   "command": "команда, которую нужно отправить"
-}',
-            'response' => '{
-  "status": "ok",
-  "message": "command sent",
-  "device": {
-    "id": "1",
-    "mac": "94:B1:0A:F8:47:B8",
-    "ip": "192.168.10.101",
-    "channel": "1",
-    "description": "some dev",
-    "group_id": "1",
-    "room_id": "1",
-    "type": "1",
-    "max_amp": "0.25",
-    "connection_type": "1",
-    "last_command": "down"
-  }
-}',
-            'description' => 'используется только метод POST',
-        ],
-        'description' => 'Позволяет отправлять команды ("up", "down") устройствам',
-    ],
-    'plate\\V1\\Rest\\Dev2grp\\Controller' => [
-        'description' => 'Управление распределением устройств по группам',
-        'collection' => [
-            'description' => 'Управление списком элементов',
-            'GET' => [
-                'description' => 'Получить записи соответствия устройство->группа  с учетом доступа к устройствам и группам. Подразумевается, что если пользователь имеет доступ к группе устройств, то он имеет доступ и ко все устройствам в этой группе.',
-                'response' => '{
-   "_links": {
-       "self": {
-           "href": "/dev2grp"
-       },
-       "first": {
-           "href": "/dev2grp?page={page}"
-       },
-       "prev": {
-           "href": "/dev2grp?page={page}"
-       },
-       "next": {
-           "href": "/dev2grp?page={page}"
-       },
-       "last": {
-           "href": "/dev2grp?page={page}"
-       }
-   }
-   "_embedded": {
-       "dev2grp": [
-           {
-               "_links": {
-                   "self": {
-                       "href": "/dev2grp[/:dev2grp_id]"
-                   }
-               }
-              "device_id": "Id устройства",
-              "group_id": "Id группы"
-           }
-       ]
-   }
-}',
-            ],
-            'POST' => [
-                'description' => 'Добавить соответствие устройство->группа. При этом должны быть выполнены условия: 1) пользователь имеет право доступа к устройству; 2) пользователь имеет право доступа к группе; 3) в системе нет пользователей, которые имеют доступ к группе, но не имеют доступа к устройству.',
-                'request' => '{
-   "device_id": "Id устройства",
-   "group_id": "Id группы"
-}',
-                'response' => '{
-   "_links": {
-       "self": {
-           "href": "/dev2grp[/:dev2grp_id]"
-       }
-   }
-   "device_id": "Id устройства",
-   "group_id": "Id группы"
-}',
-            ],
-        ],
-        'entity' => [
-            'description' => 'Управление записью устройство->группа. Доступно только удаление',
-            'DELETE' => [
-                'description' => 'Удаление записи устройство->группа. Как устройство, так и группа должны быть доступны пользователю.',
-                'request' => '{
-   "device_id": "Id устройства",
-   "group_id": "Id группы"
-}',
-            ],
-        ],
-    ],
-    'plate\\V1\\Rest\\Groups\\Controller' => [
-        'description' => 'Управление группами устройств',
-        'collection' => [
-            'description' => 'Управление списком групп устройств',
-            'GET' => [
-                'response' => '{
-   "_links": {
-       "self": {
-           "href": "/groups"
-       },
-       "first": {
-           "href": "/groups?page={page}"
-       },
-       "prev": {
-           "href": "/groups?page={page}"
-       },
-       "next": {
-           "href": "/groups?page={page}"
-       },
-       "last": {
-           "href": "/groups?page={page}"
-       }
-   }
-   "_embedded": {
-       "groups": [
-           {
-               "_links": {
-                   "self": {
-                       "href": "/groups[/:groups_id]"
-                   }
-               }
-              "name": "Имя группы"
-           }
-       ]
-   }
-}',
-                'description' => 'Получить список групп. Обычный пользователь получит все группы, к которым у него есть доступ, администратор - полный список групп',
-            ],
-            'POST' => [
-                'description' => 'Создать группу. Доступно как администратору, так и обычному пользователю. Обычному пользователю автоматически добавляет созданную группу в список доступа.',
-                'request' => '{
-   "name": "Имя группы"
-}',
-                'response' => '{
-   "_links": {
-       "self": {
-           "href": "/groups[/:groups_id]"
-       }
-   }
-   "name": "Имя группы"
-}',
-            ],
-        ],
-        'entity' => [
-            'description' => 'Управление группой',
-            'GET' => [
-                'description' => 'Получить группу. Для обычного пользователя должен быть предоставлен доступ.',
-                'response' => '{
-   "_links": {
-       "self": {
-           "href": "/groups[/:groups_id]"
-       }
-   }
-   "name": "Имя группы"
-}',
-            ],
-            'PUT' => [
-                'description' => 'Обновить группу. Для обычного пользователя должен быть предоставлен доступ.',
-                'request' => '{
-   "name": "Имя группы"
-}',
-                'response' => '{
-   "_links": {
-       "self": {
-           "href": "/groups[/:groups_id]"
-       }
-   }
-   "name": "Имя группы"
-}',
-            ],
-            'DELETE' => [
-                'description' => 'Удалить группу. Для обычного пользователя должен быть предоставлен доступ.',
-                'request' => '{
-   "name": "Имя группы"
-}',
-                'response' => '',
-            ],
-            'PATCH' => [
-                'description' => 'Частичное обновление группы. Для обычного пользователя должен быть предоставлен доступ.',
-                'request' => '{
-   "name": "Имя группы",
-   "last_command": "команда, которая была обработана последней"
-}',
-                'response' => '{
-   "_links": {
-       "self": {
-           "href": "/groups[/:groups_id]"
-       }
-   }
-   "name": "Имя группы",
-   "last_command": "команда, которая была обработана последней"
-}',
-            ],
-        ],
-    ],
-];
+            ),
+        ),
+    ),
+);

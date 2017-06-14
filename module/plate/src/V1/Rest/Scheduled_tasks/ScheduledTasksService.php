@@ -12,6 +12,7 @@ namespace plate\V1\Rest\Scheduled_tasks;
 use plate\EntityServicesSupport\EntitiesUtils;
 use plate\EntityServicesSupport\EntityService;
 use plate\EntitySupport\Collection;
+use plate\EntitySupport\Entity;
 use plate\V1\Rest\Dev2grp\Dev2grpResource;
 use plate\V1\Rest\Devices\DevicesResource;
 use plate\V1\Rest\Devices\DevicesService;
@@ -31,6 +32,7 @@ class ScheduledTasksService extends EntityService
 {
     const WEEKDAYS = ['MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY','SUNDAY'];
     const SCHEDULED_TIMETABLE_TIMEFORMAT = "Y-m-d H:i:s";
+    const TURNS = ['on', 'off'];
 
     protected $entitiesUtils;
 
@@ -102,6 +104,9 @@ class ScheduledTasksService extends EntityService
         /**
          * Создаем задание и получем на него права
          */
+        if(isset($time)){
+            $retrievedData['common_time'] = $time;
+        }
         $scheduledTask = $this->getTableMapper()->create($retrievedData);
         $this->addRightsToScheduledTask($scheduledTask->id);
 
@@ -312,7 +317,8 @@ class ScheduledTasksService extends EntityService
                             where stt.scheduling_task_id = st." . $this->getIdFieldName() . "
                         )    
                     "),
-                    'scheduled.time' => new Expression("
+                    'scheduled.time' => 'common_time'
+                        /*new Expression("
                         (
                             select time(
                                 substring_index(
@@ -323,7 +329,7 @@ class ScheduledTasksService extends EntityService
                                 from " . $sttTableName . " stt
                                 where stt.scheduling_task_id = st." . $this->getIdFieldName() . "
                             )               
-                    ")
+                        ")*/
                 ]
             );
 
@@ -457,6 +463,118 @@ class ScheduledTasksService extends EntityService
     public function setGroupsService($groupsService)
     {
         $this->groupsService = $groupsService;
+    }
+
+    /**
+     * Включить/выключить срабатывание еженедельного задания в определенный день недели
+     * @param $scheduled_task_id
+     * @param $weekday
+     * @param $turn
+     * @return Entity|ApiProblem
+     */
+    public function changeWeekday($scheduled_task_id, $weekday, $turn)
+    {
+        if(!in_array($weekday, self::WEEKDAYS))
+            return new ApiProblem(400, "День недели должен соответствовать одному из значений " . implode(",", self::WEEKDAYS));
+
+        if(!in_array($turn, self::TURNS)){
+            return new ApiProblem(400, "`turn` должно соответствовать одному из значений " . implode("," , self::TURNS));
+        }
+
+        $scheduled_task_id = (int) $scheduled_task_id;
+        $params = [
+            'scheduling_task_id' => $scheduled_task_id,
+            'special_stamp' => $weekday
+        ];
+        $timeTableRes = $this->getScheduledTasksTimeTableMapper()->fetchAll($params);
+
+        if($turn == "off") {
+            if($timeTableRes->count() == 0) {
+                return new ApiProblem(400, "Не найдено дня недели " . $weekday . " у ScheduledTask#" . $scheduled_task_id);
+            }
+
+            $timeTableElement = $timeTableRes->getCurrentItems()[0];
+            $this->getScheduledTasksTimeTableMapper()->delete($timeTableElement->id);
+        }
+
+        if($turn == "on"){
+            if($timeTableRes->count() > 0) {
+                return new ApiProblem(400, "Уже есть день недели " . $weekday . " в расписании ScheduledTask#" . $scheduled_task_id);
+            }
+
+            $scheduledTask = Entity::asArray($this->getTableMapper()->fetch($scheduled_task_id));
+
+
+            if(!isset($scheduledTask['common_time']) || $scheduledTask['common_time'] == null){
+                return new ApiProblem(500, "Произошла ошибка. Время срабатывания не было сохранено");
+            }
+
+            $time = explode(":", $scheduledTask['common_time']);
+            $date = new \DateTime('next ' . strtolower($weekday));
+            $date->setTime($time[0], $time[1]);
+            $nextDTM = date(self::SCHEDULED_TIMETABLE_TIMEFORMAT, $date->getTimestamp());
+            $timeTableElement = [
+                'begin_dtm' => $nextDTM,
+                'repeat_period' => 3600*24*7,
+                'next_dtm' => $nextDTM,
+                'special_stamp' => $weekday,
+                'name' => "TIMETABLE_scheduledTask(" . $scheduled_task_id . ")_" . $weekday,
+                'scheduling_task_id' => $scheduled_task_id
+            ];
+
+            $this->getScheduledTasksTimeTableMapper()->create($timeTableElement);
+        }
+
+        return $this->fetch($scheduled_task_id);
+
+    }
+
+    /**
+     * Изменить время срабатывания для еженедельного задания
+     * @param $scheduled_task_id
+     * @param $time
+     * @return Entity|ApiProblem
+     */
+    public function changeTimeForWeeklyTask($scheduled_task_id, $time)
+    {
+        if(!preg_match("/([0-1][0-9]|20|21|22|23):[0-5][0-9]/", $time)){
+            return new ApiProblem(400, "Задайте время в формате HH:mm");
+        }
+
+        $scheduledTask = Entity::asArray($this->getTableMapper()->fetch($scheduled_task_id));
+        $scheduledTask['common_time'] = $time;
+
+        $this->getTableMapper()->update($scheduled_task_id, $scheduledTask);
+        $timetable = $this->getScheduledTasksTimeTableMapper()->fetchAll(['scheduling_task_id' => $scheduled_task_id]);
+        foreach ($timetable->getCurrentItems() as $item){
+            $item = Entity::asArray($item);
+            $times = explode(":", $time);
+            $nextDTM = new \DateTime($item['next_dtm']);
+            $nextDTM->setTime($times[0], $times[1]);
+            $item['next_dtm'] = date(self::SCHEDULED_TIMETABLE_TIMEFORMAT, $nextDTM->getTimestamp());
+            $this->getScheduledTasksTimeTableMapper()->update($item['id'], $item);
+        }
+
+        return $this->fetch($scheduled_task_id);
+    }
+
+    /**
+     * Включение/отключение назначенного задания
+     * @param $scheduled_task_id
+     * @param $turn
+     * @return Entity|ApiProblem
+     */
+    public function turnScheduled($scheduled_task_id, $turn)
+    {
+        if(!in_array($turn, self::TURNS)){
+            return new ApiProblem(400, "`turn` должно соответствовать одному из значений " . implode("," , self::TURNS));
+        }
+
+        $scheduledTask =  Entity::asArray($this->getTableMapper()->fetch($scheduled_task_id));
+        $scheduledTask['state'] = ($turn == "on")? "ACTIVE" : "PAUSED";
+        $this->getTableMapper()->update($scheduled_task_id, $scheduledTask);
+
+        return $this->fetch($scheduled_task_id);
     }
 
     protected function getScheduledTasksDevGrpIdField(){

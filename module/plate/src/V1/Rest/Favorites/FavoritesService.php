@@ -247,7 +247,7 @@ class FavoritesService extends EntityService
                             where scheduled_tasks_timetable.scheduling_task_id = `st`.id
                         )
                     "),
-                    'scheduled.time' => new Expression("
+                        /*new Expression("
                         (
                             select time(
                                 substring_index(
@@ -258,7 +258,7 @@ class FavoritesService extends EntityService
                             from scheduled_tasks_timetable
                             where scheduled_tasks_timetable.scheduling_task_id = `st`.id
                         )
-                    ")
+                        ")*/
                 ]
             )
             ->join(
@@ -287,7 +287,8 @@ class FavoritesService extends EntityService
                     'scheduled.id' => 'id',
                     'scheduled.state' => 'state',
                     'scheduled.command' => 'command',
-                    'scheduled.name' => 'name'
+                    'scheduled.name' => 'name',
+                    'scheduled.time' => 'common_time'
                 ],
                 Join::JOIN_LEFT
             )
