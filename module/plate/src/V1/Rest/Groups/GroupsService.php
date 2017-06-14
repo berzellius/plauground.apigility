@@ -180,6 +180,19 @@ class GroupsService extends EntityService
         return $this->update($id, $data, $retrievedData);
     }
 
+    public function checkRightsToGroup($client_id, $group_id)
+    {
+        $params = [
+            'client_id' => $client_id,
+            'grp_id' => $group_id
+        ];
+
+        return (
+            $this->getAuthUtils()->checkAdminPrivileges() ||
+            $this->getUserAccessListMapper()->fetchAll($params)->getCurrentItemCount() != 0
+        );
+    }
+
     /**
      * Возвращает Zend\Db\Sql\Select из тадлицы групп устройств с заданным фильтром $params
      * для обычных пользователей возвращает только те объекты, к которым есть разрешение в acl

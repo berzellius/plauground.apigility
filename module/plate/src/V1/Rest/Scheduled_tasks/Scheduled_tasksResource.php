@@ -20,22 +20,31 @@ class Scheduled_tasksResource extends CheckPrivilegesAndDataRetrievingResourceWi
                 $dev2grpTableGatewayMapper,
                 $groupsTableGateway;
 
+    protected $scheduledTasksService;
+
     /**
      * Scheduled_tasksResource constructor.
-     * @param $userAccessListMapper
+     * @param TableGatewayMapper $tableGatewayMapper
+     * @param TableGatewayMapper $userAccessListMapper
+     * @param $devicesTableGatewayMapper
+     * @param $groupsTableGatewayMapper
+     * @param $dev2grpTableGatewayMapper
+     * @param ScheduledTasksService $scheduledTasksService
      */
     public function __construct(
         $tableGatewayMapper,
         $userAccessListMapper,
         $devicesTableGatewayMapper,
         $groupsTableGatewayMapper,
-        $dev2grpTableGatewayMapper
+        $dev2grpTableGatewayMapper,
+        ScheduledTasksService $scheduledTasksService
     )
     {
         parent::__construct($tableGatewayMapper, $userAccessListMapper);
         $this->setDevicesTableGatewayMapper($devicesTableGatewayMapper);
         $this->setGroupsTableGatewayMapper($groupsTableGatewayMapper);
         $this->setDev2grpTableGatewayMapper($dev2grpTableGatewayMapper);
+        $this->setScheduledTasksService($scheduledTasksService);
     }
 
     /**
@@ -46,15 +55,8 @@ class Scheduled_tasksResource extends CheckPrivilegesAndDataRetrievingResourceWi
      */
     public function create($data)
     {
-        $data = $this->retrieveData($data);
-        $check = $this->checkData($data);
-        if($check instanceof ApiProblem)
-            return $check;
-
-        if(!$this->checkPrivilegesByData($data))
-            return $this->notAllowed();
-
-        return $this->getMapper()->create($data);
+        $retrievedData = $this->retrieveData($data);
+        return $this->getScheduledTasksService()->create($data, $retrievedData);
     }
 
     /**
@@ -65,10 +67,7 @@ class Scheduled_tasksResource extends CheckPrivilegesAndDataRetrievingResourceWi
      */
     public function delete($id)
     {
-        if(!$this->checkPrivilegesById($id))
-            return $this->notAllowed();
-
-        return $this->getMapper()->delete($id);
+        return $this->getScheduledTasksService()->delete($id);
     }
 
     /**
@@ -79,72 +78,18 @@ class Scheduled_tasksResource extends CheckPrivilegesAndDataRetrievingResourceWi
      */
     public function fetch($id)
     {
-        if(!$this->checkPrivilegesById($id))
-            return $this->notAllowed();
-
-        return $this->getMapper()->fetch($id);
+        return $this->getScheduledTasksService()->fetch($id);
     }
 
     /**
      * Fetch all or a subset of resources
-     * Для администраторов выбираются все записи
-     * Для остальных - те записи, которым соответствуют разрешения в devices_acl для группы или конкретного устройства
-     * для авторизованного пользователя
+     *
      * @param  array $params
      * @return ApiProblem|mixed
      */
     public function fetchAll($params = [])
     {
-
-        if(isset($params['room_id'])){
-            // особый случай - выбор назначенных заданий по room_id
-            $select = $this->getScheduledTasksByRoomIdSelector($params['room_id']);
-
-            $adapter = new Adapter(
-                $this->getMapper()->getTable()->getAdapter()->getDriver(),
-                $this->getMapper()->getTable()->getAdapter()->getPlatform()
-            );
-
-            $dbSelect = new DbSelect($select, $adapter);
-
-            return new Collection($dbSelect);
-        }
-        $clientId =  $this->getLoggedInClientId();
-
-        if($this->checkAdminPrivileges()){
-            return $this->getMapper()->fetchAll($params);
-        }
-
-        $scheduledTasksTableName = $this->getMapper()->getTable()->table;
-        $devicesACLTableName = $this->getUserAccessListMapper()->getTable()->table;
-
-        $select = new Select();
-        $select
-            ->from(array('da1' => $devicesACLTableName))
-            ->join(
-                $scheduledTasksTableName,
-                $scheduledTasksTableName . ".id_device = da1.device_id",
-                array("id", "state", "id_device", "id_group", "grp_dev_type", "period_type", "command", "name"),
-                Select::JOIN_RIGHT
-            )
-            ->join(
-                array('da2' => $devicesACLTableName),
-                $scheduledTasksTableName . ".id_group = da2.grp_id",
-                array(),
-                Select::JOIN_LEFT
-            )
-            ->columns([])
-            ->where("da1.client_id = '" . $clientId . "'")
-            ->where("da2.client_id = '" . $clientId . "'", Predicate::OP_OR);
-
-        $adapter = new Adapter(
-            $this->getMapper()->getTable()->getAdapter()->getDriver(),
-            $this->getMapper()->getTable()->getAdapter()->getPlatform()
-        );
-
-        $dbSelect = new DbSelect($select, $adapter);
-
-        return new Collection($dbSelect);
+        return $this->getScheduledTasksService()->fetchAll($params);
     }
 
     /**
@@ -157,30 +102,11 @@ class Scheduled_tasksResource extends CheckPrivilegesAndDataRetrievingResourceWi
     public function patch($id, $data)
     {
         $data = $this->retrieveData($data);
-        $check = $this->checkData($data);
-        if($check instanceof ApiProblem)
-            return $check;
 
         foreach($data as $k => $v){
             if($v == null)
                 unset($data[$k]);
         }
-
-        if(isset($data['id_device'])){
-            $data['id_group'] = null;
-        }
-
-        if(isset($data['id_group'])){
-            $data['id_device'] = null;
-        }
-
-
-        if(!$this->checkPrivilegesByData($data))
-            return $this->notAllowed();
-
-        if(!$this->checkPrivilegesById($id))
-            return $this->notAllowed();
-
 
         return $this->getMapper()->update($id, $data);
     }
@@ -195,79 +121,26 @@ class Scheduled_tasksResource extends CheckPrivilegesAndDataRetrievingResourceWi
     public function update($id, $data)
     {
         $data = $this->retrieveData($data);
-        $check = $this->checkData($data);
-        if($check instanceof ApiProblem)
-            return $check;
-
-        if(!$this->checkPrivilegesByData($data))
-            return $this->notAllowed();
-
-        if(!$this->checkPrivilegesById($id))
-            return $this->notAllowed();
-
         return $this->getMapper()->update($id, $data);
     }
 
-    private function checkData($data)
+    /**
+     * @return ScheduledTasksService
+     */
+    public function getScheduledTasksService()
     {
-        $dev = isset($data['id_device'])? $data['id_device'] : false;
-        $grp = isset($data['id_group'])? $data['id_group'] : false;
-        $type = isset($data['grp_dev_type'])? $data['grp_dev_type'] : false;
-
-        if(!$type){
-            return new ApiProblem(400, "'grp_dev_type' must be set");
-        }
-
-        if($type == "DEVICE" && $grp){
-            return new ApiProblem(400, "only 'device_id' must be set for 'DEVICE' type");
-        }
-
-        if($type == "GROUP" && $dev){
-            return new ApiProblem(400, "only 'group_id' must be set for 'GROUP' type");
-        }
-
-        if(!($dev xor $grp)){
-            return new ApiProblem(400, "Both 'device_id' and 'group_id' cant be set: ");
-        }
-        return true;
+        return $this->scheduledTasksService;
     }
 
-    private function checkPrivilegesByData($data)
+    /**
+     * @param ScheduledTasksService $scheduledTasksService
+     */
+    public function setScheduledTasksService($scheduledTasksService)
     {
-        if($this->checkAdminPrivileges())
-            return true;
-
-        $dev = isset($data['id_device'])? $data['id_device'] : false;
-        $grp = isset($data['id_group'])? $data['id_group'] : false;
-        $type = isset($data['grp_dev_type'])? $data['grp_dev_type'] : false;
-
-        if($type == "DEVICE"){
-            if(!$dev)
-                return false;
-
-            return $this->checkPrivileges($type, $dev);
-        }
-
-        if($type == "GROUP"){
-            if(!$grp)
-                return false;
-
-            return $this->checkPrivileges($type, $grp);
-        }
-
-        return false;
+        $this->scheduledTasksService = $scheduledTasksService;
     }
 
-    private function checkPrivilegesById($id)
-    {
-        if($this->checkAdminPrivileges())
-            return true;
-
-        $data = Scheduled_tasksEntity::asArray($this->getMapper()->fetch($id));
-        return $this->checkPrivilegesByData($data);
-    }
-
-    private function checkPrivileges($type, $id)
+    protected function checkPrivileges($type, $id)
     {
         if($this->checkAdminPrivileges())
             return true;
@@ -293,6 +166,8 @@ class Scheduled_tasksResource extends CheckPrivilegesAndDataRetrievingResourceWi
         return ($this->getUserAccessListMapper()->fetchAll($params)->getCurrentItemCount() !== 0);
     }
 
+
+
     protected function getScheduledTasksByRoomIdSelector($room_id)
     {
         $scheduledTasksTableName = $this->getMapper()->getTable()->table;
@@ -308,7 +183,7 @@ class Scheduled_tasksResource extends CheckPrivilegesAndDataRetrievingResourceWi
             ->join(
                 $scheduledTasksTableName,
                 $scheduledTasksTableName . ".id_device" . " = dt.id",
-                ["id", "grp_dev_type", "id_group", "id_device", "name", "period_type", "state", "command"],
+                ["id", "name", "period_type", "state", "command"],
                 Select::JOIN_RIGHT
             )
             ->join(
@@ -440,7 +315,4 @@ class Scheduled_tasksResource extends CheckPrivilegesAndDataRetrievingResourceWi
     {
         $this->dev2grpTableGatewayMapper = $dev2grpTableGatewayMapper;
     }
-
-
-
 }

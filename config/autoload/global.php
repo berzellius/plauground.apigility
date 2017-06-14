@@ -66,5 +66,9 @@ return array(
     'favorites' => array(
         'db' => 'oauth2_users',
         'table' => 'favorites'
+    ),
+    'scheduled_tasks_dev_grp' => array(
+        'db' => 'oauth2_users',
+        'table' => 'scheduled_tasks_dev_grp'
     )
 );

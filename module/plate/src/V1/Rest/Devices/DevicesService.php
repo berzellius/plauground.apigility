@@ -154,6 +154,18 @@ class DevicesService extends EntityService{
         $this->getUserAccessListMapper()->create($data);
     }
 
+    public function checkRightsToDevice($client_id, $device_id){
+        $params = [
+            'client_id' => $client_id,
+            'device_id' => $device_id
+        ];
+
+        return (
+            $this->getAuthUtils()->checkAdminPrivileges() ||
+            $this->getUserAccessListMapper()->fetchAll($params)->getCurrentItemCount() != 0
+        );
+    }
+
     /**
      * Возвращает Zend\Db\Sql\Select из таблицы устройств с привязкой к группе устройств @grpId
      * для обычных пользователей возвращает только те объекты, к которым есть разрешение в acl

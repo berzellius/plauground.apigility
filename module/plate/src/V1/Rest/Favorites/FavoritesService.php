@@ -17,7 +17,9 @@ use plate\V1\Rest\DevicesAcl\UserAccessUtilsForServices;
 use plate\V1\Rest\Groups\GroupsResource;
 use plate\V1\Rest\Scheduled_tasks\Scheduled_tasksEntity;
 use plate\V1\Rest\Scheduled_tasks\Scheduled_tasksResource;
+use plate\V1\Rest\Scheduled_tasks_dev_grp\Scheduled_tasks_dev_grpResource;
 use Zend\Db\Adapter\Adapter;
+use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Join;
 use Zend\Db\Sql\Select;
 use Zend\Paginator\Adapter\DbSelect;
@@ -128,7 +130,7 @@ class FavoritesService extends EntityService
                 if(!isset($data['id_scheduled_task']))
                     return false;
 
-                $scheduledTask = $this->getScheduledTasksMapper()->fetch($data['id_scheduled_task']);
+                /*$scheduledTask = $this->getScheduledTasksMapper()->fetch($data['id_scheduled_task']);
                 $scheduledTask = Entity::asArray($scheduledTask);
                 if(Scheduled_tasksEntity::getEntityDevGrpType($scheduledTask) == "GROUP"){
                     $params = [
@@ -142,8 +144,11 @@ class FavoritesService extends EntityService
                         "device_id" => $scheduledTask['id_device'],
                         "client_id" => $this->getAuthUtils()->getClientId()
                     ];
-                }
-
+                }*/
+                $params = [
+                    "scheduled_task_id" => $data['id_scheduled_task'],
+                    "client_id" => $this->getAuthUtils()->getClientId()
+                ];
                 break;
             default:
                 return false;
@@ -200,10 +205,11 @@ class FavoritesService extends EntityService
 
     /**
      * Получить избранное пользователя
-     * @param $client_id - пользователь
-     * @return Collection
+     * @return array
      */
-    public function fetchAllFavoritesByUser($client_id){
+    public function fetchAllFavorites(){
+        $client_id = $this->getAuthUtils()->getClientId();
+
         $devicesTable = $this->getDevicesTableName();
         $devicesIdField = $this->getDevicesIdFieldName();
 
@@ -216,32 +222,116 @@ class FavoritesService extends EntityService
         $table = $this->getTableName();
         $idField = $this->getIdFieldName();
 
+        $stdgTableName = $this->getScheduledTasks_dev_grpTableName();
+
         $select = new Select();
         $select
             ->from(array("d" => $devicesTable))
+            ->columns(
+                [
+                    'device.id' => 'id',
+                    'device.mac' => 'mac',
+                    'device.ip' => 'ip',
+                    'device.channel' => 'channel',
+                    'device.description' => 'description',
+                    'device.room_id' => 'room_id',
+                    'device.type' => 'type',
+                    'device.max_amp' => 'max_amp',
+                    'device.connection_type' => 'connection_type',
+                    'device.last_command' => 'last_command',
+                    'scheduled.stamps' => new Expression("
+                        (
+                            select
+                            group_concat(`special_stamp`)
+                            from scheduled_tasks_timetable
+                            where scheduled_tasks_timetable.scheduling_task_id = `st`.id
+                        )
+                    "),
+                    'scheduled.time' => new Expression("
+                        (
+                            select time(
+                                substring_index(
+                                    group_concat(
+                                        cast(`begin_dtm` as CHAR) ORDER BY `id`), ',', 1
+                                    )
+                                )
+                            from scheduled_tasks_timetable
+                            where scheduled_tasks_timetable.scheduling_task_id = `st`.id
+                        )
+                    ")
+                ]
+            )
             ->join(
                 array("f" => $table),
                 "d." . $devicesIdField . " = f.id_device",
-                Select::SQL_STAR,
+                [
+                    'favorite.id' => 'id',
+                    'favorite.entity_type' => 'entity_type',
+                ],
                 Join::JOIN_RIGHT
             )
             ->join(
                 array("g" => $groupsTable),
                 "g." . $groupsIdField . " = f.id_group",
-                Select::SQL_STAR,
+                [
+                    'group.id' => 'id',
+                    'group.name' => 'name',
+                    'group.last_command' => 'last_command'
+                ],
                 Join::JOIN_LEFT
             )
             ->join(
                 array("st" => $scheduledTasksTable),
                 "st." . $scheduledTasksIdField . " = f.id_scheduled_task",
-                Select::SQL_STAR,
+                [
+                    'scheduled.id' => 'id',
+                    'scheduled.state' => 'state',
+                    'scheduled.command' => 'command',
+                    'scheduled.name' => 'name'
+                ],
                 Join::JOIN_LEFT
             )
+            ->join(
+                ['stdg' => $stdgTableName],
+                "stdg.scheduled_task_id = st." . $this->getIdFieldName(),
+                [],
+                Join::JOIN_LEFT
+            )
+            ->join(
+                ['sd' => $devicesTable],
+                "stdg.id_device = sd." . $devicesIdField,
+                [
+                    'scheduled.device.id' => 'id',
+                    'scheduled.device.mac' => 'mac',
+                    'scheduled.device.ip' => 'ip',
+                    'scheduled.device.channel' => 'channel',
+                    'scheduled.device.description' => 'description',
+                    'scheduled.device.room_id' => 'room_id',
+                    'scheduled.device.type' => 'type',
+                    'scheduled.device.max_amp' => 'max_amp',
+                    'scheduled.device.connection_type' => 'connection_type',
+                    'scheduled.device.last_command' => 'last_command'
+                ],
+                Join::JOIN_LEFT
+            )
+            ->join(
+                ["sg" => $groupsTable],
+                "stdg.id_group = sg." . $groupsIdField,
+                [
+                    'scheduled.group.id' => 'id',
+                    'scheduled.group.name' => 'name',
+                    'scheduled.group.last_command' => 'last_command'
+                ],
+                Join::JOIN_LEFT
+            )
+            ->where("f.user = '" . $client_id . "'")
             ->where(
-                "f.user = '" . $client_id . "'",
-                "d.id IS NOT NULL OR
+                "(d.id IS NOT NULL OR
                  g.id IS NOT NULL OR
-                 st.id IS NOT NULL"
+                 st.id IS NOT NULL)"
+            )
+            ->order(
+                "f.entity_type"
             )
         ;
 
@@ -252,7 +342,7 @@ class FavoritesService extends EntityService
 
         $dbSelect = new DbSelect($select, $adapter);
 
-        return new Collection($dbSelect);
+        return $dbSelect->getItems(0, 300);
     }
 
     protected function getDevicesIdFieldName(){
@@ -277,5 +367,9 @@ class FavoritesService extends EntityService
 
     protected function getScheduledTasksIdFieldName(){
         return $this->getITableService()->getTableIdFieldName(Scheduled_tasksResource::class);
+    }
+
+    protected function getScheduledTasks_dev_grpTableName(){
+        return $this->getITableService()->getTableNameByKey(Scheduled_tasks_dev_grpResource::class);
     }
 }

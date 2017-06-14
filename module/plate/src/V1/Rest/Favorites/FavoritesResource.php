@@ -15,6 +15,8 @@ class FavoritesResource extends DataRetrievingResource
 
     /**
      * FavoritesResource constructor.
+     * @param TableGatewayMapper $mapper
+     * @param FavoritesService $service
      */
     public function __construct(
         TableGatewayMapper $mapper,

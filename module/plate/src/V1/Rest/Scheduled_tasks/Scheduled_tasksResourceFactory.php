@@ -1,12 +1,13 @@
 <?php
 namespace plate\V1\Rest\Scheduled_tasks;
 
+use Interop\Container\ContainerInterface;
 use plate\EntitySupport\ResourceFactory;
 use plate\EntitySupport\TableGatewayMapper;
 
 class Scheduled_tasksResourceFactory extends ResourceFactory
 {
-    public function __invoke($services)
+    public function __invoke(ContainerInterface $services)
     {
         $tableGateway = $this->getTableGateway($services, "scheduled_tasks");
         $tableGatewayMapper = new TableGatewayMapper($tableGateway);
@@ -28,12 +29,16 @@ class Scheduled_tasksResourceFactory extends ResourceFactory
         $dev2grpTableGateway = $this->getTableGateway($services, "dev2grp");
         $dev2grpTableGatewayMapper = new TableGatewayMapper($dev2grpTableGateway);
 
+        /** @var ScheduledTasksService $scheduledTasksService */
+        $scheduledTasksService = $services->get(ScheduledTasksService::class);
+
         return new Scheduled_tasksResource(
             $tableGatewayMapper,
             $aclTableGatewayMapper,
             $devicesTableGatewayMapper,
             $groupsTableGatewayMapper,
-            $dev2grpTableGatewayMapper
+            $dev2grpTableGatewayMapper,
+            $scheduledTasksService
         );
     }
 }

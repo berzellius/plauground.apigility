@@ -159,7 +159,7 @@ class BasicTest extends AbstractHttpControllerTestCase
     }
 
     public function ____test4loadDebbugingTest(){
-        $this->loadEntitiesSet(\TestDatasetsPart1::forFavoritesSet());
+        //$this->loadEntitiesSet(\TestDatasetsPart1::forFavoritesSet());
         /*$devicesIds = [421, 422, 423, 424, 425];
         $groupsIds = [107, 108, 109];
 
