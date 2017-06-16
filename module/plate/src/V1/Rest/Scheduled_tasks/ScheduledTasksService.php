@@ -275,7 +275,6 @@ class ScheduledTasksService extends EntityService
         );
 
         $dbSelect = new ScheduledDbSelect($this->getEntitiesUtils(), $select, $adapter);
-
         return new Collection($dbSelect);
     }
 

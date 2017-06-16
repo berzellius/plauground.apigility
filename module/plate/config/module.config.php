@@ -452,7 +452,7 @@ return array(
             'plate\\V1\\Rpc\\GroupsAcl\\Controller' => 'Json',
             'plate\\V1\\Rpc\\FavoritesRpc\\Controller' => 'HalJson',
             'plate\\V1\\Rpc\\ScheduledTasks\\Controller' => 'HalJson',
-            'plate\\V1\\Rpc\\ItemsLists\\Controller' => 'Json',
+            'plate\\V1\\Rpc\\ItemsLists\\Controller' => 'HalJson',
         ),
         'accept_whitelist' => array(
             'plate\\V1\\Rest\\Oauth_users_control\\Controller' => array(
