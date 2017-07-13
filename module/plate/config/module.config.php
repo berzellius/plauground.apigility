@@ -1201,6 +1201,7 @@ return array(
                         ),
                     ),
                 ),
+                'description' => 'Не может быть null',
             ),
         ),
         'plate\\V1\\Rest\\Rooms\\Validator' => array(
@@ -1215,6 +1216,7 @@ return array(
                 ),
                 'name' => 'room_id',
                 'field_type' => '',
+                'description' => 'Id комнаты. Не может быть null.',
             ),
             1 => array(
                 'required' => true,
@@ -1226,6 +1228,7 @@ return array(
                     ),
                 ),
                 'name' => 'name',
+                'description' => 'Имя комнаты. Не может быть null',
             ),
         ),
         'plate\\V1\\Rest\\Devices\\Validator' => array(
@@ -1242,7 +1245,7 @@ return array(
                 ),
                 'filters' => array(),
                 'name' => 'mac',
-                'description' => 'MAC-адрес интерфейса',
+                'description' => 'MAC-адрес интерфейса. Не может быть null',
                 'field_type' => '',
                 'error_message' => 'Wrong mac-address!',
             ),
@@ -1258,7 +1261,7 @@ return array(
                 ),
                 'filters' => array(),
                 'name' => 'ip',
-                'description' => 'IP адрес устройства',
+                'description' => 'IP адрес устройства. Не может быть null.',
                 'error_message' => 'Wrong ip address!',
             ),
             2 => array(
@@ -1271,7 +1274,7 @@ return array(
                     ),
                 ),
                 'name' => 'description',
-                'description' => 'Именование устройства (пр. "штора на кухне")',
+                'description' => 'Именование устройства (пр. "штора на кухне"). Не может быть null.',
             ),
             3 => array(
                 'required' => true,
@@ -1288,7 +1291,7 @@ return array(
                 ),
                 'filters' => array(),
                 'name' => 'room_id',
-                'description' => 'id комнаты',
+                'description' => 'id комнаты. не может быть null',
             ),
             4 => array(
                 'required' => true,
@@ -1304,7 +1307,7 @@ return array(
                     ),
                 ),
                 'name' => 'type',
-                'description' => 'Тип подключения',
+                'description' => 'Тип подключения. не может быть null',
             ),
             5 => array(
                 'required' => true,
@@ -1320,7 +1323,7 @@ return array(
                     ),
                 ),
                 'name' => 'max_amp',
-                'description' => 'Максимально допустимый ток в цепи питания двигателя в миллиамперах',
+                'description' => 'Максимально допустимый ток в цепи питания двигателя в миллиамперах. Не может быть null',
                 'field_type' => 'Current, mA',
             ),
             6 => array(
@@ -1350,7 +1353,7 @@ return array(
                         'options' => array(),
                     ),
                 ),
-                'description' => 'команда, которая была обработана последней',
+                'description' => 'команда, которая была обработана последней. может быть NULL, если команд еще не поступало.',
                 'name' => 'last_command',
             ),
             8 => array(
@@ -1368,7 +1371,7 @@ return array(
                     ),
                 ),
                 'name' => 'channel',
-                'description' => 'логический канал устройства',
+                'description' => 'логический канал устройства. не может быть null',
             ),
         ),
         'plate\\V1\\Rest\\Application_clients\\Validator' => array(
@@ -1385,7 +1388,7 @@ return array(
                 ),
                 'filters' => array(),
                 'name' => 'mac',
-                'description' => 'MAC адрес клиента',
+                'description' => 'MAC адрес клиента. Не может быть null',
             ),
             1 => array(
                 'required' => true,
@@ -1397,7 +1400,7 @@ return array(
                 ),
                 'filters' => array(),
                 'name' => 'ip',
-                'description' => 'IP адрес клиента',
+                'description' => 'IP адрес клиента. Не может быть null',
             ),
             2 => array(
                 'required' => true,
@@ -1416,7 +1419,7 @@ return array(
                     ),
                 ),
                 'name' => 'description',
-                'description' => 'Отображаемое описание клиента',
+                'description' => 'Отображаемое описание клиента. Не может быть null',
             ),
             3 => array(
                 'required' => true,
@@ -1436,7 +1439,7 @@ return array(
                     ),
                 ),
                 'name' => 'hostname',
-                'description' => 'Hostname (имя устройства)',
+                'description' => 'Hostname (имя устройства). Не  может быть null',
             ),
         ),
         'plate\\V1\\Rest\\Scheduled_tasks\\Validator' => array(
@@ -1462,7 +1465,7 @@ return array(
                     ),
                 ),
                 'name' => 'state',
-                'description' => 'Статус задачи - ACTIVE/PAUSED/STOPPED/ENDED',
+                'description' => 'Статус задачи - ACTIVE/PAUSED/STOPPED/ENDED. Не  может быть null',
             ),
             1 => array(
                 'required' => true,
@@ -1486,7 +1489,7 @@ return array(
                     ),
                 ),
                 'name' => 'period_type',
-                'description' => 'тип периода - DAILY, WEEKLY, CUSTOM',
+                'description' => 'тип периода - DAILY, WEEKLY, CUSTOM. Не  может быть null',
             ),
             2 => array(
                 'required' => true,
@@ -1498,7 +1501,7 @@ return array(
                     ),
                 ),
                 'name' => 'command',
-                'description' => 'Команда, которая должна быть выполнена',
+                'description' => 'Команда, которая должна быть выполнена. Не  может быть null',
             ),
             3 => array(
                 'required' => true,
@@ -1521,7 +1524,7 @@ return array(
                     ),
                 ),
                 'name' => 'name',
-                'description' => 'имя задачи по расписанию',
+                'description' => 'имя задачи по расписанию. Не  может быть null',
             ),
             4 => array(
                 'required' => false,
@@ -1544,7 +1547,7 @@ return array(
                     ),
                 ),
                 'name' => 'devices_ids',
-                'description' => 'идентификаторы устройств, которые нужно добавить к назначенному заданию',
+                'description' => 'идентификаторы устройств, которые нужно добавить к назначенному заданию. Не  может быть null; если к заданию не нужно добавлять устройства, то нужно передать только поле groups_ids. Хотя бы одно из полей - devices_ids, groups_ids - должно быть заполнено.',
                 'continue_if_empty' => true,
                 'allow_empty' => true,
             ),
@@ -1571,7 +1574,7 @@ return array(
                 'name' => 'stamps',
                 'allow_empty' => true,
                 'continue_if_empty' => true,
-                'description' => '',
+                'description' => 'Специальные пометки. Тип пометок зависит от значения period_type. Если period_type=WEEKLY, то это список дней недели, по которым должно выполняться задание, в верхнем регистре на английском языке через запятую. Не  может быть null',
             ),
             6 => array(
                 'required' => false,
@@ -1594,7 +1597,7 @@ return array(
                     ),
                 ),
                 'name' => 'groups_ids',
-                'description' => 'Идентификаторы групп, которые нужно добавить к заданию',
+                'description' => 'Идентификаторы групп, которые нужно добавить к заданию. Не  может быть null; если к заданию не нужно добавлять групп, нужно передать только devices_ids. Хотя бы одно из полей - devides_ids, groups_ids - должно быть заполнено.',
                 'allow_empty' => true,
                 'continue_if_empty' => true,
             ),
@@ -1611,7 +1614,7 @@ return array(
                 ),
                 'filters' => array(),
                 'name' => 'time',
-                'description' => 'Общее для всего расписания время срабатывания',
+                'description' => 'Общее для всего расписания время срабатывания. Не  может быть null',
                 'allow_empty' => true,
                 'continue_if_empty' => true,
             ),
@@ -1784,7 +1787,7 @@ return array(
                     ),
                 ),
                 'name' => 'name',
-                'description' => 'Имя группы',
+                'description' => 'Имя группы. Не  может быть null',
             ),
             1 => array(
                 'required' => false,
@@ -1807,7 +1810,7 @@ return array(
                     ),
                 ),
                 'name' => 'last_command',
-                'description' => 'команда, которая была обработана последней',
+                'description' => 'команда, которая была обработана последней. может быть null, если команд еще не поступало.',
                 'allow_empty' => false,
             ),
         ),
@@ -2191,32 +2194,7 @@ return array(
                 'description' => 'Id группы, к которой нужно предоставить доступ',
             ),
         ),
-        'plate\\V1\\Rpc\\FavoritesRpc\\Validator' => array(
-            0 => array(
-                'required' => true,
-                'validators' => array(
-                    0 => array(
-                        'name' => 'ZF\\ContentValidation\\Validator\\DbRecordExists',
-                        'options' => array(
-                            'adapter' => 'oauth2_users',
-                            'table' => 'oauth_clients',
-                            'field' => 'client_id',
-                        ),
-                    ),
-                ),
-                'filters' => array(
-                    0 => array(
-                        'name' => 'Zend\\Filter\\StringTrim',
-                        'options' => array(),
-                    ),
-                    1 => array(
-                        'name' => 'Zend\\Filter\\StripTags',
-                        'options' => array(),
-                    ),
-                ),
-                'name' => 'client_id',
-            ),
-        ),
+        'plate\\V1\\Rpc\\FavoritesRpc\\Validator' => array(),
     ),
     'zf-mvc-auth' => array(
         'authorization' => array(
@@ -2446,6 +2424,17 @@ return array(
                     ),
                 ),
             ),
+            'plate\\V1\\Rpc\\ItemsLists\\Controller' => array(
+                'actions' => array(
+                    'ItemsLists' => array(
+                        'GET' => true,
+                        'POST' => false,
+                        'PUT' => false,
+                        'PATCH' => false,
+                        'DELETE' => false,
+                    ),
+                ),
+            ),
         ),
     ),
     'zf-apigility' => array(
@@ -2511,6 +2500,7 @@ return array(
             'service_name' => 'ScheduledTasks',
             'http_methods' => array(
                 0 => 'POST',
+                1 => 'GET',
             ),
             'route_name' => 'plate.rpc.scheduled-tasks',
         ),

@@ -225,6 +225,22 @@ class ScheduledTasksService extends EntityService
     }
 
     /**
+     * См. аннотацию к fetchAllToArray()
+     * @param  array $params
+     * @return ApiProblem|mixed
+     */
+    public function fetchAll($params)
+    {
+        $dbSelect = $this->fetchAllToArray($params);
+        if(isset($params['room_id'])){
+            $collection = new Collection($dbSelect);
+            $collection->setItemCountPerPage(-1);
+            return $collection;
+        }
+        return new Collection($dbSelect);
+    }
+
+    /**
      * Fetch all or a subset of resources
      * Для администраторов выбираются все записи
      * Для остальных - те записи, которым соответствуют разрешения в devices_acl
@@ -241,41 +257,36 @@ class ScheduledTasksService extends EntityService
      * @param  array $params
      * @return ApiProblem|mixed
      */
-    public function fetchAll($params)
-    {
+    public function fetchAllToArray($params){
+        $adapter = new Adapter(
+            $this->getTableMapper()->getTable()->getAdapter()->getDriver(),
+            $this->getTableMapper()->getTable()->getAdapter()->getPlatform()
+        );
+
         /**
          * Особый случай - передан room_id
          */
         if(isset($params['room_id'])){
             $select = $this->getScheduledTasksSelectByRoomIdSpecialFormat($params['room_id']);
-
-            $adapter = new Adapter(
-                $this->getTableMapper()->getTable()->getAdapter()->getDriver(),
-                $this->getTableMapper()->getTable()->getAdapter()->getPlatform()
-            );
-
             $dbSelect = new ScheduledDbSelect($this->getEntitiesUtils(), $select, $adapter);
-            $collection = new Collection($dbSelect);
-            $collection->setItemCountPerPage(-1);
-            return $collection;
+            return $dbSelect;
         }
 
         if($this->getAuthUtils()->checkAdminPrivileges()){
             /**
              * Администратор получает список всех объектов в обычном формате
              */
-            return $this->getTableMapper()->fetchAll($params);
+            // todo проверить правильность!!!!
+            $select =  $this->getScheduledTasksSelectSpecialFormat();
+            $dbSelect = new ScheduledDbSelect($this->getEntitiesUtils(), $select, $adapter);
+            return $dbSelect;
+            //return $this->getTableMapper()->fetchAll($params);
         }
 
+
         $select = $this->getScheduledTasksSelectSpecialFormat();
-
-        $adapter = new Adapter(
-            $this->getTableMapper()->getTable()->getAdapter()->getDriver(),
-            $this->getTableMapper()->getTable()->getAdapter()->getPlatform()
-        );
-
         $dbSelect = new ScheduledDbSelect($this->getEntitiesUtils(), $select, $adapter);
-        return new Collection($dbSelect);
+        return $dbSelect;
     }
 
     protected function getScheduledTasksSelect(){

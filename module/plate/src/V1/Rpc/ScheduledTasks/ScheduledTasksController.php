@@ -25,7 +25,7 @@ class ScheduledTasksController extends RpcController
 
     public function scheduledTasksAction()
     {
-        $queryParams = $this->bodyParams();
+        $queryParams = $this->getRequest()->isPost()? $this->bodyParams() : $this->params()->fromQuery();
         ControllerSupportUtils::assertParameterSet($queryParams, "action", "`action` parameter required!");
         $action = $queryParams['action'];
 
@@ -39,10 +39,16 @@ class ScheduledTasksController extends RpcController
             case "turn_scheduled":
                 return $this->turnScheduled($queryParams);
                 break;
+            case "get_scheduled_tasks":
+                $params = [];
+                if(isset($queryParams['room_id'])){
+                    $params['room_id'] = $queryParams['room_id'];
+                }
+                $res = $this->getScheduledTasksService()->fetchAllToArray($params)->getItems();
+                return $res;
             default:
                 throw new \Exception("no processor for action " . $action);
         }
-
     }
 
     /**

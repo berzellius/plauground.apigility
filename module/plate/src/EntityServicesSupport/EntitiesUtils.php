@@ -21,7 +21,7 @@ class EntitiesUtils
         $res = [
             'devices' => [],
             'groups' => [],
-            'scheduled' => []
+            'scheduled_tasks' => []
         ];
 
         $jkey = $joining . '.entity_type';
@@ -36,12 +36,12 @@ class EntitiesUtils
                         $res['groups'][] = $this->getEntityPart($entity, "group");
                         break;
                     case "scheduled":
-                        $res['scheduled'][] = $this->getEntityPart($entity, "scheduled");
+                        $res['scheduled_tasks'][] = $this->getEntityPart($entity, "scheduled");
                 }
             }
         }
 
-        $res['scheduled'] = $this->groupEntities($res['scheduled'], '', ['groups' => 'group', 'devices' => 'device']);
+        $res['scheduled_tasks'] = $this->groupEntities($res['scheduled_tasks'], '', ['groups' => 'group', 'devices' => 'device']);
 
         return $res;
     }

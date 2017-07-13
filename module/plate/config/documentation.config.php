@@ -986,204 +986,6 @@ room_id - получение списка устройств в комнате (
             ),
         ),
     ),
-    'plate\\V1\\Rpc\\FavoritesRpc\\Controller' => array(
-        'description' => 'Получение всех объектов из избранного',
-        'GET' => array(
-            'response' => '{
-    "devices": [
-        {
-            "id": "421",
-            "mac": "98:BE:A4:EE:25:00",
-            "ip": "10.121.0.101",
-            "channel": "1",
-            "description": "устройство для откладки #1",
-            "room_id": "1",
-            "type": "1",
-            "max_amp": "250",
-            "connection_type": "1",
-            "last_command": null
-        },
-        {
-            "id": "422",
-            "mac": "98:BE:A4:EE:25:02",
-            "ip": "10.121.0.101",
-            "channel": "2",
-            "description": "устройство для откладки #2",
-            "room_id": "2",
-            "type": "1",
-            "max_amp": "250",
-            "connection_type": "1",
-            "last_command": null
-        },
-        {
-            "id": "423",
-            "mac": "98:BE:A4:EE:25:03",
-            "ip": "10.121.0.101",
-            "channel": "3",
-            "description": "устройство для откладки #3",
-            "room_id": "1",
-            "type": "1",
-            "max_amp": "250",
-            "connection_type": "1",
-            "last_command": null
-        }
-    ],
-    "groups": [
-        {
-            "id": "107",
-            "name": "группа для отладки#1",
-            "last_command": null
-        }
-    ],
-    "scheduled": [
-        {
-            "stamps": "f,f1",
-            "id": "2",
-            "state": "ACTIVE",
-            "command": "up",
-            "name": "задача#1",
-            "time": null,
-            "devices": [
-                {
-                    "id": "3",
-                    "mac": "60:A4:4C:32:11:C3",
-                    "ip": "192.168.10.102",
-                    "channel": "1",
-                    "description": "dev01 on 102",
-                    "room_id": "2",
-                    "type": "1",
-                    "max_amp": "170",
-                    "connection_type": "1",
-                    "last_command": null
-                },
-                {
-                    "id": "423",
-                    "mac": "98:BE:A4:EE:25:03",
-                    "ip": "10.121.0.101",
-                    "channel": "3",
-                    "description": "устройство для откладки #3",
-                    "room_id": "1",
-                    "type": "1",
-                    "max_amp": "250",
-                    "connection_type": "1",
-                    "last_command": null
-                },
-                {
-                    "id": "425",
-                    "mac": "98:BE:A4:EE:25:05",
-                    "ip": "10.121.0.101",
-                    "channel": "5",
-                    "description": "устройство для откладки #5",
-                    "room_id": "1",
-                    "type": "1",
-                    "max_amp": "250",
-                    "connection_type": "1",
-                    "last_command": null
-                }
-            ],
-            "groups": [
-                {
-                    "id": "108",
-                    "name": "группа для отладки #2",
-                    "last_command": null
-                },
-                {
-                    "id": "119",
-                    "name": "всякие девайсы",
-                    "last_command": null
-                },
-                {
-                    "id": "2",
-                    "name": "мои шторы",
-                    "last_command": null
-                }
-            ]
-        },
-        {
-            "stamps": "TUESDAY",
-            "id": "30",
-            "state": "ACTIVE",
-            "command": "up",
-            "name": "test#1",
-            "time": "17:10:00",
-            "devices": [
-                {
-                    "id": "422",
-                    "mac": "98:BE:A4:EE:25:02",
-                    "ip": "10.121.0.101",
-                    "channel": "2",
-                    "description": "устройство для откладки #2",
-                    "room_id": "2",
-                    "type": "1",
-                    "max_amp": "250",
-                    "connection_type": "1",
-                    "last_command": null
-                },
-                {
-                    "id": "424",
-                    "mac": "98:BE:A4:EE:25:04",
-                    "ip": "10.121.0.101",
-                    "channel": "4",
-                    "description": "устройство для откладки #4",
-                    "room_id": "3",
-                    "type": "1",
-                    "max_amp": "250",
-                    "connection_type": "1",
-                    "last_command": null
-                }
-            ],
-            "groups": [
-                {
-                    "id": "108",
-                    "name": "группа для отладки #2",
-                    "last_command": null
-                },
-                {
-                    "id": "107",
-                    "name": "группа для отладки#1",
-                    "last_command": null
-                }
-            ]
-        }
-    ]
-}',
-            'description' => 'Для получения всех объектов из избранного нужно выполнить запрос GET /favorites_rpc
-Результатом будет json объект с 3 полями в корне: devices, groups, scheduled со списками, соответственно, устройств, групп, назначенных заданий. Каждое назначенное задание, в свою очередь, также имеет поля  devices и groups, в которых лежат списки устройств и групп, которые включены в данное задание.',
-        ),
-    ),
-    'plate\\V1\\Rpc\\ScheduledTasks\\Controller' => array(
-        'description' => 'Сервис для специальных действий с назначенными заданиями: включение/отключение задания, включение/отключение дней в еженедельных заданиях, изменение времени срабатывания.',
-        'POST' => array(
-            'description' => 'Все действия выполняются POST-запросом.
-Обязательные поля:
-scheduled_task_id - id задания, к которому нужно применить действие;
-action - тип действия: 
-    turn_scheduled - включение/выключение задания; требует дополнительного параметра turn=on/off;
-    change_time - изменить время; требует дополнительного параметра time в формате hh:mm, например, 15:45;
-    change_week_days - включение/выключение дней недели; требует дополнительных параметров:
-        weekday - день недели - MONDAY, TUESDAY, ....
-        turn=on/off - включить/выключить',
-            'request' => '{
-	"action" : "change_week_days",
-	"scheduled_task_id" : "30",
-	"weekday" : "TUESDAY",
-	"turn" : "on"
-}
-
-
-{
-	"action" : "change_time",
-	"scheduled_task_id" : 30,
-	"time" : "17:10"
-}
-
-{
-	"action" : "turn_scheduled",
-	"scheduled_task_id" : 30,
-	"turn" : "on"
-}',
-        ),
-    ),
     'plate\\V1\\Rest\\Scheduled_tasks\\Controller' => array(
         'description' => 'Сервис для работы с назначенными заданиями.',
         'collection' => array(
@@ -1401,6 +1203,1489 @@ groups_ids - идентификаторы устройств, которые н�
             'DELETE' => array(
                 'description' => 'Метод для удаления о назначенном задании.',
             ),
+        ),
+    ),
+    'plate\\V1\\Rpc\\ItemsLists\\Controller' => array(
+        'description' => 'Получение списка всех основных объектов в системе (устройств, групп, назначенных заданий)',
+        'GET' => array(
+            'description' => 'Получить список всех объектов в виде контейнеров devices, groups, scheduled_tasks. Возможно получение объектов по id комнаты (get параметр room_id)',
+            'response' => '{
+    "devices": [
+        {
+            "id": "421",
+            "mac": "98:BE:A4:EE:25:00",
+            "ip": "10.121.0.101",
+            "channel": "1",
+            "description": "устройство для откладки #1",
+            "room_id": "1",
+            "type": "1",
+            "max_amp": "250",
+            "connection_type": "1",
+            "last_command": null
+        },
+        {
+            "id": "422",
+            "mac": "98:BE:A4:EE:25:02",
+            "ip": "10.121.0.101",
+            "channel": "2",
+            "description": "устройство для откладки #2",
+            "room_id": "2",
+            "type": "1",
+            "max_amp": "250",
+            "connection_type": "1",
+            "last_command": null
+        },
+        {
+            "id": "423",
+            "mac": "98:BE:A4:EE:25:03",
+            "ip": "10.121.0.101",
+            "channel": "3",
+            "description": "устройство для откладки #3",
+            "room_id": "1",
+            "type": "1",
+            "max_amp": "250",
+            "connection_type": "1",
+            "last_command": null
+        },
+        {
+            "id": "424",
+            "mac": "98:BE:A4:EE:25:04",
+            "ip": "10.121.0.101",
+            "channel": "4",
+            "description": "устройство для откладки #4",
+            "room_id": "3",
+            "type": "1",
+            "max_amp": "250",
+            "connection_type": "1",
+            "last_command": null
+        }
+    ],
+    "groups": [
+        {
+            "id": "107",
+            "name": "группа для отладки#1",
+            "last_command": null
+        },
+        {
+            "id": "108",
+            "name": "группа для отладки #2",
+            "last_command": null
+        }
+    ],
+    "scheduled_tasks": [
+        {
+            "id": "2",
+            "name": "задача#1",
+            "state": "ACTIVE",
+            "command": "up",
+            "period_type": "WEEKLY",
+            "stamps": "f,f1",
+            "time": null,
+            "devices": [
+                {
+                    "id": "3",
+                    "mac": "60:A4:4C:32:11:C3",
+                    "ip": "192.168.10.102",
+                    "channel": "1",
+                    "description": "dev01 on 102",
+                    "room_id": "2",
+                    "type": "1",
+                    "max_amp": "170",
+                    "connection_type": "1",
+                    "last_command": null
+                },
+                {
+                    "id": "423",
+                    "mac": "98:BE:A4:EE:25:03",
+                    "ip": "10.121.0.101",
+                    "channel": "3",
+                    "description": "устройство для откладки #3",
+                    "room_id": "1",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                },
+                {
+                    "id": "425",
+                    "mac": "98:BE:A4:EE:25:05",
+                    "ip": "10.121.0.101",
+                    "channel": "5",
+                    "description": "устройство для откладки #5",
+                    "room_id": "1",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                }
+            ],
+            "groups": [
+                {
+                    "id": "108",
+                    "name": "группа для отладки #2",
+                    "last_command": null
+                },
+                {
+                    "id": "119",
+                    "name": "всякие девайсы",
+                    "last_command": null
+                },
+                {
+                    "id": "2",
+                    "name": "мои шторы",
+                    "last_command": null
+                }
+            ]
+        },
+        {
+            "id": "3",
+            "name": "задача#9.1",
+            "state": "ACTIVE",
+            "command": "up",
+            "period_type": "WEEKLY",
+            "stamps": null,
+            "time": null,
+            "devices": [
+                {
+                    "id": "6",
+                    "mac": "B8:27:EB:F0:B5:D4",
+                    "ip": "192.168.10.103",
+                    "channel": "2",
+                    "description": "dev02 on 103 ",
+                    "room_id": "1",
+                    "type": "1",
+                    "max_amp": "350",
+                    "connection_type": "1",
+                    "last_command": null
+                }
+            ]
+        },
+        {
+            "id": "22",
+            "name": "test#1",
+            "state": "ACTIVE",
+            "command": "up",
+            "period_type": "WEEKLY",
+            "stamps": null,
+            "time": null,
+            "devices": [
+                {
+                    "id": "422",
+                    "mac": "98:BE:A4:EE:25:02",
+                    "ip": "10.121.0.101",
+                    "channel": "2",
+                    "description": "устройство для откладки #2",
+                    "room_id": "2",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                },
+                {
+                    "id": "424",
+                    "mac": "98:BE:A4:EE:25:04",
+                    "ip": "10.121.0.101",
+                    "channel": "4",
+                    "description": "устройство для откладки #4",
+                    "room_id": "3",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                }
+            ],
+            "groups": [
+                {
+                    "id": "108",
+                    "name": "группа для отладки #2",
+                    "last_command": null
+                },
+                {
+                    "id": "107",
+                    "name": "группа для отладки#1",
+                    "last_command": null
+                }
+            ]
+        },
+        {
+            "id": "23",
+            "name": "test#1",
+            "state": "ACTIVE",
+            "command": "up",
+            "period_type": "WEEKLY",
+            "stamps": null,
+            "time": null,
+            "devices": [
+                {
+                    "id": "422",
+                    "mac": "98:BE:A4:EE:25:02",
+                    "ip": "10.121.0.101",
+                    "channel": "2",
+                    "description": "устройство для откладки #2",
+                    "room_id": "2",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                },
+                {
+                    "id": "424",
+                    "mac": "98:BE:A4:EE:25:04",
+                    "ip": "10.121.0.101",
+                    "channel": "4",
+                    "description": "устройство для откладки #4",
+                    "room_id": "3",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                }
+            ],
+            "groups": [
+                {
+                    "id": "108",
+                    "name": "группа для отладки #2",
+                    "last_command": null
+                },
+                {
+                    "id": "107",
+                    "name": "группа для отладки#1",
+                    "last_command": null
+                }
+            ]
+        },
+        {
+            "id": "24",
+            "name": "test#1",
+            "state": "ACTIVE",
+            "command": "up",
+            "period_type": "WEEKLY",
+            "stamps": null,
+            "time": null,
+            "devices": [
+                {
+                    "id": "422",
+                    "mac": "98:BE:A4:EE:25:02",
+                    "ip": "10.121.0.101",
+                    "channel": "2",
+                    "description": "устройство для откладки #2",
+                    "room_id": "2",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                },
+                {
+                    "id": "424",
+                    "mac": "98:BE:A4:EE:25:04",
+                    "ip": "10.121.0.101",
+                    "channel": "4",
+                    "description": "устройство для откладки #4",
+                    "room_id": "3",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                }
+            ],
+            "groups": [
+                {
+                    "id": "108",
+                    "name": "группа для отладки #2",
+                    "last_command": null
+                },
+                {
+                    "id": "107",
+                    "name": "группа для отладки#1",
+                    "last_command": null
+                }
+            ]
+        },
+        {
+            "id": "25",
+            "name": "test#1",
+            "state": "ACTIVE",
+            "command": "up",
+            "period_type": "WEEKLY",
+            "stamps": null,
+            "time": null,
+            "devices": [
+                {
+                    "id": "422",
+                    "mac": "98:BE:A4:EE:25:02",
+                    "ip": "10.121.0.101",
+                    "channel": "2",
+                    "description": "устройство для откладки #2",
+                    "room_id": "2",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                },
+                {
+                    "id": "424",
+                    "mac": "98:BE:A4:EE:25:04",
+                    "ip": "10.121.0.101",
+                    "channel": "4",
+                    "description": "устройство для откладки #4",
+                    "room_id": "3",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                }
+            ],
+            "groups": [
+                {
+                    "id": "108",
+                    "name": "группа для отладки #2",
+                    "last_command": null
+                },
+                {
+                    "id": "107",
+                    "name": "группа для отладки#1",
+                    "last_command": null
+                }
+            ]
+        },
+        {
+            "id": "26",
+            "name": "test#1",
+            "state": "ACTIVE",
+            "command": "up",
+            "period_type": "WEEKLY",
+            "stamps": null,
+            "time": null,
+            "devices": [
+                {
+                    "id": "422",
+                    "mac": "98:BE:A4:EE:25:02",
+                    "ip": "10.121.0.101",
+                    "channel": "2",
+                    "description": "устройство для откладки #2",
+                    "room_id": "2",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                },
+                {
+                    "id": "424",
+                    "mac": "98:BE:A4:EE:25:04",
+                    "ip": "10.121.0.101",
+                    "channel": "4",
+                    "description": "устройство для откладки #4",
+                    "room_id": "3",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                }
+            ],
+            "groups": [
+                {
+                    "id": "108",
+                    "name": "группа для отладки #2",
+                    "last_command": null
+                },
+                {
+                    "id": "107",
+                    "name": "группа для отладки#1",
+                    "last_command": null
+                }
+            ]
+        },
+        {
+            "id": "27",
+            "name": "test#1",
+            "state": "ACTIVE",
+            "command": "up",
+            "period_type": "WEEKLY",
+            "stamps": null,
+            "time": null,
+            "devices": [
+                {
+                    "id": "422",
+                    "mac": "98:BE:A4:EE:25:02",
+                    "ip": "10.121.0.101",
+                    "channel": "2",
+                    "description": "устройство для откладки #2",
+                    "room_id": "2",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                },
+                {
+                    "id": "424",
+                    "mac": "98:BE:A4:EE:25:04",
+                    "ip": "10.121.0.101",
+                    "channel": "4",
+                    "description": "устройство для откладки #4",
+                    "room_id": "3",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                }
+            ],
+            "groups": [
+                {
+                    "id": "108",
+                    "name": "группа для отладки #2",
+                    "last_command": null
+                },
+                {
+                    "id": "107",
+                    "name": "группа для отладки#1",
+                    "last_command": null
+                }
+            ]
+        },
+        {
+            "id": "28",
+            "name": "test#1",
+            "state": "ACTIVE",
+            "command": "up",
+            "period_type": "WEEKLY",
+            "stamps": null,
+            "time": null,
+            "devices": [
+                {
+                    "id": "422",
+                    "mac": "98:BE:A4:EE:25:02",
+                    "ip": "10.121.0.101",
+                    "channel": "2",
+                    "description": "устройство для откладки #2",
+                    "room_id": "2",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                },
+                {
+                    "id": "424",
+                    "mac": "98:BE:A4:EE:25:04",
+                    "ip": "10.121.0.101",
+                    "channel": "4",
+                    "description": "устройство для откладки #4",
+                    "room_id": "3",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                }
+            ],
+            "groups": [
+                {
+                    "id": "108",
+                    "name": "группа для отладки #2",
+                    "last_command": null
+                },
+                {
+                    "id": "107",
+                    "name": "группа для отладки#1",
+                    "last_command": null
+                }
+            ]
+        },
+        {
+            "id": "29",
+            "name": "test#1",
+            "state": "ACTIVE",
+            "command": "up",
+            "period_type": "WEEKLY",
+            "stamps": null,
+            "time": null,
+            "devices": [
+                {
+                    "id": "422",
+                    "mac": "98:BE:A4:EE:25:02",
+                    "ip": "10.121.0.101",
+                    "channel": "2",
+                    "description": "устройство для откладки #2",
+                    "room_id": "2",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                },
+                {
+                    "id": "424",
+                    "mac": "98:BE:A4:EE:25:04",
+                    "ip": "10.121.0.101",
+                    "channel": "4",
+                    "description": "устройство для откладки #4",
+                    "room_id": "3",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                }
+            ],
+            "groups": [
+                {
+                    "id": "108",
+                    "name": "группа для отладки #2",
+                    "last_command": null
+                },
+                {
+                    "id": "107",
+                    "name": "группа для отладки#1",
+                    "last_command": null
+                }
+            ]
+        },
+        {
+            "id": "30",
+            "name": "test#1",
+            "state": "ACTIVE",
+            "command": "up",
+            "period_type": "WEEKLY",
+            "stamps": "TUESDAY",
+            "time": "17:10:00",
+            "devices": [
+                {
+                    "id": "422",
+                    "mac": "98:BE:A4:EE:25:02",
+                    "ip": "10.121.0.101",
+                    "channel": "2",
+                    "description": "устройство для откладки #2",
+                    "room_id": "2",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                },
+                {
+                    "id": "424",
+                    "mac": "98:BE:A4:EE:25:04",
+                    "ip": "10.121.0.101",
+                    "channel": "4",
+                    "description": "устройство для откладки #4",
+                    "room_id": "3",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                }
+            ],
+            "groups": [
+                {
+                    "id": "108",
+                    "name": "группа для отладки #2",
+                    "last_command": null
+                },
+                {
+                    "id": "107",
+                    "name": "группа для отладки#1",
+                    "last_command": null
+                }
+            ]
+        },
+        {
+            "id": "31",
+            "name": "test#1",
+            "state": "ACTIVE",
+            "command": "up",
+            "period_type": "WEEKLY",
+            "stamps": "MONDAY",
+            "time": null,
+            "devices": [
+                {
+                    "id": "422",
+                    "mac": "98:BE:A4:EE:25:02",
+                    "ip": "10.121.0.101",
+                    "channel": "2",
+                    "description": "устройство для откладки #2",
+                    "room_id": "2",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                },
+                {
+                    "id": "424",
+                    "mac": "98:BE:A4:EE:25:04",
+                    "ip": "10.121.0.101",
+                    "channel": "4",
+                    "description": "устройство для откладки #4",
+                    "room_id": "3",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                }
+            ],
+            "groups": [
+                {
+                    "id": "108",
+                    "name": "группа для отладки #2",
+                    "last_command": null
+                },
+                {
+                    "id": "107",
+                    "name": "группа для отладки#1",
+                    "last_command": null
+                }
+            ]
+        },
+        {
+            "id": "32",
+            "name": "test#2",
+            "state": "ACTIVE",
+            "command": "up",
+            "period_type": "WEEKLY",
+            "stamps": "MONDAY",
+            "time": "23:59:00",
+            "devices": [
+                {
+                    "id": "422",
+                    "mac": "98:BE:A4:EE:25:02",
+                    "ip": "10.121.0.101",
+                    "channel": "2",
+                    "description": "устройство для откладки #2",
+                    "room_id": "2",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                },
+                {
+                    "id": "424",
+                    "mac": "98:BE:A4:EE:25:04",
+                    "ip": "10.121.0.101",
+                    "channel": "4",
+                    "description": "устройство для откладки #4",
+                    "room_id": "3",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                }
+            ],
+            "groups": [
+                {
+                    "id": "108",
+                    "name": "группа для отладки #2",
+                    "last_command": null
+                },
+                {
+                    "id": "107",
+                    "name": "группа для отладки#1",
+                    "last_command": null
+                }
+            ]
+        }
+    ]
+}',
+        ),
+    ),
+    'plate\\V1\\Rpc\\ScheduledTasks\\Controller' => array(
+        'description' => 'Сервис для специальных действий с назначенными заданиями: включение/отключение задания, включение/отключение дней в еженедельных заданиях, изменение времени срабатывания. Также возможно получение списка всех назначенных заданий в rpc-формате.',
+        'POST' => array(
+            'description' => 'Действия выполняются POST-запросом.
+Обязательные поля:
+scheduled_task_id - id задания, к которому нужно применить действие;
+action - тип действия: 
+    turn_scheduled - включение/выключение задания; требует дополнительного параметра turn=on/off;
+    change_time - изменить время; требует дополнительного параметра time в формате hh:mm, например, 15:45;
+    change_week_days - включение/выключение дней недели; требует дополнительных параметров:
+        weekday - день недели - MONDAY, TUESDAY, ....
+        turn=on/off - включить/выключить',
+            'request' => '{
+	"action" : "change_week_days",
+	"scheduled_task_id" : "30",
+	"weekday" : "TUESDAY",
+	"turn" : "on"
+}
+
+
+{
+	"action" : "change_time",
+	"scheduled_task_id" : 30,
+	"time" : "17:10"
+}
+
+{
+	"action" : "turn_scheduled",
+	"scheduled_task_id" : 30,
+	"turn" : "on"
+}',
+        ),
+        'GET' => array(
+            'description' => 'GET запрос позволяет получить список всех назначенных заданий в простом rpc формате (без постраничного вывода и embedded). Требует передачи get параметра action=get_scheduled_tasks. Также можно передать параметр room_id для получения списка заданий по id комнаты.',
+            'response' => '[
+    {
+        "id": "2",
+        "name": "задача#1",
+        "state": "ACTIVE",
+        "command": "up",
+        "period_type": "WEEKLY",
+        "stamps": "f,f1",
+        "time": null,
+        "devices": [
+            {
+                "id": "3",
+                "mac": "60:A4:4C:32:11:C3",
+                "ip": "192.168.10.102",
+                "channel": "1",
+                "description": "dev01 on 102",
+                "room_id": "2",
+                "type": "1",
+                "max_amp": "170",
+                "connection_type": "1",
+                "last_command": null
+            },
+            {
+                "id": "423",
+                "mac": "98:BE:A4:EE:25:03",
+                "ip": "10.121.0.101",
+                "channel": "3",
+                "description": "устройство для откладки #3",
+                "room_id": "1",
+                "type": "1",
+                "max_amp": "250",
+                "connection_type": "1",
+                "last_command": null
+            },
+            {
+                "id": "425",
+                "mac": "98:BE:A4:EE:25:05",
+                "ip": "10.121.0.101",
+                "channel": "5",
+                "description": "устройство для откладки #5",
+                "room_id": "1",
+                "type": "1",
+                "max_amp": "250",
+                "connection_type": "1",
+                "last_command": null
+            }
+        ],
+        "groups": [
+            {
+                "id": "108",
+                "name": "группа для отладки #2",
+                "last_command": null
+            },
+            {
+                "id": "119",
+                "name": "всякие девайсы",
+                "last_command": null
+            },
+            {
+                "id": "2",
+                "name": "мои шторы",
+                "last_command": null
+            }
+        ]
+    },
+    {
+        "id": "3",
+        "name": "задача#9.1",
+        "state": "ACTIVE",
+        "command": "up",
+        "period_type": "WEEKLY",
+        "stamps": null,
+        "time": null,
+        "devices": [
+            {
+                "id": "6",
+                "mac": "B8:27:EB:F0:B5:D4",
+                "ip": "192.168.10.103",
+                "channel": "2",
+                "description": "dev02 on 103 ",
+                "room_id": "1",
+                "type": "1",
+                "max_amp": "350",
+                "connection_type": "1",
+                "last_command": null
+            }
+        ]
+    },
+    {
+        "id": "22",
+        "name": "test#1",
+        "state": "ACTIVE",
+        "command": "up",
+        "period_type": "WEEKLY",
+        "stamps": null,
+        "time": null,
+        "devices": [
+            {
+                "id": "422",
+                "mac": "98:BE:A4:EE:25:02",
+                "ip": "10.121.0.101",
+                "channel": "2",
+                "description": "устройство для откладки #2",
+                "room_id": "2",
+                "type": "1",
+                "max_amp": "250",
+                "connection_type": "1",
+                "last_command": null
+            },
+            {
+                "id": "424",
+                "mac": "98:BE:A4:EE:25:04",
+                "ip": "10.121.0.101",
+                "channel": "4",
+                "description": "устройство для откладки #4",
+                "room_id": "3",
+                "type": "1",
+                "max_amp": "250",
+                "connection_type": "1",
+                "last_command": null
+            }
+        ],
+        "groups": [
+            {
+                "id": "108",
+                "name": "группа для отладки #2",
+                "last_command": null
+            },
+            {
+                "id": "107",
+                "name": "группа для отладки#1",
+                "last_command": null
+            }
+        ]
+    },
+    {
+        "id": "23",
+        "name": "test#1",
+        "state": "ACTIVE",
+        "command": "up",
+        "period_type": "WEEKLY",
+        "stamps": null,
+        "time": null,
+        "devices": [
+            {
+                "id": "422",
+                "mac": "98:BE:A4:EE:25:02",
+                "ip": "10.121.0.101",
+                "channel": "2",
+                "description": "устройство для откладки #2",
+                "room_id": "2",
+                "type": "1",
+                "max_amp": "250",
+                "connection_type": "1",
+                "last_command": null
+            },
+            {
+                "id": "424",
+                "mac": "98:BE:A4:EE:25:04",
+                "ip": "10.121.0.101",
+                "channel": "4",
+                "description": "устройство для откладки #4",
+                "room_id": "3",
+                "type": "1",
+                "max_amp": "250",
+                "connection_type": "1",
+                "last_command": null
+            }
+        ],
+        "groups": [
+            {
+                "id": "108",
+                "name": "группа для отладки #2",
+                "last_command": null
+            },
+            {
+                "id": "107",
+                "name": "группа для отладки#1",
+                "last_command": null
+            }
+        ]
+    },
+    {
+        "id": "24",
+        "name": "test#1",
+        "state": "ACTIVE",
+        "command": "up",
+        "period_type": "WEEKLY",
+        "stamps": null,
+        "time": null,
+        "devices": [
+            {
+                "id": "422",
+                "mac": "98:BE:A4:EE:25:02",
+                "ip": "10.121.0.101",
+                "channel": "2",
+                "description": "устройство для откладки #2",
+                "room_id": "2",
+                "type": "1",
+                "max_amp": "250",
+                "connection_type": "1",
+                "last_command": null
+            },
+            {
+                "id": "424",
+                "mac": "98:BE:A4:EE:25:04",
+                "ip": "10.121.0.101",
+                "channel": "4",
+                "description": "устройство для откладки #4",
+                "room_id": "3",
+                "type": "1",
+                "max_amp": "250",
+                "connection_type": "1",
+                "last_command": null
+            }
+        ],
+        "groups": [
+            {
+                "id": "108",
+                "name": "группа для отладки #2",
+                "last_command": null
+            },
+            {
+                "id": "107",
+                "name": "группа для отладки#1",
+                "last_command": null
+            }
+        ]
+    },
+    {
+        "id": "25",
+        "name": "test#1",
+        "state": "ACTIVE",
+        "command": "up",
+        "period_type": "WEEKLY",
+        "stamps": null,
+        "time": null,
+        "devices": [
+            {
+                "id": "422",
+                "mac": "98:BE:A4:EE:25:02",
+                "ip": "10.121.0.101",
+                "channel": "2",
+                "description": "устройство для откладки #2",
+                "room_id": "2",
+                "type": "1",
+                "max_amp": "250",
+                "connection_type": "1",
+                "last_command": null
+            },
+            {
+                "id": "424",
+                "mac": "98:BE:A4:EE:25:04",
+                "ip": "10.121.0.101",
+                "channel": "4",
+                "description": "устройство для откладки #4",
+                "room_id": "3",
+                "type": "1",
+                "max_amp": "250",
+                "connection_type": "1",
+                "last_command": null
+            }
+        ],
+        "groups": [
+            {
+                "id": "108",
+                "name": "группа для отладки #2",
+                "last_command": null
+            },
+            {
+                "id": "107",
+                "name": "группа для отладки#1",
+                "last_command": null
+            }
+        ]
+    },
+    {
+        "id": "26",
+        "name": "test#1",
+        "state": "ACTIVE",
+        "command": "up",
+        "period_type": "WEEKLY",
+        "stamps": null,
+        "time": null,
+        "devices": [
+            {
+                "id": "422",
+                "mac": "98:BE:A4:EE:25:02",
+                "ip": "10.121.0.101",
+                "channel": "2",
+                "description": "устройство для откладки #2",
+                "room_id": "2",
+                "type": "1",
+                "max_amp": "250",
+                "connection_type": "1",
+                "last_command": null
+            },
+            {
+                "id": "424",
+                "mac": "98:BE:A4:EE:25:04",
+                "ip": "10.121.0.101",
+                "channel": "4",
+                "description": "устройство для откладки #4",
+                "room_id": "3",
+                "type": "1",
+                "max_amp": "250",
+                "connection_type": "1",
+                "last_command": null
+            }
+        ],
+        "groups": [
+            {
+                "id": "108",
+                "name": "группа для отладки #2",
+                "last_command": null
+            },
+            {
+                "id": "107",
+                "name": "группа для отладки#1",
+                "last_command": null
+            }
+        ]
+    },
+    {
+        "id": "27",
+        "name": "test#1",
+        "state": "ACTIVE",
+        "command": "up",
+        "period_type": "WEEKLY",
+        "stamps": null,
+        "time": null,
+        "devices": [
+            {
+                "id": "422",
+                "mac": "98:BE:A4:EE:25:02",
+                "ip": "10.121.0.101",
+                "channel": "2",
+                "description": "устройство для откладки #2",
+                "room_id": "2",
+                "type": "1",
+                "max_amp": "250",
+                "connection_type": "1",
+                "last_command": null
+            },
+            {
+                "id": "424",
+                "mac": "98:BE:A4:EE:25:04",
+                "ip": "10.121.0.101",
+                "channel": "4",
+                "description": "устройство для откладки #4",
+                "room_id": "3",
+                "type": "1",
+                "max_amp": "250",
+                "connection_type": "1",
+                "last_command": null
+            }
+        ],
+        "groups": [
+            {
+                "id": "108",
+                "name": "группа для отладки #2",
+                "last_command": null
+            },
+            {
+                "id": "107",
+                "name": "группа для отладки#1",
+                "last_command": null
+            }
+        ]
+    },
+    {
+        "id": "28",
+        "name": "test#1",
+        "state": "ACTIVE",
+        "command": "up",
+        "period_type": "WEEKLY",
+        "stamps": null,
+        "time": null,
+        "devices": [
+            {
+                "id": "422",
+                "mac": "98:BE:A4:EE:25:02",
+                "ip": "10.121.0.101",
+                "channel": "2",
+                "description": "устройство для откладки #2",
+                "room_id": "2",
+                "type": "1",
+                "max_amp": "250",
+                "connection_type": "1",
+                "last_command": null
+            },
+            {
+                "id": "424",
+                "mac": "98:BE:A4:EE:25:04",
+                "ip": "10.121.0.101",
+                "channel": "4",
+                "description": "устройство для откладки #4",
+                "room_id": "3",
+                "type": "1",
+                "max_amp": "250",
+                "connection_type": "1",
+                "last_command": null
+            }
+        ],
+        "groups": [
+            {
+                "id": "108",
+                "name": "группа для отладки #2",
+                "last_command": null
+            },
+            {
+                "id": "107",
+                "name": "группа для отладки#1",
+                "last_command": null
+            }
+        ]
+    },
+    {
+        "id": "29",
+        "name": "test#1",
+        "state": "ACTIVE",
+        "command": "up",
+        "period_type": "WEEKLY",
+        "stamps": null,
+        "time": null,
+        "devices": [
+            {
+                "id": "422",
+                "mac": "98:BE:A4:EE:25:02",
+                "ip": "10.121.0.101",
+                "channel": "2",
+                "description": "устройство для откладки #2",
+                "room_id": "2",
+                "type": "1",
+                "max_amp": "250",
+                "connection_type": "1",
+                "last_command": null
+            },
+            {
+                "id": "424",
+                "mac": "98:BE:A4:EE:25:04",
+                "ip": "10.121.0.101",
+                "channel": "4",
+                "description": "устройство для откладки #4",
+                "room_id": "3",
+                "type": "1",
+                "max_amp": "250",
+                "connection_type": "1",
+                "last_command": null
+            }
+        ],
+        "groups": [
+            {
+                "id": "108",
+                "name": "группа для отладки #2",
+                "last_command": null
+            },
+            {
+                "id": "107",
+                "name": "группа для отладки#1",
+                "last_command": null
+            }
+        ]
+    },
+    {
+        "id": "30",
+        "name": "test#1",
+        "state": "ACTIVE",
+        "command": "up",
+        "period_type": "WEEKLY",
+        "stamps": "TUESDAY",
+        "time": "17:10:00",
+        "devices": [
+            {
+                "id": "422",
+                "mac": "98:BE:A4:EE:25:02",
+                "ip": "10.121.0.101",
+                "channel": "2",
+                "description": "устройство для откладки #2",
+                "room_id": "2",
+                "type": "1",
+                "max_amp": "250",
+                "connection_type": "1",
+                "last_command": null
+            },
+            {
+                "id": "424",
+                "mac": "98:BE:A4:EE:25:04",
+                "ip": "10.121.0.101",
+                "channel": "4",
+                "description": "устройство для откладки #4",
+                "room_id": "3",
+                "type": "1",
+                "max_amp": "250",
+                "connection_type": "1",
+                "last_command": null
+            }
+        ],
+        "groups": [
+            {
+                "id": "108",
+                "name": "группа для отладки #2",
+                "last_command": null
+            },
+            {
+                "id": "107",
+                "name": "группа для отладки#1",
+                "last_command": null
+            }
+        ]
+    },
+    {
+        "id": "31",
+        "name": "test#1",
+        "state": "ACTIVE",
+        "command": "up",
+        "period_type": "WEEKLY",
+        "stamps": "MONDAY",
+        "time": null,
+        "devices": [
+            {
+                "id": "422",
+                "mac": "98:BE:A4:EE:25:02",
+                "ip": "10.121.0.101",
+                "channel": "2",
+                "description": "устройство для откладки #2",
+                "room_id": "2",
+                "type": "1",
+                "max_amp": "250",
+                "connection_type": "1",
+                "last_command": null
+            },
+            {
+                "id": "424",
+                "mac": "98:BE:A4:EE:25:04",
+                "ip": "10.121.0.101",
+                "channel": "4",
+                "description": "устройство для откладки #4",
+                "room_id": "3",
+                "type": "1",
+                "max_amp": "250",
+                "connection_type": "1",
+                "last_command": null
+            }
+        ],
+        "groups": [
+            {
+                "id": "108",
+                "name": "группа для отладки #2",
+                "last_command": null
+            },
+            {
+                "id": "107",
+                "name": "группа для отладки#1",
+                "last_command": null
+            }
+        ]
+    },
+    {
+        "id": "32",
+        "name": "test#2",
+        "state": "ACTIVE",
+        "command": "up",
+        "period_type": "WEEKLY",
+        "stamps": "MONDAY",
+        "time": "23:59:00",
+        "devices": [
+            {
+                "id": "422",
+                "mac": "98:BE:A4:EE:25:02",
+                "ip": "10.121.0.101",
+                "channel": "2",
+                "description": "устройство для откладки #2",
+                "room_id": "2",
+                "type": "1",
+                "max_amp": "250",
+                "connection_type": "1",
+                "last_command": null
+            },
+            {
+                "id": "424",
+                "mac": "98:BE:A4:EE:25:04",
+                "ip": "10.121.0.101",
+                "channel": "4",
+                "description": "устройство для откладки #4",
+                "room_id": "3",
+                "type": "1",
+                "max_amp": "250",
+                "connection_type": "1",
+                "last_command": null
+            }
+        ],
+        "groups": [
+            {
+                "id": "108",
+                "name": "группа для отладки #2",
+                "last_command": null
+            },
+            {
+                "id": "107",
+                "name": "группа для отладки#1",
+                "last_command": null
+            }
+        ]
+    }
+]',
+        ),
+    ),
+    'plate\\V1\\Rpc\\FavoritesRpc\\Controller' => array(
+        'description' => 'Получение всех объектов из избранного',
+        'GET' => array(
+            'response' => '{
+    "devices": [
+        {
+            "id": "421",
+            "mac": "98:BE:A4:EE:25:00",
+            "ip": "10.121.0.101",
+            "channel": "1",
+            "description": "устройство для откладки #1",
+            "room_id": "1",
+            "type": "1",
+            "max_amp": "250",
+            "connection_type": "1",
+            "last_command": null
+        },
+        {
+            "id": "422",
+            "mac": "98:BE:A4:EE:25:02",
+            "ip": "10.121.0.101",
+            "channel": "2",
+            "description": "устройство для откладки #2",
+            "room_id": "2",
+            "type": "1",
+            "max_amp": "250",
+            "connection_type": "1",
+            "last_command": null
+        },
+        {
+            "id": "423",
+            "mac": "98:BE:A4:EE:25:03",
+            "ip": "10.121.0.101",
+            "channel": "3",
+            "description": "устройство для откладки #3",
+            "room_id": "1",
+            "type": "1",
+            "max_amp": "250",
+            "connection_type": "1",
+            "last_command": null
+        }
+    ],
+    "groups": [
+        {
+            "id": "107",
+            "name": "группа для отладки#1",
+            "last_command": null
+        }
+    ],
+    "scheduled_tasks": [
+        {
+            "stamps": "f,f1",
+            "id": "2",
+            "state": "ACTIVE",
+            "command": "up",
+            "name": "задача#1",
+            "time": null,
+            "devices": [
+                {
+                    "id": "3",
+                    "mac": "60:A4:4C:32:11:C3",
+                    "ip": "192.168.10.102",
+                    "channel": "1",
+                    "description": "dev01 on 102",
+                    "room_id": "2",
+                    "type": "1",
+                    "max_amp": "170",
+                    "connection_type": "1",
+                    "last_command": null
+                },
+                {
+                    "id": "423",
+                    "mac": "98:BE:A4:EE:25:03",
+                    "ip": "10.121.0.101",
+                    "channel": "3",
+                    "description": "устройство для откладки #3",
+                    "room_id": "1",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                },
+                {
+                    "id": "425",
+                    "mac": "98:BE:A4:EE:25:05",
+                    "ip": "10.121.0.101",
+                    "channel": "5",
+                    "description": "устройство для откладки #5",
+                    "room_id": "1",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                }
+            ],
+            "groups": [
+                {
+                    "id": "108",
+                    "name": "группа для отладки #2",
+                    "last_command": null
+                },
+                {
+                    "id": "119",
+                    "name": "всякие девайсы",
+                    "last_command": null
+                },
+                {
+                    "id": "2",
+                    "name": "мои шторы",
+                    "last_command": null
+                }
+            ]
+        },
+        {
+            "stamps": "TUESDAY",
+            "id": "30",
+            "state": "ACTIVE",
+            "command": "up",
+            "name": "test#1",
+            "time": "17:10:00",
+            "devices": [
+                {
+                    "id": "422",
+                    "mac": "98:BE:A4:EE:25:02",
+                    "ip": "10.121.0.101",
+                    "channel": "2",
+                    "description": "устройство для откладки #2",
+                    "room_id": "2",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                },
+                {
+                    "id": "424",
+                    "mac": "98:BE:A4:EE:25:04",
+                    "ip": "10.121.0.101",
+                    "channel": "4",
+                    "description": "устройство для откладки #4",
+                    "room_id": "3",
+                    "type": "1",
+                    "max_amp": "250",
+                    "connection_type": "1",
+                    "last_command": null
+                }
+            ],
+            "groups": [
+                {
+                    "id": "108",
+                    "name": "группа для отладки #2",
+                    "last_command": null
+                },
+                {
+                    "id": "107",
+                    "name": "группа для отладки#1",
+                    "last_command": null
+                }
+            ]
+        }
+    ]
+}',
+            'description' => 'Для получения всех объектов из избранного нужно выполнить запрос GET /favorites_rpc
+Результатом будет json объект с 3 полями в корне: devices, groups, scheduled_tasks со списками, соответственно, устройств, групп, назначенных заданий. Каждое назначенное задание, в свою очередь, также имеет поля  devices и groups, в которых лежат списки устройств и групп, которые включены в данное задание.',
         ),
     ),
 );
