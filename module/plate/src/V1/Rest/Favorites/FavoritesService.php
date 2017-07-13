@@ -287,6 +287,7 @@ class FavoritesService extends EntityService
                     'scheduled.id' => 'id',
                     'scheduled.state' => 'state',
                     'scheduled.command' => 'command',
+                    'scheduled.period_type' => 'period_type',
                     'scheduled.name' => 'name',
                     'scheduled.time' => 'common_time'
                 ],
