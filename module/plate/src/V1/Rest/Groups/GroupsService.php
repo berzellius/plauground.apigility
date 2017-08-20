@@ -76,7 +76,7 @@ class GroupsService extends EntityService
             "client_id<=>" => $this->getAuthUtils()->getClientId()
         ]);
 
-        if($aclDataNotOwnedCount > 0){
+        if(count($aclDataNotOwnedCount) > 0){
             $users = [];
             foreach ($aclDataNotOwnedCount as $user) {
                 $users[] = $user->client_id;
