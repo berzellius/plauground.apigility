@@ -104,6 +104,8 @@ class ScheduledTasksService extends EntityService
         /**
          * Создаем задание и получем на него права
          */
+        unset($retrievedData['groups_ids']);
+        unset($retrievedData['devices_ids']);
         if(isset($time)){
             $retrievedData['common_time'] = $time;
         }
