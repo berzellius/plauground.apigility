@@ -1,0 +1,4 @@
+Для PhpStorm:
+- создаем конфигурацию запуска "PHPUnit"
+- используем опцию "Defined in configuration file"
+- опция "use alternate configuration file" -> выбираем файл phpunit.xml.dist в корне проекта

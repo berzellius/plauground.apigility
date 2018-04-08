@@ -132,6 +132,23 @@ class BasicTest extends AbstractHttpControllerTestCase
         return $favoritesData;
     }
 
+    protected function createEntityInstanceWOCheck($clazz, $data, $scope = "", $user){
+        $result = ($scope == self::ADMIN_SCOPE)?
+            $this->dispatchRequestAdmin($clazz::$baseUrl, "POST", $data) :
+            $this->dispatchRequest($clazz::$baseUrl, "POST", $data, $user);
+        $res = Entity::asArray(json_decode($result['content']));
+
+        if(isset($res['id'])){
+            echo "Создан объект " . $clazz . "#" . $res['id'] . "\r\n";
+
+            $registry = $this->getRegistry();
+            $registry[$clazz][] = new $clazz($res['id'], $res, $scope, $user);
+            $this->setRegistry($registry);
+        }
+
+        return $res;
+    }
+
     protected function createEntityInstance($clazz, $data, $scope = "", $user){
         $result = ($scope == self::ADMIN_SCOPE)?
             $this->dispatchRequestAdmin($clazz::$baseUrl, "POST", $data) :
@@ -146,8 +163,11 @@ class BasicTest extends AbstractHttpControllerTestCase
         echo "Создан объект " . $clazz . "#" . $res['id'] . "\r\n";
 
         $registry = $this->getRegistry();
-        $registry[$clazz][] = new $clazz($res['id'], $res, $scope, $user);
+        $registry[$clazz][$res['id']] = new $clazz($res['id'], $res, $scope, $user);
+
         $this->setRegistry($registry);
+
+        return $res['id'];
     }
 
     protected function trySendRequest($clazz, $method, $data, $scope, $user){
@@ -209,23 +229,26 @@ class BasicTest extends AbstractHttpControllerTestCase
         }
     }
 
-    protected function getGroupInRegistryIDs(){
+    protected function getGroupInRegistryIDs($user = null){
         $groups = array();
 
         /** @var GroupsTestEntity $item */
         foreach ($this->getRegistry()[GroupsTestEntity::class] as $item){
-            $groups[] = $item->getId();
+            echo "owner: " . $item->getOwner() . "\r\n";
+            if($user == null || $item->getOwner() == $user || in_array($user, $item->getUserList()))
+                $groups[] = $item->getId();
         }
 
         return $groups;
     }
 
-    protected function getDevicesInRegistryIDs(){
+    protected function getDevicesInRegistryIDs($user = null){
         $devices = array();
 
         /** @var GroupsTestEntity $item */
         foreach ($this->getRegistry()[DevicesTestEntity::class] as $item){
-            $devices[] = $item->getId();
+            if($user == null || $item->getOwner() == $user || in_array($user, $item->getUserList()))
+                $devices[] = $item->getId();
         }
 
         return $devices;
@@ -287,6 +310,17 @@ class BasicTest extends AbstractHttpControllerTestCase
         echo "\r\n";
     }
 
+    public function disributor(){
+        return [
+            'devices' =>
+                [[0, 1, 5, 6],
+                [2, 3, 8, 9]],
+            'groups' =>
+                [[0], [2]],
+            'users' =>
+                ["testUser1", "testUser2"]
+        ];
+    }
 
     /**
      * Тест добавления в избранное
@@ -298,14 +332,10 @@ class BasicTest extends AbstractHttpControllerTestCase
         $groups = $this->getGroupInRegistryIDs();
         $devices = $this->getDevicesInRegistryIDs();
 
-        $devIds = [
-            [0, 1, 5, 6],
-            [2, 3, 8, 9]
-        ];
-
-        $groupIds = [[0], [2]];
-
-        $users = ["testUser1", "testUser2"];
+        $distr = $this->disributor();
+        $devIds = $distr['devices'];
+        $groupIds = $distr['groups'];
+        $users = $distr['users'];
 
         foreach ($users as $k => $user) {
             foreach ($devIds[$k] as $deviceId) {
@@ -318,14 +348,22 @@ class BasicTest extends AbstractHttpControllerTestCase
         }
     }
 
-    protected function addDeviceToFavorite($devId, $user){
+    /**
+     * @param $devId
+     * @param $user
+     * @param $disableCheck - true если сущность может не создаться (тогда мы сами проверяем результат запроса)
+     * @return mixed
+     */
+    protected function addDeviceToFavorite($devId, $user, $disableCheck = false){
         $devToFav = [
             "id_device" => $devId,
             "entity_type" => "DEVICE"
         ];
 
         echo "Добавляется в избранное устройство #" . $devId . " для пользователя " . $user;
-        $this->createEntityInstance(FavoritesTestEntity::class, $devToFav, "", $user);
+        return ($disableCheck)?
+            $this->createEntityInstanceWOCheck(FavoritesTestEntity::class, $devToFav, "", $user) :
+            $this->createEntityInstance(FavoritesTestEntity::class, $devToFav, "", $user);
     }
 
     protected function addGroupToFavorite($grpId, $user){
@@ -362,6 +400,26 @@ class BasicTest extends AbstractHttpControllerTestCase
                 }
             }
         }
+    }
+
+    /**
+     * @param TestEntity $entity
+     * @param $clazz
+     * @param $id
+     */
+    public function updateEntityInRegistry($entity, $clazz, $id){
+        if(isset($this->getRegistry()[$clazz][$id])){
+            $this->getRegistry()[$clazz][$id] = $entity;
+        }
+    }
+
+    /**
+     * @param $clazz
+     * @param $id
+     * @return TestEntity|null
+     */
+    public function getEntityInRegistry($clazz, $id){
+        return (isset($this->getRegistry()[$clazz][$id]))? $this->getRegistry()[$clazz][$id] : null;
     }
 
     /**
@@ -452,6 +510,12 @@ class BasicTest extends AbstractHttpControllerTestCase
         $this->createEntityInstance(\DevicesAclRpcTestEntity::class, $acl, "", $user);
         echo "\r\n";
 
+        $devInReg = $this->getEntityInRegistry(DevicesTestEntity::class, $id);
+        $userList = $devInReg->getUserList();
+        $userList[] = $user;
+        $devInReg->setUserList($userList);
+        $this->updateEntityInRegistry($devInReg, DevicesTestEntity::class, $id);
+
         $this->checkGettingsDevice($id, $user);
     }
 
@@ -465,6 +529,12 @@ class BasicTest extends AbstractHttpControllerTestCase
         echo "Устанавливаются права на группу #" . $id . "\r\n";
         $this->createEntityInstance(\GroupsAclRpcTestEntity::class, $acl, "", $user);
         echo "\r\n";
+
+        $grpInReg = $this->getEntityInRegistry(GroupsTestEntity::class, $id);
+        $userList = $grpInReg->getUserList();
+        $userList[] = $user;
+        $grpInReg->setUserList($userList);
+        $this->updateEntityInRegistry($grpInReg, GroupsTestEntity::class, $id);
 
         $this->checkGettingsGroup($id, $user);
     }

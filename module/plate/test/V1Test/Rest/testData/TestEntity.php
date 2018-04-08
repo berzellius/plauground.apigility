@@ -38,9 +38,29 @@ abstract class TestEntity
      */
     protected $data;
     /**
-     * @var mixed - владелей, учетная запись, из-под которой был создан объект
+     * @var mixed - владелец, учетная запись, из-под которой был создан объект
      */
     protected $owner;
+    /**
+     * @var array - список пользователей, имеющих доступ к объекту
+     */
+    protected $userList = [];
+
+    /**
+     * @return mixed
+     */
+    public function getUserList()
+    {
+        return $this->userList;
+    }
+
+    /**
+     * @param mixed $userList
+     */
+    public function setUserList($userList)
+    {
+        $this->userList = $userList;
+    }
 
     /**
      * @return mixed

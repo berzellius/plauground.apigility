@@ -41,6 +41,14 @@ class FavoritesService extends EntityService
     public function create($data, $retrievedData)
     {
         $type = $retrievedData['entity_type'];
+        if(!$this->checkPrivileges($retrievedData)){
+            return $this->notAllowed();
+        }
+
+        if(!$this->getAuthUtils()->checkAdminPrivileges()){
+            $retrievedData['user'] = $this->getAuthUtils()->getClientId();
+        }
+
         switch ($type){
             case "DEVICE":
                 if(!isset($retrievedData['id_device'])){
@@ -50,6 +58,18 @@ class FavoritesService extends EntityService
                 if(isset($retrievedData['id_group']) || isset($retrievedData['id_scheduled_task'])){
                     return new ApiProblem(403, "for 'DEVICE' record id_group or id_scheduled_task cant be set");
                 }
+
+                $exists = $this->fetchAll(
+                    [
+                        'entity_type' => $retrievedData['entity_type'],
+                        'id_device' => $retrievedData['id_device'],
+                        'user' => $retrievedData['user']
+                    ]
+                );
+                if ($exists->getCurrentItemCount() > 0){
+                    return new ApiProblem(403, "Device#" . $retrievedData['id_device'] . " is already in favorites!");
+                }
+
                 break;
             case "GROUP":
                 if(!isset($retrievedData['id_group'])){
@@ -59,6 +79,18 @@ class FavoritesService extends EntityService
                 if(isset($retrievedData['id_device']) || isset($retrievedData['id_scheduled_task'])){
                     return new ApiProblem(403, "for 'GROUP' record id_device or id_scheduled_task cant be set");
                 }
+
+                $exists = $this->fetchAll(
+                    [
+                        'entity_type' => $retrievedData['entity_type'],
+                        'id_group' => $retrievedData['id_group'],
+                        'user' => $retrievedData['user']
+                    ]
+                );
+                if ($exists->getCurrentItemCount() > 0){
+                    return new ApiProblem(403, "Group#" . $retrievedData['id_group'] . " is already in favorites!");
+                }
+
                 break;
             case "SCHEDULED":
                 if(!isset($retrievedData['id_scheduled_task'])){
@@ -68,15 +100,19 @@ class FavoritesService extends EntityService
                 if(isset($retrievedData['id_group']) || isset($retrievedData['id_device'])){
                     return new ApiProblem(403, "for 'SCHEDULED' record id_group or id_device cant be set");
                 }
+
+                $exists = $this->fetchAll(
+                    [
+                        'entity_type' => $retrievedData['entity_type'],
+                        'id_scheduled_task' => $retrievedData['id_scheduled_task'],
+                        'user' => $retrievedData['user']
+                    ]
+                );
+                if ($exists->getCurrentItemCount() > 0){
+                    return new ApiProblem(403, "Scheduled#" . $retrievedData['id_scheduled_task'] . " is already in favorites!");
+                }
+
                 break;
-        }
-
-        if(!$this->checkPrivileges($retrievedData)){
-            return $this->notAllowed();
-        }
-
-        if(!$this->getAuthUtils()->checkAdminPrivileges()){
-            $retrievedData['user'] = $this->getAuthUtils()->getClientId();
         }
 
 
