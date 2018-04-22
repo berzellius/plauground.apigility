@@ -296,7 +296,9 @@ class ScheduledTasksService extends EntityService
      */
     protected function validateCreatingScheduledTaskExtended(array $param)
     {
-        Assert::assertTrue(is_array($param));
+        if(!is_array($param)){
+            return new ApiProblem(403, "no params!");
+        }
 
         if(!isset($param['name']))
             return new ApiProblem(403, "'name' parameter must be set!");
