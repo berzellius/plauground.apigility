@@ -227,7 +227,7 @@ class FavoritesService extends EntityService
             return new ApiProblem(404, "record not found!");
 
         $toDelete = $foundItems[0];
-        return $this->delete($toDelete['id']);
+        return $this->delete($toDelete->id);
     }
 
     protected function getScheduledTasksMapper(){
@@ -372,6 +372,8 @@ class FavoritesService extends EntityService
                 "f.entity_type"
             )
         ;
+
+        //die($select->getSqlString($this->getTableMapper()->getTable()->getAdapter()->getPlatform()));
 
         $adapter = new Adapter(
             $this->getTableMapper()->getTable()->getAdapter()->getDriver(),

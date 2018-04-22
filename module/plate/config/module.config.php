@@ -2493,6 +2493,7 @@ return array(
             'service_name' => 'FavoritesRpc',
             'http_methods' => array(
                 0 => 'GET',
+                1 => 'POST',
             ),
             'route_name' => 'plate.rpc.favorites-rpc',
         ),

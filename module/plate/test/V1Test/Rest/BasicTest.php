@@ -656,6 +656,8 @@ class BasicTest extends AbstractHttpControllerTestCase
                 $this->addGroupToFavorite($groups[$groupId], $user);
             }
         }
+
+
     }
 
     /**
