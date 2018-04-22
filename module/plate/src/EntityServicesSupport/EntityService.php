@@ -12,6 +12,7 @@ use plate\EntityServicesSupport\ITableService;
 use plate\EntitySupport\TableGatewayMapper;
 use plate\EntityServicesSupport\IEntityService;
 use Zend\Db\Adapter\Adapter;
+use Zend\Db\Adapter\Driver\ConnectionInterface;
 
 abstract class EntityService implements IEntityService{
     protected   $authUtils,
@@ -31,6 +32,35 @@ abstract class EntityService implements IEntityService{
         $this->setAuthUtils($authUtils);
         $this->setITableService($iTableService);
         $this->setTableMapper($mapper);
+    }
+
+    /**
+     * Коммит
+     */
+    protected function commitTransaction(){
+        $this->getConnectionObjectFromTableMapper()->commit();
+    }
+
+    /**
+     * Откат
+     */
+    protected function rollbackTransaction(){
+        $this->getConnectionObjectFromTableMapper()->rollback();
+    }
+
+    /**
+     * Начать транзакцию
+     */
+    protected function beginTransaction(){
+        $this->getConnectionObjectFromTableMapper()->beginTransaction();
+    }
+
+    /**
+     * Получаем объект ConnectionInterface для управления транзакциями
+     * @return ConnectionInterface
+     */
+    protected function getConnectionObjectFromTableMapper(){
+        return $this->getAdapter()->getDriver()->getConnection();
     }
 
 

@@ -9,6 +9,8 @@
 namespace plate\V1\Rest\Scheduled_tasks;
 
 
+use DomainException;
+use PHPUnit\Framework\Assert;
 use plate\EntityServicesSupport\EntitiesUtils;
 use plate\EntityServicesSupport\EntityService;
 use plate\EntitySupport\Collection;
@@ -21,6 +23,7 @@ use plate\V1\Rest\Groups\GroupsResource;
 use plate\V1\Rest\Groups\GroupsService;
 use plate\V1\Rest\Scheduled_tasks_dev_grp\Scheduled_tasks_dev_grpResource;
 use plate\V1\Rest\Scheduled_tasks_timetable\Scheduled_tasks_timetableResource;
+use Symfony\Component\Yaml\Tests\A;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Join;
@@ -48,6 +51,8 @@ class ScheduledTasksService extends EntityService
 
     public function create($data, $retrievedData)
     {
+        //print_r($retrievedData);
+
         /**
          * Время, на которое должны быть установлены элементы расписания
          */
@@ -168,6 +173,222 @@ class ScheduledTasksService extends EntityService
     }
 
     /**
+     * Создать назначенное задание в расширенном режиме
+     * Создает еженедельные задания
+     *
+     *
+     * пример
+     *
+     * [
+     *      'name' => 'test case scheduler',
+     *      'devices' => [3, 14, 22],
+     *      'groups' => [2,3,4],
+     *      'week_scheduling' => [
+     *          [
+     *              'weekday' => 'MONDAY',
+     *              'time' => '11:21:12',
+     *              'command' => 'up'
+     *          ],
+     *          [
+     *              'weekday' => 'TUESDAY',
+     *              'time' => '21:00:00',
+     *              'command' => 'down'
+     *          ],
+     *          (...)
+     *      ]
+     * ]
+     *
+     *
+     * @param array $param
+     * @return Scheduled_tasksEntity|\ZF\ApiProblem\ApiProblem
+     *
+     *
+     */
+    public function createScheduledTaskExtended(array $param)
+    {
+        $this->beginTransaction();
+
+        $check = $this->validateCreatingScheduledTaskExtended($param);
+
+        if($check instanceof ApiProblem) {
+            return $check;
+        }
+
+
+        // создаем назначенное задание
+        $scheduledTask = $this->getTableMapper()->create([
+            'name' => $param['name'],
+            'state' => 'ACTIVE',
+            'period_type' => 'WEEKLY'
+        ]);
+        $this->addRightsToScheduledTask($scheduledTask->id);
+
+
+        // добавляем устройства
+        if(isset($param['devices'])){
+            foreach ($param['devices'] as $device_id) {
+                $scheduledTask_dev_grp = [
+                    'scheduled_task_id' => $scheduledTask->id,
+                    'dev_grp_type' => 'DEVICE',
+                    'id_device' => $device_id
+                ];
+
+                $this->getScheduledTasksDevGrpTableMapper()->create($scheduledTask_dev_grp);
+            }
+        }
+
+        // добавляем группы
+        if(isset($param['groups'])) foreach ($param['groups'] as $group_id){
+            $scheduledTask_dev_grp = [
+                'scheduled_task_id' => $scheduledTask->id,
+                'dev_grp_type' => 'GROUP',
+                'id_group' => $group_id
+            ];
+
+            $this->getScheduledTasksDevGrpTableMapper()->create($scheduledTask_dev_grp);
+        }
+
+        foreach ($param['week_scheduling'] as $schedule) {
+            $time = $schedule['time'];
+            $command = $schedule['command'];
+            $weekday = $schedule['weekday'];
+
+            // дата = следующий(ая) <день недели>
+            $date = new \DateTime('next ' . strtolower($weekday));
+            // ставим время
+            $this->addDelimetedTimeToDate($time, $date);
+            $nextDTM = date(self::SCHEDULED_TIMETABLE_TIMEFORMAT, $date->getTimestamp());
+
+            $scheduledTask_timetable = [
+                'begin_dtm' => $nextDTM,
+                'repeat_period' => 3600 * 24 * 7,
+                'state' => 'ACTIVE',
+                'next_dtm' => $nextDTM,
+                'special_stamp' => $weekday,
+                'scheduling_task_id' => $scheduledTask->id,
+                'name' => 'TIMETABLE_scheduledTask(' . $scheduledTask->id . ")_" . $weekday,
+                'command' => $command
+            ];
+
+            $this->getScheduledTasksTimeTableMapper()->create($scheduledTask_timetable);
+        }
+
+        //echo "CREATED Scheduled task #" . $scheduledTask->id;
+
+        $this->commitTransaction();
+
+        return $this->fetch($scheduledTask->id, "WEEKLY");
+    }
+
+    /**
+     * Установить время $time (формат hh:mm:ss) в переменную $date
+     * @param $time
+     * @param \DateTime $date
+     */
+    protected function addDelimetedTimeToDate($time, \DateTime &$date){
+        $times = explode(":", $time);
+        $date->setTime($times[0], $times[1], isset($times[2])? $times[2] : "00");
+    }
+
+    /**
+     * @param $param
+     * @return null|\ZF\ApiProblem\ApiProblem
+     */
+    protected function validateCreatingScheduledTaskExtended(array $param)
+    {
+        Assert::assertTrue(is_array($param));
+
+        if(!isset($param['name']))
+            return new ApiProblem(403, "'name' parameter must be set!");
+
+        if(
+            (!isset($param['groups']) || !is_array($param['groups']) || empty($param['groups'])) &&
+            (!isset($param['devices']) || !is_array($param['devices']) || empty($param['devices']))
+        )
+            return new ApiProblem(403, "'devices' or 'groups' must be set!");
+
+        if(isset($param['groups'])){
+            if(!is_array($param['groups']))
+                return new ApiProblem(403, "'groups' must be array of group id's");
+
+            foreach ($param['groups'] as $g) {
+                if (!preg_match("/[\\d]+/", $g))
+                    return new ApiProblem(403, "Value $g of 'groups' not validated, it must be group id");
+
+                try {
+                    $exists = $this->getGroupsTableMapper()->fetch($g);
+                }
+                catch (DomainException $e){
+                    return new ApiProblem(403, "group with id = $g is absent");
+                }
+
+                if (!($exists instanceof Entity)) {
+                    return new ApiProblem(403, "group with id = $g is absent");
+                }
+            }
+        }
+
+        if(isset($param['devices'])){
+            if(!is_array($param['devices']))
+                return new ApiProblem(403, "'devices' must be array of devices id's");
+
+            foreach ($param['devices'] as $d){
+                if(!preg_match("/[\\d]+/", $d))
+                    return new ApiProblem(403, "Value $d of 'devices' not validated, it must be device id");
+
+                try {
+                    $exists = $this->getDevicesTableMapper()->fetch($d);
+                }
+                catch (DomainException $e){
+                    return new ApiProblem(403, "device with id = $d is absent");
+                }
+
+                if(!($exists instanceof Entity)) {
+                    return new ApiProblem(403, "device with id = $d is absent");
+                }
+            }
+        }
+
+        if(!isset($param['week_scheduling']) || !is_array($param['week_scheduling']) || empty($param['week_scheduling']))
+            return new ApiProblem(403, "'week_scheduling' must be set and must be array (not empty)");
+
+        foreach ($param['week_scheduling'] as $week_schedule) {
+            if(!is_array($week_schedule))
+                return new ApiProblem(403, "all of 'week_scheduling' elements must be arrays");
+
+
+            $weekday = isset($week_schedule['weekday'])? strtoupper(trim($week_schedule['weekday'])) : false;
+            if(!$weekday || !in_array($weekday, self::WEEKDAYS))
+                return new ApiProblem(403, "'weekday' must be in [" . implode(", ", self::WEEKDAYS) . "], but not such in " . json_encode($week_schedule));
+
+            $time = isset($week_schedule['time'])? $week_schedule['time'] : false;
+            if(!$time || !preg_match("/^([0-1][0-9]|20|21|22|23):[0-5][0-9](|:[0-5][0-9])$/", $time))
+                return new ApiProblem(403, "'time' must be time like hh:mm:ss or hh:mm, but not such in " . json_encode($week_schedule));
+
+            if(!isset($week_schedule['command']))
+                return new ApiProblem(403, "'command' must be set, but absent in " . json_encode($week_schedule));
+        }
+
+        // проверяем доступность устройств
+        if(isset($param['devices'])){
+            foreach ($param['devices'] as $device_id) {
+                if (!$this->getDevicesService()->checkRightsToDevice($this->getAuthUtils()->getClientId(), $device_id)) {
+                    return new ApiProblem(403, "Нет доступа к устройству #" . $device_id);
+                }
+            }
+        }
+
+        // проверяем доступность групп
+        if(isset($param['groups'])) foreach ($param['groups'] as $group_id){
+            if(!$this->getGroupsService()->checkRightsToGroup($this->getAuthUtils()->getClientId(), $group_id)){
+                return new ApiProblem(403, "Нет доступа к группе #" . $group_id);
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @param $id
      * @return bool|\ZF\ApiProblem\ApiProblem
      */
@@ -205,14 +426,18 @@ class ScheduledTasksService extends EntityService
 
     /**
      * @param $id
-     * @return \plate\EntitySupport\Entity|\ZF\ApiProblem\ApiProblem
+     * @param string $special_output - тип "специального вывода"; позволяет установить названия полей в соответствии с типом расписания
+     * будильника. Наиболее типичный тип - "WEEKLY", еженедельный будильник; для еженедельного будильника название поля
+     * "special_stamp" преобразуется в "weekday"
+     * @return Entity|ApiProblem
      */
-    public function fetch($id)
+    public function fetch($id, $special_output = "EXTENDED")
     {
         if(!$this->checkPrivilegesById($id))
             return $this->notAllowed();
 
-        $select = $this->getScheduledTasksSelectSpecialFormat(false);
+        //$select = $this->getScheduledTasksSelectSpecialFormat(false);
+        $select = $this->getScheduledTasksSelectSpecialFormat2(false, $special_output);
         $select->where("st.id = " . $id);
 
         $adapter = new Adapter(
@@ -221,8 +446,9 @@ class ScheduledTasksService extends EntityService
         );
 
         //die($select->getSqlString($this->getTableMapper()->getTable()->getAdapter()->getPlatform()));
-
         $dbSelect = new ScheduledDbSelect($this->getEntitiesUtils(), $select, $adapter);
+        $dbSelect->setSpecialFormat($special_output);
+
         return $dbSelect->fetch($this->getTableMapper(), $id);
     }
 
@@ -259,7 +485,7 @@ class ScheduledTasksService extends EntityService
      * @param  array $params
      * @return ApiProblem|mixed
      */
-    public function fetchAllToArray($params){
+    public function fetchAllToArray($params, $special_output = "EXTENDED"){
         $adapter = new Adapter(
             $this->getTableMapper()->getTable()->getAdapter()->getDriver(),
             $this->getTableMapper()->getTable()->getAdapter()->getPlatform()
@@ -279,15 +505,16 @@ class ScheduledTasksService extends EntityService
              * Администратор получает список всех объектов в обычном формате
              */
             // todo проверить правильность!!!!
-            $select =  $this->getScheduledTasksSelectSpecialFormat();
+            $select =  $this->getScheduledTasksSelectSpecialFormat2(false);
             $dbSelect = new ScheduledDbSelect($this->getEntitiesUtils(), $select, $adapter);
             return $dbSelect;
             //return $this->getTableMapper()->fetchAll($params);
         }
 
 
-        $select = $this->getScheduledTasksSelectSpecialFormat();
+        $select = $this->getScheduledTasksSelectSpecialFormat2(false);
         $dbSelect = new ScheduledDbSelect($this->getEntitiesUtils(), $select, $adapter);
+        $dbSelect->setSpecialFormat($special_output);
         return $dbSelect;
     }
 
@@ -410,6 +637,48 @@ class ScheduledTasksService extends EntityService
                 ],
                 Join::JOIN_LEFT
             );
+
+        return $select;
+    }
+
+
+    /**
+     * @param boolean $acl - учитывать ли уровни доступа к дочерним объектам
+     * @param string $special_output - специальный формат вывода. Учитывает многообразие будильников,
+     * может интерпретировать "специальные отметки" как дни недели, например
+     * @return Select
+     */
+    protected function getScheduledTasksSelectSpecialFormat2($acl, $special_output = 'WEEKLY')
+    {
+        $select = $this->getScheduledTasksSelectSpecialFormat($acl);
+
+        $specialStampAssumed = "special_stamp";
+
+        switch ($special_output){
+            CASE "WEEKLY":
+                $specialStampAssumed = "weekday";
+                break;
+            CASE "EXTENDED":
+                $specialStampAssumed = "special_stamp";
+                break;
+        }
+
+        $select->join(
+            ['tt' => $this->getScheduledTasksTimeTableName()],
+            "stdg.scheduled_task_id = tt.scheduling_task_id",
+            [
+                'timetable.id' => 'id',
+                //'timetable.weekday' => 'special_stamp',
+                //'timetable.' . ($special_output == 'WEEKLY' ? 'weekday' : 'special_stamp') => 'special_stamp',
+                'timetable.' . $specialStampAssumed => 'special_stamp',
+                //'timetable.time' => 'next_dtm'
+                'timetable.time' => new Expression("date_format(tt.next_dtm, '%H:%i')"),
+                'timetable.command' => 'command'
+            ],
+            JOIN::JOIN_LEFT
+        );
+
+//        die($select->getSqlString($this->getAdapter()->getPlatform()));
 
         return $select;
     }
@@ -544,27 +813,50 @@ class ScheduledTasksService extends EntityService
     /**
      * Изменить время срабатывания для еженедельного задания
      * @param $scheduled_task_id
-     * @param $time
+     * @param $weekday - день недели
+     * @param $time - время было
+     * @param $new_time - время стало
      * @return Entity|ApiProblem
      */
-    public function changeTimeForWeeklyTask($scheduled_task_id, $time)
+    public function changeTimeForWeeklyTask($scheduled_task_id, $weekday, $time, $new_time)
     {
         if(!preg_match("/([0-1][0-9]|20|21|22|23):[0-5][0-9]/", $time)){
             return new ApiProblem(400, "Задайте время в формате HH:mm");
         }
 
-        $scheduledTask = Entity::asArray($this->getTableMapper()->fetch($scheduled_task_id));
-        $scheduledTask['common_time'] = $time;
+        if(!preg_match("/([0-1][0-9]|20|21|22|23):[0-5][0-9]/", $new_time)){
+            return new ApiProblem(400, "Задайте время в формате HH:mm");
+        }
 
-        $this->getTableMapper()->update($scheduled_task_id, $scheduledTask);
+        //$scheduledTask = Entity::asArray($this->getTableMapper()->fetch($scheduled_task_id));
+        //$scheduledTask['common_time'] = $time;
+
+        //$this->getTableMapper()->update($scheduled_task_id, $scheduledTask);
         $timetable = $this->getScheduledTasksTimeTableMapper()->fetchAll(['scheduling_task_id' => $scheduled_task_id]);
         foreach ($timetable->getCurrentItems() as $item){
             $item = Entity::asArray($item);
             $times = explode(":", $time);
+            $new_times = explode(":", $new_time);
+            $nextDTM = new \DateTime($item['next_dtm']);
+
+
+            if(
+                strtoupper(date('l', $nextDTM->getTimestamp())) == strtoupper($weekday) &&
+                date('H', $nextDTM->getTimestamp()) == $times[0] &&
+                date('i', $nextDTM->getTimestamp()) == $times[1]
+            ){
+                $nextDTM = new \DateTime($item['next_dtm']);
+                $nextDTM->setTime($new_times[0], $new_times[1]);
+                $item['next_dtm'] = date(self::SCHEDULED_TIMETABLE_TIMEFORMAT, $nextDTM->getTimestamp());
+                $this->getScheduledTasksTimeTableMapper()->update($item['id'], $item);
+            }
+
+            /*$item = Entity::asArray($item);
+            $times = explode(":", $time);
             $nextDTM = new \DateTime($item['next_dtm']);
             $nextDTM->setTime($times[0], $times[1]);
             $item['next_dtm'] = date(self::SCHEDULED_TIMETABLE_TIMEFORMAT, $nextDTM->getTimestamp());
-            $this->getScheduledTasksTimeTableMapper()->update($item['id'], $item);
+            $this->getScheduledTasksTimeTableMapper()->update($item['id'], $item);*/
         }
 
         return $this->fetch($scheduled_task_id);

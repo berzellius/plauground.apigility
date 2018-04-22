@@ -23,6 +23,7 @@ class ScheduledDbSelect extends DbSelect
 {
     protected $entitiesUtils;
     protected $select;
+    protected $special_format;
 
     /**
      * ScheduledDbSelect constructor.
@@ -40,11 +41,28 @@ class ScheduledDbSelect extends DbSelect
         parent::__construct($select, $adapterOrSqlObject, $resultSetPrototype, $countSelect);
     }
 
-    public function getItems($offset, $itemCountPerPage)
+    public function getItems($offset, $itemCountPerPage, $special_output = 'EXTENDED')
     {
         // todo пересчет $offset и $itemCountPerPage на лету
         $arr = parent::getItems(0, 1000);
-        return $this->getEntitiesUtils()->groupEntities($arr, "scheduled", ["devices" => "device", "groups" => "group"]);
+
+        if($this->getSpecialFormat() != null){
+            $special_output = $this->getSpecialFormat();
+        }
+
+        return
+            ($special_output == 'WEEKLY')?
+                $this->getEntitiesUtils()->groupEntities(
+                    $arr, "scheduled",
+                    ["devices" => "device", "groups" => "group", "week_scheduling" => "timetable"],
+                    ["scheduled" => "id", "groups" => "id", "week_scheduling" => "id", "devices" => "id"]
+                )
+                :
+                $this->getEntitiesUtils()->groupEntities(
+                    $arr, "scheduled",
+                    ["devices" => "device", "groups" => "group", "timetables" => "timetable"],
+                    ["scheduled" => "id", "groups" => "id", "timetables" => "id", "devices" => "id"]
+                );
     }
 
     /**
@@ -81,16 +99,47 @@ class ScheduledDbSelect extends DbSelect
 
 
 
-    public function fetch(TableGatewayMapper $tableGatewayMapper, $id){
+    public function fetch(TableGatewayMapper $tableGatewayMapper, $id, $special_output = 'EXTENDED'){
         $res = [];
         $resultSet = $tableGatewayMapper->getTable()->selectWith($this->getSelect());
+
+        if($this->getSpecialFormat() != null){
+            $special_output = $this->getSpecialFormat();
+        }
 
         foreach ($resultSet as $item) {
             $res[] = Entity::asArray($item);
         }
 
-        return $this->getEntitiesUtils()->groupEntities(
-            $res, "scheduled", ["devices" => "device", "groups" => "group"]
-        )[0];
+        return
+            ($special_output == 'WEEKLY')?
+                $this->getEntitiesUtils()->groupEntities(
+                    $res, "scheduled",
+                    ["devices" => "device", "groups" => "group", "week_scheduling" => "timetable"],
+                    ["scheduled" => "id", "groups" => "id", "week_scheduling" => "id", "devices" => "id"]
+                )[0]
+                :
+                $this->getEntitiesUtils()->groupEntities(
+                    $res, "scheduled",
+                    ["devices" => "device", "groups" => "group", "timetables" => "timetable"],
+                    ["scheduled" => "id", "groups" => "id", "timetables" => "id", "devices" => "id"]
+                )[0]
+            ;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSpecialFormat()
+    {
+        return $this->special_format;
+    }
+
+    /**
+     * @param mixed $special_format
+     */
+    public function setSpecialFormat($special_format)
+    {
+        $this->special_format = $special_format;
     }
 }

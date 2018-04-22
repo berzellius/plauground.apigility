@@ -64,17 +64,46 @@ class EntitiesUtils
 
 
     /**
-     * @param array $entities
-     * @param string $grouping
-     * @param array $map
-     * @return array
+     * Группировка сущностей одного типа по контейнерам
+     *
+     * @param array $entities - входной массив. Содержит в себе плоскую структуру вида
+     * [
+     *      {
+     *          'scheduled.id' : 1,
+     *          'scheduled.name' : 'some name1',
+     *          'device.id' : 3,
+     *          'device.name' : 'some dev 1'
+     *      },
+     *      {
+     *          'scheduled.id' : 2,
+     *          'scheduled.name' : 'some name2',
+     *          'device.id' : 4,
+     *          'device.name' : 'some dev 2'
+     *      }
+     * ]
+     * @param string $grouping - задает главную сущность, например 'scheduled'
+     * @param array $map - задает соответствие "название контейнера, куда складывать объекты - префикс в именах полей",
+     *  например, ['devices' => 'device']
+     * @param array $idmap, опционально - перечень соответствий "название контейнера - название id"
+     * @return array - результат  работы, для рассмотренного примера
+     * [
+     * {
+     * 'id' : 1,
+     * 'name' : 'some name 1',
+     * 'devices' : [
+     * {'id': 3, 'name' : 'some dev 1'}
+     * ]
+     * },
+     * (...)
+     * ]
      */
-    public function groupEntities($entities, $grouping, $map)
+    public function groupEntities(array $entities, $grouping, array $map, array $idmap = null)
     {
         $middle = [];
+        $usedEntities = [];
 
         foreach ($entities as $entity){
-            $idField = ($grouping == '')? "id" : $grouping . ".id";
+            $idField = ($grouping == '')? "id" : $grouping . ( ($idmap == null || !isset($idmap[$grouping]))? ".id" : "." . $idmap[$grouping]);
 
             if(!isset($middle[$entity[$idField]])){
                 $middle[$entity[$idField]] = $this->getEntityPart($entity, $grouping);
@@ -83,10 +112,21 @@ class EntitiesUtils
             foreach ($map as $part => $prefix) {
                 $epart = $this->getEntityPart($entity, $prefix);
                 if(!$this->nullArr($epart)) {
-                    $middle[$entity[$idField]][$part][] = $epart;
+                    if($idmap != null && isset($idmap[$part])) {
+                        if(!@($usedEntities[$part][$epart[$idmap[$part]]] == 1)) {
+                            $usedEntities[$part][$epart[$idmap[$part]]] = 1;
+                            $middle[$entity[$idField]][$part][] = $epart;
+                        }
+                    }
+                    else
+                        $middle[$entity[$idField]][$part][] = $epart;
                 }
+
             }
         }
+
+        //print_r($usedEntities);
+        print_r($middle);
 
         return array_values($middle);
     }

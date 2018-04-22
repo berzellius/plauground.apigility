@@ -9,6 +9,8 @@
 namespace V1Test\Rest;
 
 use PHPUnit\Framework\Assert;
+use plate\EntitySupport\Entity;
+use plate\V1\Rest\Scheduled_tasks\Scheduled_tasksEntity;
 use V1Test\Rest\BasicTest;
 use V1Test\Rest\testData\FavoritesTestEntity;
 use V1Test\Rest\testData\ScheduledTasksTestEntity;
@@ -17,6 +19,19 @@ require_once "BasicTest.php";
 
 class CurrentWorkTest extends BasicTest
 {
+    public function testSimple(){
+        /*$this->loadEntitiesSet(\TestDatasetsPart1::basicSet());
+
+
+        $this->cleanUp();
+
+        foreach ($successIDs as $id){
+            // убеждаемся, что назначенное задание удалено
+            $resDeleted = $this->dispatchRequest(ScheduledTasksTestEntity::$baseUrl . "/" . $id, "GET", [], $user);
+            Assert::assertEquals(403, $resDeleted['http_status'], "Назаначенное задание #" . $id . " не удалено в ходе очистки");
+        }*/
+    }
+
     public function testCurrentWorkCases(){
         //echo "Успешный тест";
         $this->loadEntitiesSet(\TestDatasetsPart1::basicSet());
@@ -47,9 +62,22 @@ class CurrentWorkTest extends BasicTest
             'name' => 'TEST_SCH_TASK_1',
             'stamps' => 'SUNDAY, MONDAY',
             'time' => '15:10',
-            'period_type' => 'WEEKLY'
+            'period_type' => 'WEEKLY',
+            'some_json' => ["a" => ["b", "c"]]
         ];
-        $this->createEntityInstance(ScheduledTasksTestEntity::class, $data, "", $user);
+        $id = $this->createEntityInstance(ScheduledTasksTestEntity::class, $data, "", $user);
+
+        /*
+        $ch_weekdays = [
+            'action' => 'change_week_days',
+            'scheduled_tasks_id' => $id,
+            'weekday' => 'SUNDAY',
+            'turn' => 'off',
+            'json' => ['a' => 'b', 'c' => [1, 3, ['d' => 'e']]]
+        ];
+
+        $this->dispatchRequest("/scheduled_tasks_rpc", "POST", $ch_weekdays, $user);
+        */
 
         // что еще проверить по будильникам?
     }

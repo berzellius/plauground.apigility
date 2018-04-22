@@ -10,11 +10,13 @@ namespace V1Test\Rest;
 
 
 use Herrera\Json\Exception\Exception;
+use PHPUnit\Framework\Assert;
 use plate\EntitySupport\Entity;
 use plate\V1\Rest\Devices\DevicesService;
 use V1Test\Rest\testData\DevicesTestEntity;
 use V1Test\Rest\testData\FavoritesTestEntity;
 use V1Test\Rest\testData\GroupsTestEntity;
+use V1Test\Rest\testData\ScheduledTasksTestEntity;
 use V1Test\Rest\testData\TestEntity;
 use Zend\Stdlib\ArrayUtils;
 use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
@@ -178,44 +180,12 @@ class BasicTest extends AbstractHttpControllerTestCase
         return $result;
     }
 
-    public function ____test4loadDebbugingTest(){
-        //$this->loadEntitiesSet(\TestDatasetsPart1::forFavoritesSet());
-        /*$devicesIds = [421, 422, 423, 424, 425];
-        $groupsIds = [107, 108, 109];
-
-        foreach($devicesIds as $k => $deviceId){
-            if($k < 3) {
-                $this->addRightsToDeviceWithCheck($deviceId, "testUser1");
-                $this->addDeviceToGroup($deviceId, $groupsIds[0]);
-                $this->addDeviceToFavorite($deviceId, "testUser1");
-            }
-
-            if($k == 3){
-                $this->addRightsToDeviceWithCheck($deviceId, "testUser1");
-                $this->addRightsToDeviceWithCheck($deviceId, "testUser2");
-                $this->addDeviceToGroup($deviceId, $groupsIds[1]);
-            }
-
-            if($k > 3) {
-                $this->addRightsToDeviceWithCheck($deviceId, "testUser2");
-                $this->addDeviceToGroup($deviceId, $groupsIds[2]);
-                $this->addDeviceToFavorite($deviceId, "testUser2");
-            }
-        }
-
-        $this->addRightsToGroupWithCheck($groupsIds[0], "testUser1");
-        $this->addRightsToGroupWithCheck($groupsIds[1], "testUser1");
-        $this->addRightsToGroupWithCheck($groupsIds[1], "testUser2");
-        $this->addRightsToGroupWithCheck($groupsIds[2], "testUser2");
-
-        $this->addGroupToFavorite($groupsIds[0], "testUser1");
-        $this->addGroupToFavorite($groupsIds[2], "testUser2");*/
-    }
-
     public function testDevicesAndGroups(){
         $this->loadEntitiesSet(\TestDatasetsPart1::basicSet());
         $this->basicGroupsDistribution();
         $this->addToFavorites();
+        $this->addScheduling();
+
 
         $this->cleanUp();
     }
@@ -320,6 +290,346 @@ class BasicTest extends AbstractHttpControllerTestCase
             'users' =>
                 ["testUser1", "testUser2"]
         ];
+    }
+
+    /**
+     * Тест добавления назначенных заданий
+     */
+    protected function addScheduling()
+    {
+        $req = [
+            'action' => 'create_scheduled'
+        ];
+
+        $users = ["testUser1", "testUser2"];
+        $user = $users[0];
+        $groups = $this->getGroupInRegistryIDs($user);
+        $devices = $this->getDevicesInRegistryIDs($user);
+
+
+        $reqAbsentDevsGroupsSuccessWeekScheduling = array_merge(
+            $req,
+            [
+                'name' => "test case scheduling",
+                'week_scheduling' => [
+                    [
+                        'weekday' => "SUNDAY",
+                        'time' => "14:30",
+                        'command' => 'up'
+                    ]
+                ]
+            ]
+        );
+
+        $reqAbsentWeekSchedulingGroupsSuccessDevs = array_merge(
+            $req,
+            [
+                'name' => "test case scheduling",
+                'devices' => [$devices[0], $devices[1]]
+            ]
+        );
+
+        $reqAbsentWeekSchedulingDevsSuccessGroups = array_merge(
+            $req,
+            [
+                'name' => "test case scheduling",
+                'groups' => $groups[1]
+            ]
+        );
+
+        $testRequests = [
+            'fail' => [
+                [
+                    'request' => $req,
+                    'expectedHTTPStatus' => 403
+                ],
+                [
+                    'request' => array_merge(
+                        $req,
+                        [
+                            'name' => "test case scheduling",
+                        ]
+                    ),
+                    'expectedHTTPStatus' => 403
+                ],
+                [
+                    'request' => array_merge(
+                        $reqAbsentDevsGroupsSuccessWeekScheduling
+                    ),
+                    'expectedHTTPStatus' => 403
+                ],
+                [
+                    'request' => array_merge(
+                        $reqAbsentDevsGroupsSuccessWeekScheduling,
+                        [
+                            'devices' => "1,2,3"
+                        ]
+                    ),
+                    'expectedHTTPStatus' => 403
+                ],
+                [
+                    'request' => array_merge(
+                        $reqAbsentDevsGroupsSuccessWeekScheduling,
+                        [
+                            'devices' => [1,2,3]
+                        ]
+                    ),
+                    'expectedHTTPStatus' => 403
+                ],
+                [
+                    'request' => array_merge(
+                        $reqAbsentDevsGroupsSuccessWeekScheduling,
+                        [
+                            'name' => "test case scheduling",
+                            'groups' => 1
+                        ]
+                    ),
+                    'expectedHTTPStatus' => 403
+                ],
+                [
+                    'request' => array_merge(
+                        $reqAbsentDevsGroupsSuccessWeekScheduling,
+                        [
+                            'name' => "test case scheduling",
+                            'groups' => [20000001,100000004]
+                        ]
+                    ),
+                    'expectedHTTPStatus' => 403
+                ],
+                [
+                    'request' => array_merge(
+                        $reqAbsentDevsGroupsSuccessWeekScheduling,
+                        [
+                            'name' => "test case scheduling",
+                            'groups' => "0,1"
+                        ]
+                    ),
+                    'expectedHTTPStatus' => 403
+                ],
+                [
+                    'request' => array_merge(
+                        $reqAbsentWeekSchedulingGroupsSuccessDevs,
+                        [
+                            'week_scheduling' => 1
+                        ]
+                    ),
+                    'expectedHTTPStatus' => 403
+                ],
+                [
+                    'request' => array_merge(
+                        $reqAbsentWeekSchedulingGroupsSuccessDevs,
+                        [
+                            'week_scheduling' => [
+                                'weekday' => 'SHITDAY'
+                            ]
+                        ]
+                    ),
+                    'expectedHTTPStatus' => 403
+                ],
+                [
+                    'request' => array_merge(
+                        $reqAbsentWeekSchedulingGroupsSuccessDevs,
+                        [
+                            'name' => "test case scheduling",
+                            'devices' => [$devices[0], $devices[1]],
+                            'week_scheduling' => [
+                                'weekday' => 'SUNDAY'
+                            ]
+                        ]
+                    ),
+                    'expectedHTTPStatus' => 403
+                ],
+                [
+                    'request' => array_merge(
+                        $reqAbsentWeekSchedulingGroupsSuccessDevs,
+                        [
+                            'week_scheduling' => [
+                                'weekday' => 'SUNDAY',
+                                'time' => '14:30:',
+                                'command' => 'up'
+                            ]
+                        ]
+                    ),
+                    'expectedHTTPStatus' => 403
+                ],
+                [
+                    'request' => array_merge(
+                        $reqAbsentWeekSchedulingGroupsSuccessDevs,
+                        [
+                            'week_scheduling' => [
+                                'weekday' => 'SUNDAY',
+                                'time' => '14:30:0000',
+                                'command' => 'up'
+                            ]
+                        ]
+                    ),
+                    'expectedHTTPStatus' => 403
+                ],
+                [
+                    'request' => array_merge(
+                        $reqAbsentWeekSchedulingGroupsSuccessDevs,
+                        [
+                            'week_scheduling' => [
+                                'weekday' => 'SUNDAY',
+                                'time' => '14:30',
+                            ]
+                        ]
+                    ),
+                    'expectedHTTPStatus' => 403
+                ]
+            ],
+            'success' => [
+                [
+                    'request' => array_merge(
+                        $reqAbsentDevsGroupsSuccessWeekScheduling,
+                        [
+                            'name' => "test case scheduling",
+                            'devices' => [$devices[0], $devices[1]]
+                        ]
+                    ),
+                    'expectedHTTPStatus' => 200
+                ],
+                [
+                    'request' => array_merge(
+                        $reqAbsentDevsGroupsSuccessWeekScheduling,
+                        [
+                            'name' => "test case scheduling",
+                            'groups' => [$groups[0]]
+                        ]
+                    ),
+                    'expectedHTTPStatus' => 200
+                ],
+                [
+                    'request' => array_merge(
+                        $reqAbsentDevsGroupsSuccessWeekScheduling,
+                        [
+                            'name' => "test case scheduling",
+                            'devices' => [$devices[0], $devices[1]],
+                            'groups' => [$groups[0]]
+                        ]
+                    ),
+                    'expectedHTTPStatus' => 200
+                ]
+            ]
+        ];
+
+
+        foreach ($testRequests['fail'] as $request){
+            // неуспешный запрос
+            $res = $this->dispatchRequest("/scheduled_tasks_rpc", "POST", $request['request'], $user);
+            Assert::assertEquals(
+                $request['expectedHTTPStatus'], $res['http_status'],
+                "Запрос " . json_encode($request['request']) . " вернул http статус " . $res['http_status'] .
+                " вместо ожидаемого " . $request['expectedHTTPStatus'] . ", содержимое ответа: " .
+                $res['content']);
+        }
+
+        $successIDs = [];
+
+        foreach ($testRequests['success'] as $request){
+            // успешный запрос
+            $res = $this->dispatchRequest("/scheduled_tasks_rpc", "POST", $request['request'], $user);
+            Assert::assertEquals(
+                $request['expectedHTTPStatus'], $res['http_status'],
+                "Запрос " . json_encode($request['request']) . " вернул http статус " . $res['http_status'] .
+                " вместо ожидаемого " . $request['expectedHTTPStatus'] . ", содержимое ответа: " .
+                $res['content']);
+
+            $res = Entity::asArray(json_decode($res['content']));
+            // добавляем сохраненную сущность в реестр, чтоб потом корректно удалилась
+            $registry = $this->getRegistry();
+            $registry[ScheduledTasksTestEntity::class][$res['id']] = new ScheduledTasksTestEntity($res['id'], $res, "", $user);
+            $this->setRegistry($registry);
+
+            // убеждаемся в существовании назначенного задания и правильном содержании
+            //$resExists = $this->dispatchRequest(ScheduledTasksTestEntity::$baseUrl . "/" . $res['id'], "GET", [], $user);
+            $resExists = $this->dispatchRequest(
+                ScheduledTasksTestEntity::$baseUrl . "_rpc", "POST",
+                [
+                    'action' => 'get_weekly_scheduled_task',
+                    'scheduled_task_id' => $res['id']
+                ], $user);
+            Assert::assertEquals(200, $resExists['http_status']);
+
+            // проверяем, что все устройства и группы ассоциированы с будильником
+            $content = json_decode($resExists['content']);
+
+            //echo "content..\r\n";
+            //print_r($content);
+
+            if(!empty($request['request']['devices'])){
+                Assert::assertTrue(@!!$content->devices, "В ответе на создание назначенного задания нет устройств!");
+            }
+
+            if(!empty($request['request']['groups'])){
+                Assert::assertTrue(@!!$content->groups, "В ответе на создание назначенного задания нет групп!");
+            }
+
+            Assert::assertTrue(@!!$content->week_scheduling, "В ответе на создание назначенного задания нет расписания!");
+
+            if(@!!$content->devices) {
+                $existsDevs = [];
+                foreach ($content->devices as $dev) {
+                    $existsDevs[] = $dev->id;
+                }
+
+                /*echo "requested devs: \r\n";
+                print_r($request['request']['devices']);
+                echo "existsDevs \r\n";
+                print_r($existsDevs);*/
+
+                // 2 проверки - в совокупности проверяют, что те и только те устройства, которые передали в запросе,
+                // действительно добавлены к будильнику
+                self::assertArraySubset($request['request']['devices'], $existsDevs);
+                self::assertArraySubset($existsDevs, $request['request']['devices']);
+            }
+
+            if(@!!$content->groups) {
+                $existsGroups = [];
+                foreach ($content->groups as $grp) {
+                    $existsGroups[] = $grp->id;
+                }
+
+                // 2 проверки - в совокупности проверяют, что те и только те группы, которые передали в запросе,
+                // действительно добавлены к будильнику
+                self::assertArraySubset($request['request']['groups'], $existsGroups);
+                self::assertArraySubset($existsGroups, $request['request']['groups']);
+            }
+
+            //  останавливаем будильник
+            $resTurnOff = $this->dispatchRequest(
+                ScheduledTasksTestEntity::$baseUrl . "_rpc", "POST",
+                [
+                    'action' => 'turn_scheduled',
+                    'scheduled_task_id' => $res['id'],
+                    'turn' => 'off'
+                ], $user);
+
+            //echo "resTurnOFF\r\n";
+
+            Assert::assertEquals(200, $resTurnOff['http_status']);
+            $resTurnOffContent = json_decode($resTurnOff['content']);
+            Assert::assertEquals("PAUSED", $resTurnOffContent->state);
+
+            // вновь запускаем будильник
+            $resTurnOn = $this->dispatchRequest(
+                ScheduledTasksTestEntity::$baseUrl . "_rpc", "POST",
+                [
+                    'action' => 'turn_scheduled',
+                    'scheduled_task_id' => $res['id'],
+                    'turn' => 'on'
+                ], $user);
+
+            //echo "resTurnOFF\r\n";
+
+            Assert::assertEquals(200, $resTurnOn['http_status']);
+            $resTurnOnContent = json_decode($resTurnOn['content']);
+            Assert::assertEquals("ACTIVE", $resTurnOnContent->state);
+
+
+
+            $successIDs[] = $res['id'];
+        }
     }
 
     /**
