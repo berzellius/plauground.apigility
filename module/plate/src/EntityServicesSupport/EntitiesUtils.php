@@ -126,7 +126,7 @@ class EntitiesUtils
         }
 
         //print_r($usedEntities);
-        print_r($middle);
+        //print_r($middle);
 
         return array_values($middle);
     }

@@ -664,7 +664,7 @@ class BasicTest extends AbstractHttpControllerTestCase
      * @param $devId
      * @param $user
      * @param $disableCheck - true если сущность может не создаться (тогда мы сами проверяем результат запроса)
-     * @return mixed
+     * @return void
      */
     protected function addDeviceToFavorite($devId, $user, $disableCheck = false){
         $devToFav = [
@@ -672,10 +672,37 @@ class BasicTest extends AbstractHttpControllerTestCase
             "entity_type" => "DEVICE"
         ];
 
+
         echo "Добавляется в избранное устройство #" . $devId . " для пользователя " . $user;
-        return ($disableCheck)?
-            $this->createEntityInstanceWOCheck(FavoritesTestEntity::class, $devToFav, "", $user) :
-            $this->createEntityInstance(FavoritesTestEntity::class, $devToFav, "", $user);
+
+        if($disableCheck){
+            // вариант без проверки - юзаем обычный rest метод
+            $this->createEntityInstanceWOCheck(FavoritesTestEntity::class, $devToFav, "", $user);
+        }
+        else{
+            $devToFav['entity_id'] = $devToFav['id_device'];
+            unset($devToFav['id_device']);
+            $devToFav['action'] = 'add';
+            // вариант с проверкой - используем rpc метод, проверяем сущестование устройства в полном списке избранного
+            $res = $this->dispatchRequest(
+                FavoritesTestEntity::$baseUrl . "_rpc?",
+                "POST",
+                $devToFav,
+                $user
+            );
+
+            $result = Entity::asArray(json_decode($res['content']));
+
+            Assert::assertArrayHasKey('devices', $result);
+            $addedDev = null;
+
+            foreach ($result['devices'] as $favdev){
+                if($favdev['id'] == $devId){
+                    $addedDev = $favdev;
+                }
+            }
+            Assert::assertNotNull($addedDev);
+        }
     }
 
     protected function addGroupToFavorite($grpId, $user){
