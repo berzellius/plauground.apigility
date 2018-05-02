@@ -89,6 +89,7 @@ class TableService implements ITableService
             return $this->getTableMappersStorage()[$key];
         }
         else{
+            //die($key . " not set");
             $resource = $this->getServices()->get($key);
             return $this->getTableMappersStorage()[$key];
             //return null;

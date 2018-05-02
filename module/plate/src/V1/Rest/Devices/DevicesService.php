@@ -6,18 +6,26 @@
  * Time: 15:53
  */
 namespace plate\V1\Rest\Devices;
+use Herrera\Json\Exception\Exception;
 use plate\EntityServicesSupport\EntityService;
 use plate\EntitySupport\Collection;
 use plate\EntitySupport\Entity;
 use plate\V1\Rest\Dev2grp\Dev2grpResource;
 use plate\V1\Rest\DevicesAcl\DevicesAclResource;
+use plate\V1\Rest\Favorites\FavoritesResource;
 use Zend\Db\Adapter\Adapter;
+use Zend\Db\Sql\Join;
+use Zend\Db\Sql\Predicate\Expression;
 use Zend\Db\Sql\Predicate\Predicate;
 use Zend\Db\Sql\Select;
 use Zend\Paginator\Adapter\DbSelect;
 use ZF\ApiProblem\ApiProblem;
 
 class DevicesService extends EntityService{
+
+    public function sample1(){
+        return 'ok' . $this->getTableName();
+    }
 
     public function sampleMethod(){
         return 'ok' . $this->getITableService()->getTableNameByKey('devices') . '/' . $this->getAuthUtils()->getClientId();
@@ -86,6 +94,7 @@ class DevicesService extends EntityService{
             isset($params['room_id'])? ['room_id' => $params['room_id']] : []
         );
 
+        //die($select->getSqlString($this->getAdapter()->platform));
         $dbSelect = new DbSelect($select, $this->getAdapter());
 
         return new Collection($dbSelect);
@@ -173,16 +182,25 @@ class DevicesService extends EntityService{
      * @return Select
      */
     protected function getDevicesSelectorByGroup($grpId){
+        $favoritesTableName = $this->getFavoritesTableName();
+
         $select = new Select();
         $select
             ->from($this->getDevices2GroupMapperTableName())
             ->join(
-                $this->getTableName(),
-                $this->getTableName() . ". " . $this->getIdFieldName() . " = " . $this->getDevices2GroupMapperTableName() . ".device_id"
+                ['d' => $this->getTableName()],
+                "d. " . $this->getIdFieldName() . " = " . $this->getDevices2GroupMapperTableName() . ".device_id",
+                [
+                    Select::SQL_STAR,
+                    'isFavorite' => new Expression(
+                        "(select count(*) from " . $favoritesTableName . " f where f.id_device = d." . $this->getIdFieldName()
+                        . " and f.entity_type = 'DEVICE' and f.user = '" . $this->getAuthUtils()->getClientId() . "')"
+                    )
+                ]
             )
             ->join(
                 $this->getUserAccessListMapperTableName(),
-                $this->getUserAccessListMapperTableName() . ".device_id = " . $this->getTableName() . ".id",
+                $this->getUserAccessListMapperTableName() . ".device_id = " . "d.id",
                 []
             )
             ->columns([])
@@ -193,7 +211,7 @@ class DevicesService extends EntityService{
     }
 
     /**
-     * Возвращает Zend\Db\Sql\Select из тадлицы устройств с заданным фильтром @params
+     * Возвращает Zend\Db\Sql\Select из таблицы устройств с заданным фильтром @params
      * для обычных пользователей возвращает только те объекты, к которым есть разрешение в acl
      *
      * @param $params
@@ -217,20 +235,42 @@ class DevicesService extends EntityService{
         else{
             $clientId =  $this->getAuthUtils()->getClientId();
             $devicesACLTableName = $this->getUserAccessListMapperTableName();
+            $favoritesTableName = $this->getFavoritesTableName();
 
             $select = new Select();
             $select
                 ->from($devicesACLTableName)
                 ->join(
-                    $this->getTableName(),
-                    $this->getTableName() . "." . $this->getIdFieldName() .
+                    [ 'd' => $this->getTableName()],
+                    "d." . $this->getIdFieldName() .
                     " = " .
-                    $devicesACLTableName . ".device_id"
+                    $devicesACLTableName . ".device_id",
+                    [
+                       Select::SQL_STAR,
+                       'isFavorite' => new Expression(
+                           "(select count(*) from " . $favoritesTableName . " f where f.id_device = d." . $this->getIdFieldName()
+                           . " and f.entity_type = 'DEVICE' and f.user = '" . $clientId . "')"
+                       )
+                    ]
                 )
+                /*->join(
+                    ['f' => $favoritesTableName],
+                    $this->getTableName() . "." . $this->getIdFieldName() .
+                    " = " . "f.id_device"
+                    ,
+                    [],
+                    Join::JOIN_LEFT
+                )*/
                 ->columns([])
                 ->where(
                     $devicesACLTableName . ".client_id = '$clientId'"
                 );
+                /*->where(
+                    "f.entity_type = 'DEVICE'", Predicate::OP_AND
+                )
+                ->where(
+                    "f.user = '$clientId'", Predicate::OP_AND
+                );*/
 
             foreach($params as $pname => $pvalue) {
                 $select->where(
@@ -258,5 +298,13 @@ class DevicesService extends EntityService{
     protected function getDevices2GroupMapperTableName(){
         $mapper = $this->getDevices2GroupMapper();
         return $mapper->getTable()->table;
+    }
+
+    protected function getFavoritesMapper(){
+        return $this->getITableService()->getTableMapperByKey(FavoritesResource::class);
+    }
+
+    protected function getFavoritesTableName(){
+        return $this->getFavoritesMapper()->getTable()->table;
     }
 }

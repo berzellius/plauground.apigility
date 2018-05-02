@@ -185,6 +185,16 @@ return array(
                     ),
                 ),
             ),
+            'plate.rpc.devices-rpc' => array(
+                'type' => 'Segment',
+                'options' => array(
+                    'route' => '/devices_rpc',
+                    'defaults' => array(
+                        'controller' => 'plate\\V1\\Rpc\\DevicesRpc\\Controller',
+                        'action' => 'devicesRpc',
+                    ),
+                ),
+            ),
         ),
     ),
     'zf-versioning' => array(
@@ -207,6 +217,7 @@ return array(
             19 => 'plate.rpc.favorites-rpc',
             20 => 'plate.rpc.scheduled-tasks',
             21 => 'plate.rpc.items-lists',
+            22 => 'plate.rpc.devices-rpc',
         ),
     ),
     'zf-rest' => array(
@@ -453,6 +464,7 @@ return array(
             'plate\\V1\\Rpc\\FavoritesRpc\\Controller' => 'HalJson',
             'plate\\V1\\Rpc\\ScheduledTasks\\Controller' => 'HalJson',
             'plate\\V1\\Rpc\\ItemsLists\\Controller' => 'HalJson',
+            'plate\\V1\\Rpc\\DevicesRpc\\Controller' => 'HalJson',
         ),
         'accept_whitelist' => array(
             'plate\\V1\\Rest\\Oauth_users_control\\Controller' => array(
@@ -540,6 +552,11 @@ return array(
                 1 => 'application/json',
                 2 => 'application/*+json',
             ),
+            'plate\\V1\\Rpc\\DevicesRpc\\Controller' => array(
+                0 => 'application/vnd.plate.v1+json',
+                1 => 'application/json',
+                2 => 'application/*+json',
+            ),
         ),
         'content_type_whitelist' => array(
             'plate\\V1\\Rest\\Oauth_users_control\\Controller' => array(
@@ -607,6 +624,10 @@ return array(
                 1 => 'application/json',
             ),
             'plate\\V1\\Rpc\\ItemsLists\\Controller' => array(
+                0 => 'application/vnd.plate.v1+json',
+                1 => 'application/json',
+            ),
+            'plate\\V1\\Rpc\\DevicesRpc\\Controller' => array(
                 0 => 'application/vnd.plate.v1+json',
                 1 => 'application/json',
             ),
@@ -2435,6 +2456,17 @@ return array(
                     ),
                 ),
             ),
+            'plate\\V1\\Rpc\\DevicesRpc\\Controller' => array(
+                'actions' => array(
+                    'DevicesRpc' => array(
+                        'GET' => true,
+                        'POST' => false,
+                        'PUT' => false,
+                        'PATCH' => false,
+                        'DELETE' => false,
+                    ),
+                ),
+            ),
         ),
     ),
     'zf-apigility' => array(
@@ -2458,6 +2490,7 @@ return array(
             'plate\\V1\\Rpc\\FavoritesRpc\\Controller' => 'plate\\V1\\Rpc\\FavoritesRpc\\FavoritesRpcControllerFactory',
             'plate\\V1\\Rpc\\ScheduledTasks\\Controller' => 'plate\\V1\\Rpc\\ScheduledTasks\\ScheduledTasksControllerFactory',
             'plate\\V1\\Rpc\\ItemsLists\\Controller' => 'plate\\V1\\Rpc\\ItemsLists\\ItemsListsControllerFactory',
+            'plate\\V1\\Rpc\\DevicesRpc\\Controller' => 'plate\\V1\\Rpc\\DevicesRpc\\DevicesRpcControllerFactory',
         ),
     ),
     'zf-rpc' => array(
@@ -2511,6 +2544,14 @@ return array(
                 0 => 'GET',
             ),
             'route_name' => 'plate.rpc.items-lists',
+        ),
+        'plate\\V1\\Rpc\\DevicesRpc\\Controller' => array(
+            'service_name' => 'DevicesRpc',
+            'http_methods' => array(
+                0 => 'GET',
+                1 => 'POST',
+            ),
+            'route_name' => 'plate.rpc.devices-rpc',
         ),
     ),
 );
