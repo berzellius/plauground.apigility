@@ -9,6 +9,7 @@
 namespace plate\EntitySupport;
 
 use DomainException;
+use Interop\Container\ContainerInterface;
 use plate\EntityServicesSupport\GetITableService;
 use plate\EntityServicesSupport\ITableService;
 use plate\EntitySupport\TableGateway;
@@ -22,6 +23,36 @@ use plate\EntitySupport\TableGateway;
 abstract class ResourceFactory
 {
     use GetITableService;
+
+    /**
+     * Регистрация маппинга персистентных объектов с таблицами БД
+     * @param ContainerInterface $services
+     * @param $configName - имя секции конфигурации в global.php,
+     * например 
+     * 'entities' => array( // имя секции
+     *       'db' => 'oauth2_users', // псевдоним БД в конфигуации Apigility
+     *       'table' => 'entities' // имя таблицы
+     *  ) 
+     * @param $controllerPath - путь к контроллеру в module.config.php, 
+     * например plate\\V1\\Rest\\Entities\\Controller, при добавлении сервиса через веб-интерфейс создается автоматически 
+     * @param $resourceClass - имя класса ресурса-контроллера
+     * @return TableGatewayMapper
+     */
+    public function registerPersistenceMapping(ContainerInterface $services, $configName, $controllerPath, $resourceClass)
+    {
+        /**
+         * конфигурация должна быть прописана в global.php
+         */
+        $tableGateway = $this->getTableGateway($services, $configName);
+        $tableGatewayMapper = new TableGatewayMapper($tableGateway);
+
+        $halEntityProperties = $this->getZfHalEntityProperties($controllerPath);
+        $tableGatewayMapper->setHalEntityProperties($halEntityProperties);
+
+        $this->getITableService($services)->registerTableMapper($resourceClass, $tableGatewayMapper);
+        
+        return $tableGatewayMapper;
+    }
 
     /**
      * Получить TableGateway
@@ -42,6 +73,7 @@ abstract class ResourceFactory
             ));
         }
         $config = $config[$configPrefix];
+
 
         if(!isset($config['db']) || !isset($config['table'])){
             throw new DomainException(sprintf(

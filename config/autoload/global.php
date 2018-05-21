@@ -31,44 +31,12 @@ return array(
         'db' => 'oauth2_users',
         'table' => 'oauth_clients',
     ),
-    'devices' => array(
-        'db' => 'oauth2_users',
-        'table' => 'devices',
-    ),
-    'devices_acl' => array(
-        'db' => 'oauth2_users',
-        'table' => 'devices_acl',
-    ),
-    'rooms' => array(
-        'db' => 'oauth2_users',
-        'table' => 'rooms',
-    ),
     'application_clients' => array(
         'db' => 'oauth2_users',
         'table' => 'application_clients'
     ),
-    'scheduled_tasks' => array(
+    'entities' => array(
         'db' => 'oauth2_users',
-        'table' => 'scheduled_tasks'
-    ),
-    'scheduled_tasks_timetable' => array(
-        'db' => 'oauth2_users',
-        'table' => 'scheduled_tasks_timetable'
-    ),
-    'groups' => array(
-        'db' => 'oauth2_users',
-        'table' => 'groups'
-    ),
-    'dev2grp' => array(
-        'db' => 'oauth2_users',
-        'table' => 'dev2grp'
-    ),
-    'favorites' => array(
-        'db' => 'oauth2_users',
-        'table' => 'favorites'
-    ),
-    'scheduled_tasks_dev_grp' => array(
-        'db' => 'oauth2_users',
-        'table' => 'scheduled_tasks_dev_grp'
+        'table' => 'entities'
     )
 );

@@ -15,6 +15,11 @@ use Zend\Stdlib\ArrayObject;
  */
 class Entity extends ArrayObject
 {
+    /**
+     * Представить объект ассоциативным массивом
+     * @param $entity
+     * @return mixed
+     */
     public static function asArray($entity)
     {
         return json_decode(json_encode($entity), true);
