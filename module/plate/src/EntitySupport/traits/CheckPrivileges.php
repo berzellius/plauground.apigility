@@ -5,9 +5,7 @@
  * Date: 25.04.2017
  * Time: 19:49
  */
-
-namespace plate\EntitySupport;
-
+namespace plate\EntitySupport\traits;
 
 use ZF\ApiProblem\ApiProblem;
 

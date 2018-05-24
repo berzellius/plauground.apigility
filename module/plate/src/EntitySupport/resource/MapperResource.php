@@ -6,9 +6,10 @@
  * Time: 19:12
  */
 
-namespace plate\EntitySupport;
+namespace plate\EntitySupport\resource;
 
 
+use plate\EntitySupport\resource\MapperInterface;
 use ZF\Rest\AbstractResourceListener;
 
 /**

@@ -1,8 +1,8 @@
 <?php
 namespace plate\V1\Rest\Oauth_users_control;
 
-use plate\EntitySupport\ResourceFactory;
-use plate\EntitySupport\TableGatewayMapper;
+use plate\EntitySupport\resource\ResourceFactory;
+use plate\EntitySupport\tableGateway\TableGatewayMapper;
 
 class Oauth_users_controlResourceFactory extends ResourceFactory
 {

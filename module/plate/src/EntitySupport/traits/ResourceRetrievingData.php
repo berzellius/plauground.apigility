@@ -6,7 +6,7 @@
  * Time: 17:12
  */
 
-namespace plate\EntitySupport;
+namespace plate\EntitySupport\traits;
 
 /**
  * Class ResourceRetrievingData

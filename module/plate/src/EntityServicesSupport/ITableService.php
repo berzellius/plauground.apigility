@@ -8,7 +8,7 @@
  */
 namespace plate\EntityServicesSupport;
 
-use plate\EntitySupport\TableGatewayMapper;
+use plate\EntitySupport\tableGateway\TableGatewayMapper;
 
 interface ITableService
 {

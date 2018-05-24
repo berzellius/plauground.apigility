@@ -68,7 +68,7 @@ class TableService implements ITableService
     /**
      * Зарегистрировать mapper таблицы для общего использования
      * @param string $key
-     * @param \plate\EntitySupport\TableGatewayMapper $mapper
+     * @param \plate\EntitySupport\tableGateway\TableGatewayMapper $mapper
      * @return void
      */
     public function registerTableMapper($key, $mapper)
@@ -81,7 +81,7 @@ class TableService implements ITableService
     /**
      * Получить зарегистрированный mapper по ключу
      * @param $key
-     * @return \plate\EntitySupport\TableGatewayMapper
+     * @return \plate\EntitySupport\tableGateway\TableGatewayMapper
      */
     public function getTableMapperByKey($key)
     {
@@ -89,7 +89,6 @@ class TableService implements ITableService
             return $this->getTableMappersStorage()[$key];
         }
         else{
-            //die($key . " not set");
             $resource = $this->getServices()->get($key);
             return $this->getTableMappersStorage()[$key];
             //return null;

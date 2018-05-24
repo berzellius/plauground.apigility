@@ -1,10 +1,10 @@
 <?php
 namespace plate\V1\Rest\Oauth_users_control;
 
-use plate\EntitySupport\CheckPrivilegesAndDataRetrievingResource;
-use plate\EntitySupport\DataRetrievingResource;
-use plate\EntitySupport\MapperInterface;
-use plate\EntitySupport\ResourceRetrievingData;
+use plate\EntitySupport\resource\CheckPrivilegesAndDataRetrievingResource;
+use plate\EntitySupport\resource\DataRetrievingResource;
+use plate\EntitySupport\resource\MapperInterface;
+use plate\EntitySupport\traits\ResourceRetrievingData;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 

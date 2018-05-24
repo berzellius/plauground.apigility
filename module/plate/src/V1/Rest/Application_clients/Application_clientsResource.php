@@ -1,7 +1,7 @@
 <?php
 namespace plate\V1\Rest\Application_clients;
 
-use plate\EntitySupport\CheckPrivilegesAndDataRetrievingResource;
+use plate\EntitySupport\resource\CheckPrivilegesAndDataRetrievingResource;
 use ZF\ApiProblem\ApiProblem;
 
 class Application_clientsResource extends CheckPrivilegesAndDataRetrievingResource

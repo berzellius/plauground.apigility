@@ -6,8 +6,10 @@ return array(
             'plate\\EntityServicesSupport\\ITableService' => 'plate\\EntityServicesSupport\\ITableServiceFactory',
             'plate\\V1\\Rest\\Oauth_users_control\\Oauth_users_controlResource' => 'plate\\V1\\Rest\\Oauth_users_control\\Oauth_users_controlResourceFactory',
             'plate\\V1\\Rest\\Application_clients\\Application_clientsResource' => 'plate\\V1\\Rest\\Application_clients\\Application_clientsResourceFactory',
-            'plate\\V1\\Rest\\Entities\\EntitiesService' => 'plate\\V1\\Rest\\Entities\\EntitiesServiceFactory',
-            'plate\\V1\\Rest\\Entities\\EntitiesResource' => 'plate\\V1\\Rest\\Entities\\EntitiesResourceFactory',
+            'plate\\V1\\Rest\\Entities\\EntitiesService' => 'plate\\EntityServicesSupport\\ServiceFactory',
+            'plate\\V1\\Rest\\Entities\\EntitiesResource' => 'plate\\EntitySupport\\resource\\ResourceFactory',
+            'plate\\V1\\Rest\\BasicHierarchy\\BasicHierarchyService' => 'plate\\EntityServicesSupport\\ServiceFactory',
+            'plate\\V1\\Rest\\BasicHierarchy\\BasicHierarchyResource' => 'plate\\EntitySupport\\resource\\ResourceFactory',
         ),
     ),
     'router' => array(
@@ -39,6 +41,15 @@ return array(
                     ),
                 ),
             ),
+            'plate.rest.basic-hierarchy' => array(
+                'type' => 'Segment',
+                'options' => array(
+                    'route' => '/basic-hierarchy[/:basic_hierarchy_id]',
+                    'defaults' => array(
+                        'controller' => 'plate\\V1\\Rest\\BasicHierarchy\\Controller',
+                    ),
+                ),
+            ),
         ),
     ),
     'zf-versioning' => array(
@@ -46,6 +57,7 @@ return array(
             5 => 'plate.rest.oauth_users_control',
             9 => 'plate.rest.application_clients',
             0 => 'plate.rest.entities',
+            10 => 'plate.rest.basic-hierarchy',
         ),
     ),
     'zf-rest' => array(
@@ -110,19 +122,55 @@ return array(
                 0 => 'GET',
                 1 => 'POST',
             ),
-            'collection_query_whitelist' => array(),
+            'collection_query_whitelist' => array(
+                0 => 'page',
+                1 => 'pagesize',
+            ),
             'page_size' => 25,
-            'page_size_param' => null,
+            'page_size_param' => 'ps',
             'entity_class' => 'plate\\V1\\Rest\\Entities\\EntitiesEntity',
             'collection_class' => 'plate\\V1\\Rest\\Entities\\EntitiesCollection',
             'service_name' => 'entities',
+            'dao_service' => 'plate\\V1\\Rest\\Entities\\EntitiesService',
+        ),
+        'plate\\V1\\Rest\\BasicHierarchy\\Controller' => array(
+            'listener' => 'plate\\V1\\Rest\\BasicHierarchy\\BasicHierarchyResource',
+            'route_name' => 'plate.rest.basic-hierarchy',
+            'route_identifier_name' => 'basic_hierarchy_id',
+            'collection_name' => 'basic_hierarchy',
+            'entity_http_methods' => array(
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+            ),
+            'collection_http_methods' => array(
+                0 => 'GET',
+                1 => 'POST',
+            ),
+            'collection_query_whitelist' => array(),
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => 'plate\\V1\\Rest\\BasicHierarchy\\BasicHierarchyEntity',
+            'collection_class' => 'plate\\V1\\Rest\\BasicHierarchy\\BasicHierarchyCollection',
+            'dao_service' => 'plate\\V1\\Rest\\BasicHierarchy\\BasicHierarchyService',
+            'service_name' => 'basicHierarchy',
+            'referenceTables' => array(
+                0 => array(
+                    'referenceConfig' => 'types',
+                    'idField' => 'type_id',
+                    'foreignColumn' => 'type',
+                    'entityClass' => 'plate\\V1\\Rest\\BasicHierarchy\\HierarchyTypes',
+                ),
+            ),
         ),
     ),
     'zf-content-negotiation' => array(
         'controllers' => array(
             'plate\\V1\\Rest\\Oauth_users_control\\Controller' => 'HalJson',
             'plate\\V1\\Rest\\Application_clients\\Controller' => 'HalJson',
-            'plate\\V1\\Rest\\Entities\\Controller' => 'HalJson',
+            'plate\\V1\\Rest\\Entities\\Controller' => 'JsonAlt',
+            'plate\\V1\\Rest\\BasicHierarchy\\Controller' => 'JsonAlt',
         ),
         'accept_whitelist' => array(
             'plate\\V1\\Rest\\Oauth_users_control\\Controller' => array(
@@ -140,6 +188,11 @@ return array(
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ),
+            'plate\\V1\\Rest\\BasicHierarchy\\Controller' => array(
+                0 => 'application/vnd.plate.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ),
         ),
         'content_type_whitelist' => array(
             'plate\\V1\\Rest\\Oauth_users_control\\Controller' => array(
@@ -153,6 +206,18 @@ return array(
             'plate\\V1\\Rest\\Entities\\Controller' => array(
                 0 => 'application/vnd.plate.v1+json',
                 1 => 'application/json',
+            ),
+            'plate\\V1\\Rest\\BasicHierarchy\\Controller' => array(
+                0 => 'application/vnd.plate.v1+json',
+                1 => 'application/json',
+            ),
+        ),
+        'selectors' => array(
+            'JsonAlt' => array(
+                'plate\\Json\\JsonModelAlt' => array(
+                    0 => 'application/json',
+                    1 => 'application/*+json',
+                ),
             ),
         ),
     ),
@@ -198,6 +263,19 @@ return array(
                 'entity_identifier_name' => 'id',
                 'route_name' => 'plate.rest.entities',
                 'route_identifier_name' => 'entities_id',
+                'is_collection' => true,
+            ),
+            'plate\\V1\\Rest\\BasicHierarchy\\BasicHierarchyEntity' => array(
+                'entity_identifier_name' => 'id',
+                'route_name' => 'plate.rest.basic-hierarchy',
+                'route_identifier_name' => 'basic_hierarchy_id',
+                //'hydrator' => 'Zend\\Hydrator\\ObjectProperty',
+                'hydrator' => \plate\Hydrator\CustomHydrator::class
+            ),
+            'plate\\V1\\Rest\\BasicHierarchy\\BasicHierarchyCollection' => array(
+                'entity_identifier_name' => 'id',
+                'route_name' => 'plate.rest.basic-hierarchy',
+                'route_identifier_name' => 'basic_hierarchy_id',
                 'is_collection' => true,
             ),
         ),
@@ -1513,6 +1591,22 @@ return array(
                 ),
             ),
             'plate\\V1\\Rest\\Entities\\Controller' => array(
+                'collection' => array(
+                    'GET' => true,
+                    'POST' => true,
+                    'PUT' => false,
+                    'PATCH' => false,
+                    'DELETE' => false,
+                ),
+                'entity' => array(
+                    'GET' => true,
+                    'POST' => false,
+                    'PUT' => true,
+                    'PATCH' => true,
+                    'DELETE' => true,
+                ),
+            ),
+            'plate\\V1\\Rest\\BasicHierarchy\\Controller' => array(
                 'collection' => array(
                     'GET' => true,
                     'POST' => true,

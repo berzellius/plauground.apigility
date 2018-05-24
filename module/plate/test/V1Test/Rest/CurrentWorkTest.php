@@ -9,7 +9,7 @@
 namespace V1Test\Rest;
 
 use PHPUnit\Framework\Assert;
-use plate\EntitySupport\Entity;
+use plate\EntitySupport\entity\Entity;
 use plate\V1\Rest\Scheduled_tasks\Scheduled_tasksEntity;
 use V1Test\Rest\BasicTest;
 use V1Test\Rest\testData\FavoritesTestEntity;

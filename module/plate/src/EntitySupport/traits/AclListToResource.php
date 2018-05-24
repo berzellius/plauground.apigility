@@ -6,8 +6,10 @@
  * Time: 22:30
  */
 
-namespace plate\EntitySupport;
+namespace plate\EntitySupport\traits;
 
+
+use plate\EntitySupport\tableGateway\TableGatewayMapper;
 
 trait AclListToResource
 {

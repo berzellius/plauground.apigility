@@ -1,7 +1,7 @@
 <?php
 namespace plate\V1\Rest\Entities;
 
-use plate\EntitySupport\Entity;
+use plate\EntitySupport\entity\Entity;
 
 /**
  * Класс для маппинга сущностей (обязателен для REST API сервисов Apigility)

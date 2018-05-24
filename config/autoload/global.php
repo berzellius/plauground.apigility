@@ -38,5 +38,13 @@ return array(
     'entities' => array(
         'db' => 'oauth2_users',
         'table' => 'entities'
+    ),
+    'basic_hierarchy' => array(
+        'db' => 'oauth2_users',
+        'table' => 'basic_hierarchy'
+    ),
+    'types' => array(
+        'db' => 'oauth2_users',
+        'table' => 'hierarchy_types'
     )
 );

@@ -1,8 +1,8 @@
 <?php
 namespace plate\V1\Rest\Application_clients;
 
-use plate\EntitySupport\ResourceFactory;
-use plate\EntitySupport\TableGatewayMapper;
+use plate\EntitySupport\resource\ResourceFactory;
+use plate\EntitySupport\tableGateway\TableGatewayMapper;
 
 class Application_clientsResourceFactory extends ResourceFactory
 {

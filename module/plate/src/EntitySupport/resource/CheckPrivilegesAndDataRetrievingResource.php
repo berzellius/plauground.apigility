@@ -6,7 +6,10 @@
  * Time: 19:51
  */
 
-namespace plate\EntitySupport;
+namespace plate\EntitySupport\resource;
+
+use plate\EntitySupport\resource\DataRetrievingResource;
+use plate\EntitySupport\traits\CheckPrivileges;
 
 /**
  * Class CheckPrivilegesAndDataRetrievingResource

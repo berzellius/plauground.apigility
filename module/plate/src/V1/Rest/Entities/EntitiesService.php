@@ -10,6 +10,8 @@ namespace plate\V1\Rest\Entities;
 
 
 use plate\EntityServicesSupport\EntityService;
+use plate\Json\JsonModelAlt;
+use Zend\View\Helper\ViewModel;
 
 /**
  * Бизнес-логика работы с Entities
@@ -21,10 +23,17 @@ class EntitiesService extends EntityService
 
     public function fetchAll($params)
     {
-        if(!$this->getAuthUtils()->checkAdminPrivileges()){
+        // работа с Entities напрямую - только админу
+        if(!$this->getAuthUtils()->checkAdminPrivileges() && false){
             return $this->notAllowed();
         }
 
-        return $this->getTableMapper()->fetchAll($params);
+        $res = $this->getTableMapper()->fetchAll($params);
+        //$json = new JsonModelAlt();
+        //$json->setVariables($res->getCurrentItems());
+        //die($json->serialize());
+        //return new ViewModel($res->getCurrentItems());
+
+        return $res;
     }
 }

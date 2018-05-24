@@ -1,7 +1,7 @@
 <?php
 namespace plate\V1\Rest\Entities;
 
-use plate\EntitySupport\Collection;
+use plate\EntitySupport\collection\Collection;
 use Zend\Paginator\Paginator;
 
 /**
@@ -11,4 +11,16 @@ use Zend\Paginator\Paginator;
  */
 class EntitiesCollection extends Collection
 {
+    /**
+     * EntitiesCollection constructor.
+     * @param \Zend\Paginator\Adapter\AdapterInterface|\Zend\Paginator\AdapterAggregateInterface $adapter
+     */
+    public function __construct($adapter)
+    {
+        parent::__construct($adapter);
+        $this->setCollectionListName('entities');
+        $this->setCollectionEntityName('entity');
+    }
+
+
 }

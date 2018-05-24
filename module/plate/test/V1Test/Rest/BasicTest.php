@@ -11,7 +11,7 @@ namespace V1Test\Rest;
 
 use Herrera\Json\Exception\Exception;
 use PHPUnit\Framework\Assert;
-use plate\EntitySupport\Entity;
+use plate\EntitySupport\entity\Entity;
 use plate\V1\Rest\Devices\DevicesService;
 use V1Test\Rest\testData\DevicesTestEntity;
 use V1Test\Rest\testData\FavoritesTestEntity;

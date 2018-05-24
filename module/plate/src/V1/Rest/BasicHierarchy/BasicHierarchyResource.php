@@ -1,34 +1,49 @@
 <?php
-namespace plate\V1\Rest\Entities;
+namespace plate\V1\Rest\BasicHierarchy;
 
-use plate\EntitySupport\resource\CheckPrivilegesAndDataRetrievingResource;
 use plate\EntitySupport\resource\DataRetrievingResource;
 use plate\EntitySupport\tableGateway\TableGatewayMapper;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
 
 /**
- * Class EntitiesResource
- * @package plate\V1\Rest\Entities
+ * Class BasicHierarchyResource
+ * @package plate\V1\Rest\BasicHierarchy
  */
-class EntitiesResource extends DataRetrievingResource
+class BasicHierarchyResource extends DataRetrievingResource
 {
     /**
-     * @var EntitiesService
+     * @var BasicHierarchyService
      */
-    protected $entitiesService;
+    protected $basicHierarchyService;
+
+    /**
+     * @return BasicHierarchyService
+     */
+    public function getBasicHierarchyService()
+    {
+        return $this->basicHierarchyService;
+    }
+
+    /**
+     * @param BasicHierarchyService $basicHierarchyService
+     */
+    public function setBasicHierarchyService($basicHierarchyService)
+    {
+        $this->basicHierarchyService = $basicHierarchyService;
+    }
 
     /**
      * EntitiesResource constructor.
-     * @param EntitiesService $entitiesService
+     * @param BasicHierarchyService $basicHierarchyService
      * @param TableGatewayMapper $tableGatewayMapper
+     * @internal param BasicHierarchyService $entitiesService
      */
-    public function __construct(EntitiesService $entitiesService, TableGatewayMapper $tableGatewayMapper)
+    public function __construct(BasicHierarchyService $basicHierarchyService, TableGatewayMapper $tableGatewayMapper)
     {
         parent::__construct($tableGatewayMapper);
-        $this->entitiesService = $entitiesService;
+        $this->setBasicHierarchyService($basicHierarchyService);
     }
-
 
     /**
      * Create a resource
@@ -82,7 +97,7 @@ class EntitiesResource extends DataRetrievingResource
      */
     public function fetchAll($params = [])
     {
-        return $this->getEntitiesService()->fetchAll($params);
+        return $this->getBasicHierarchyService()->fetchAll($params);
     }
 
     /**
@@ -129,21 +144,5 @@ class EntitiesResource extends DataRetrievingResource
     public function update($id, $data)
     {
         return new ApiProblem(405, 'The PUT method has not been defined for individual resources');
-    }
-
-    /**
-     * @return EntitiesService
-     */
-    public function getEntitiesService()
-    {
-        return $this->entitiesService;
-    }
-
-    /**
-     * @param EntitiesService $entitiesService
-     */
-    public function setEntitiesService($entitiesService)
-    {
-        $this->entitiesService = $entitiesService;
     }
 }

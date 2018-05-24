@@ -4,7 +4,9 @@
  * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
-namespace plate\EntitySupport;
+namespace plate\EntitySupport\resource;
+use plate\EntitySupport\collection\Collection;
+use plate\EntitySupport\entity\Entity;
 
 /**
  * Interface MapperInterface

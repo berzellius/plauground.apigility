@@ -9,7 +9,7 @@ namespace plate\EntityServicesSupport;
 
 use plate\Auth\AuthUtils;
 use plate\EntityServicesSupport\ITableService;
-use plate\EntitySupport\TableGatewayMapper;
+use plate\EntitySupport\tableGateway\TableGatewayMapper;
 use plate\EntityServicesSupport\IEntityService;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Adapter\Driver\ConnectionInterface;

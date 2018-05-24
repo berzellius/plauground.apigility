@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
-namespace plate\EntitySupport;
+namespace plate\EntitySupport\entity;
 
 use Zend\Stdlib\ArrayObject;
 

@@ -6,7 +6,11 @@
  * Time: 17:18
  */
 
-namespace plate\EntitySupport;
+namespace plate\EntitySupport\resource;
+use plate\EntitySupport\resource\MapperInterface;
+use plate\EntitySupport\resource\MapperResource;
+use plate\EntitySupport\traits\ResourceRetrievingData;
+use plate\EntitySupport\tableGateway\TableGatewayMapper;
 use ZF\Rest\AbstractResourceListener;
 
 /**
