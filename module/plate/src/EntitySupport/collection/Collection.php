@@ -6,7 +6,9 @@
 
 namespace plate\EntitySupport\collection;
 
+
 use Zend\Db\ResultSet\AbstractResultSet;
+use Zend\Db\Sql\Select;
 use Zend\Json\Json;
 use Zend\Paginator\Paginator;
 
@@ -38,6 +40,14 @@ class Collection extends Paginator
         parent::__construct($adapter);
     }
 
+    /**
+     * Обработка select - если нужна
+     * @param Select $select
+     * @return Select
+     */
+    public static function processSelect(Select $select){
+        return $select;
+    }
 
     /**
      * Преобразование в JSON

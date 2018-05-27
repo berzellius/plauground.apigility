@@ -101,6 +101,11 @@ class TableGatewayMapper implements MapperInterface
             }
         }
 
+        if(method_exists($this->getCollectionClass(), 'processSelect')){
+            $cs = $this->getCollectionClass();
+            $select = $cs::processSelect($select);
+        }
+
         return $select;
     }
 

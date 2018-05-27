@@ -62,7 +62,7 @@ trait ConfigReadHelper
         $zf_rest = $this->getConfigSection(['zf-rest'], $moduleConfig, "");
 
         foreach ($zf_rest as $controller => $properties){
-            if($properties['dao_service'] == $serviceClass){
+            if(isset($properties['dao_service']) && $properties['dao_service'] == $serviceClass){
                 return $controller;
             }
         }

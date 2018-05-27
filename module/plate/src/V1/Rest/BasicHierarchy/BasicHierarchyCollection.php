@@ -7,7 +7,6 @@ use Zend\Paginator\Paginator;
 
 class BasicHierarchyCollection extends NestedSetsCollection
 {
-
     /**
      * BasicHierarchyCollection constructor.
      * @param \Zend\Paginator\Adapter\AdapterInterface|\Zend\Paginator\AdapterAggregateInterface $adapter

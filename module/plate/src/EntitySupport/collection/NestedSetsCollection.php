@@ -11,15 +11,11 @@ namespace plate\EntitySupport\collection;
 
 use plate\EntitySupport\collection\Collection;
 use Zend\Db\ResultSet\AbstractResultSet;
+use Zend\Db\Sql\Select;
 use Zend\Json\Json;
 
 abstract class NestedSetsCollection extends Collection
 {
-    /*
-     * todo эти поля имеет смысл перетащить в Entity. тогда у нас будут наследники NestedSetsEntity;
-     * todo можем сделать фабричный метод получения разных HydratingResultSet -> с разной логикой формирования массивов
-     */
-
     /**
      * имя поля, которое соответствует уровню в nested sets иерархии
      * @return string
@@ -43,6 +39,25 @@ abstract class NestedSetsCollection extends Collection
      * @return string
      */
     public static $containerFieldName = 'container';
+
+    /**
+     * Обработка select - если нужна
+     * @param Select $select
+     * @return Select
+     */
+    public static function processSelect(Select $select){
+        $select = parent::processSelect($select);
+
+        $cc = get_called_class();
+        $order = [
+            $cc::$lkeyFieldName => Select::ORDER_ASCENDING,
+        ];
+
+        $select
+            ->order($order);
+
+        return $select;
+    }
 
     public function toJson()
     {

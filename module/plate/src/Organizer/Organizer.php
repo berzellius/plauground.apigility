@@ -13,6 +13,7 @@ use bar\baz\source_with_namespace;
 use Iterator;
 use plate\EntitySupport\collection\Collection;
 use plate\EntitySupport\collection\NestedSetsCollection;
+use plate\Organizer\exceptions\HandledErrorOrganizerException;
 use Zend\Paginator\Paginator;
 
 abstract class Organizer
@@ -29,6 +30,12 @@ abstract class Organizer
     public function __construct($collectionPrototypeClass)
     {
         $this->setCollectionPrototypeClass($collectionPrototypeClass);
+        set_error_handler(array($this, 'self::errorHadler'));
+    }
+
+    protected function errorHadler($errno, $errstr, $errfile, $errline){
+        throw new HandledErrorOrganizerException($errstr);
+        return true;
     }
 
     /**
