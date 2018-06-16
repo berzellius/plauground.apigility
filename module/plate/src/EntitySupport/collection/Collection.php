@@ -50,6 +50,30 @@ class Collection extends Paginator
     }
 
     /**
+     * @param Select $select
+     * @param $rootId
+     * @param $levelDepth
+     * @param array $typeList
+     * @return null|Select
+     * @throws \Exception
+     */
+    public static function selectByRootElementIdAndMaxLevelDepthAndTypeList(Select $select, $rootId, $levelDepth, array $typeList){
+        throw new \Exception("method selectByRootElementIdAndMaxLevelDepthAndTypeList must be implemented in child classes of " . Collection::class);
+    }
+
+    /**
+     * @param Select $select
+     * @param $rootId
+     * @param $levelDepth
+     * @param array $typeList
+     * @return null|Select
+     * @throws \Exception
+     */
+    public static function selectByRootNodeIdAndMaxLevelDepthAndTypeList(Select $select, $tableName, $idField, $rootId, $levelDepth, array $typeList){
+        throw new \Exception("method selectByRootNodeIdAndMaxLevelDepthAndTypeList must be implemented in child classes of " . Collection::class);
+    }
+
+    /**
      * Преобразование в JSON
      * @return string
      */

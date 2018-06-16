@@ -94,7 +94,9 @@ class NestedSetsOrganizerTest extends \PHPUnit_Framework_TestCase
      * ожидаем ошибку, тк упорядочить можно только отсортированные объекты
      */
     public function testNestedSetOrganizerBadOrderingInput(){
+        // ждем ошибку
         $this->expectException(OrderingOrganizerException::class);
+
         $collectionClass = CollectionStub1::class;
         $organizer = Organizer::getOrganizer($collectionClass);
 

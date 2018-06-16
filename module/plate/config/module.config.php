@@ -50,6 +50,16 @@ return array(
                     ),
                 ),
             ),
+            'plate.rpc.entities-rpc' => array(
+                'type' => 'Segment',
+                'options' => array(
+                    'route' => '/entities_rpc',
+                    'defaults' => array(
+                        'controller' => 'plate\\V1\\Rpc\\EntitiesRpc\\Controller',
+                        'action' => 'entitiesRpc',
+                    ),
+                ),
+            ),
         ),
     ),
     'zf-versioning' => array(
@@ -58,6 +68,7 @@ return array(
             9 => 'plate.rest.application_clients',
             0 => 'plate.rest.entities',
             10 => 'plate.rest.basic-hierarchy',
+            11 => 'plate.rpc.entities-rpc',
         ),
     ),
     'zf-rest' => array(
@@ -111,7 +122,7 @@ return array(
             'listener' => 'plate\\V1\\Rest\\Entities\\EntitiesResource',
             'route_name' => 'plate.rest.entities',
             'route_identifier_name' => 'entities_id',
-            'collection_name' => 'entities',
+            'collection_name' => 'entities_hierarchy',
             'entity_http_methods' => array(
                 0 => 'GET',
                 1 => 'PATCH',
@@ -123,8 +134,7 @@ return array(
                 1 => 'POST',
             ),
             'collection_query_whitelist' => array(
-                0 => 'page',
-                1 => 'pagesize',
+                0 => 'root_entity_id',
             ),
             'page_size' => 25,
             'page_size_param' => 'ps',
@@ -132,6 +142,21 @@ return array(
             'collection_class' => 'plate\\V1\\Rest\\Entities\\EntitiesCollection',
             'service_name' => 'entities',
             'dao_service' => 'plate\\V1\\Rest\\Entities\\EntitiesService',
+            'referenceTables' => array(
+                0 => array(
+                    'referenceConfig' => 'entities',
+                    'idField' => 'id',
+                    'foreignColumn' => 'ent_id',
+                    'entityClass' => 'plate\\V1\\Rest\\Entities\\EntitiesHierarchy',
+                ),
+                1 => array(
+                    'referenceConfig' => 'types',
+                    'idField' => 'type_id',
+                    'foreignColumn' => 'type',
+                    'foreignTable' => 'entities',
+                    'entityClass' => 'plate\\V1\\Rest\\BasicHierarchy\\HierarchyTypes',
+                ),
+            ),
         ),
         'plate\\V1\\Rest\\BasicHierarchy\\Controller' => array(
             'listener' => 'plate\\V1\\Rest\\BasicHierarchy\\BasicHierarchyResource',
@@ -148,7 +173,11 @@ return array(
                 0 => 'GET',
                 1 => 'POST',
             ),
-            'collection_query_whitelist' => array(),
+            'collection_query_whitelist' => array(
+                0 => 'root_entity_id',
+                1 => 'level_depth',
+                2 => 'type_ids_list',
+            ),
             'page_size' => 25,
             'page_size_param' => null,
             'entity_class' => 'plate\\V1\\Rest\\BasicHierarchy\\BasicHierarchyEntity',
@@ -171,6 +200,7 @@ return array(
             'plate\\V1\\Rest\\Application_clients\\Controller' => 'HalJson',
             'plate\\V1\\Rest\\Entities\\Controller' => 'JsonAlt',
             'plate\\V1\\Rest\\BasicHierarchy\\Controller' => 'JsonAlt',
+            'plate\\V1\\Rpc\\EntitiesRpc\\Controller' => 'JsonAlt',
         ),
         'accept_whitelist' => array(
             'plate\\V1\\Rest\\Oauth_users_control\\Controller' => array(
@@ -193,6 +223,11 @@ return array(
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ),
+            'plate\\V1\\Rpc\\EntitiesRpc\\Controller' => array(
+                0 => 'application/vnd.plate.v1+json',
+                1 => 'application/json',
+                2 => 'application/*+json',
+            ),
         ),
         'content_type_whitelist' => array(
             'plate\\V1\\Rest\\Oauth_users_control\\Controller' => array(
@@ -208,6 +243,10 @@ return array(
                 1 => 'application/json',
             ),
             'plate\\V1\\Rest\\BasicHierarchy\\Controller' => array(
+                0 => 'application/vnd.plate.v1+json',
+                1 => 'application/json',
+            ),
+            'plate\\V1\\Rpc\\EntitiesRpc\\Controller' => array(
                 0 => 'application/vnd.plate.v1+json',
                 1 => 'application/json',
             ),
@@ -254,13 +293,13 @@ return array(
                 'is_collection' => true,
             ),
             'plate\\V1\\Rest\\Entities\\EntitiesEntity' => array(
-                'entity_identifier_name' => 'id',
+                'entity_identifier_name' => 'ns_id',
                 'route_name' => 'plate.rest.entities',
                 'route_identifier_name' => 'entities_id',
                 'hydrator' => 'Zend\\Hydrator\\ArraySerializable',
             ),
             'plate\\V1\\Rest\\Entities\\EntitiesCollection' => array(
-                'entity_identifier_name' => 'id',
+                'entity_identifier_name' => 'ns_id',
                 'route_name' => 'plate.rest.entities',
                 'route_identifier_name' => 'entities_id',
                 'is_collection' => true,
@@ -269,8 +308,7 @@ return array(
                 'entity_identifier_name' => 'id',
                 'route_name' => 'plate.rest.basic-hierarchy',
                 'route_identifier_name' => 'basic_hierarchy_id',
-                //'hydrator' => 'Zend\\Hydrator\\ObjectProperty',
-                'hydrator' => \plate\Hydrator\CustomHydrator::class
+                'hydrator' => 'plate\\Hydrator\\CustomHydrator',
             ),
             'plate\\V1\\Rest\\BasicHierarchy\\BasicHierarchyCollection' => array(
                 'entity_identifier_name' => 'id',
@@ -289,6 +327,10 @@ return array(
         ),
         'plate\\V1\\Rest\\Entities\\Controller' => array(
             'input_filter' => 'plate\\V1\\Rest\\Entities\\Validator',
+        ),
+        'plate\\V1\\Rpc\\EntitiesRpc\\Controller' => array(
+            'input_filter' => 'plate\\V1\\Rpc\\EntitiesRpc\\Validator',
+            'GET' => 'plate\\V1\\Rpc\\EntitiesRpc\\Validator',
         ),
     ),
     'input_filter_specs' => array(
@@ -1555,6 +1597,76 @@ return array(
                 'field_type' => 'String',
             ),
         ),
+        'plate\\V1\\Rpc\\EntitiesRpc\\Validator' => array(
+            0 => array(
+                'required' => false,
+                'validators' => array(
+                    0 => array(
+                        'name' => 'Zend\\Validator\\Regex',
+                        'options' => array(
+                            'breakchainonfailure' => true,
+                            'pattern' => '/^[0-9]+$/',
+                        ),
+                    ),
+                ),
+                'filters' => array(
+                    0 => array(
+                        'name' => 'Zend\\Filter\\ToInt',
+                        'options' => array(),
+                    ),
+                ),
+                'name' => 'entity_root',
+                'field_type' => 'Integer',
+                'description' => 'Корневой элемент (поле ent_id)',
+            ),
+            1 => array(
+                'required' => false,
+                'validators' => array(
+                    0 => array(
+                        'name' => 'Zend\\Validator\\Regex',
+                        'options' => array(
+                            'pattern' => '/^((|,)[\\d]+)+$/',
+                            'breakchainonfailure' => true,
+                        ),
+                    ),
+                ),
+                'filters' => array(
+                    0 => array(
+                        'name' => 'Zend\\Filter\\StringToLower',
+                        'options' => array(),
+                    ),
+                ),
+                'name' => 'types',
+            ),
+            2 => array(
+                'required' => false,
+                'validators' => array(
+                    0 => array(
+                        'name' => 'Zend\\Validator\\Regex',
+                        'options' => array(
+                            'pattern' => '/^[\\d]+$/',
+                            'breakchainonfailure' => true,
+                        ),
+                    ),
+                ),
+                'filters' => array(),
+                'name' => 'node_root',
+            ),
+            3 => array(
+                'required' => false,
+                'validators' => array(
+                    0 => array(
+                        'name' => 'Zend\\Validator\\Regex',
+                        'options' => array(
+                            'pattern' => '/^[\\d]+$/',
+                            'breakchainonfailure' => true,
+                        ),
+                    ),
+                ),
+                'filters' => array(),
+                'name' => 'level_depth',
+            ),
+        ),
     ),
     'zf-mvc-auth' => array(
         'authorization' => array(
@@ -1622,11 +1734,35 @@ return array(
                     'DELETE' => true,
                 ),
             ),
+            'plate\\V1\\Rpc\\EntitiesRpc\\Controller' => array(
+                'actions' => array(
+                    'EntitiesRpc' => array(
+                        'GET' => true,
+                        'POST' => true,
+                        'PUT' => false,
+                        'PATCH' => false,
+                        'DELETE' => false,
+                    ),
+                ),
+            ),
         ),
     ),
     'zf-apigility' => array(
         'db-connected' => array(),
     ),
-    'controllers' => array(),
-    'zf-rpc' => array(),
+    'controllers' => array(
+        'factories' => array(
+            'plate\\V1\\Rpc\\EntitiesRpc\\Controller' => 'plate\\V1\\Rpc\\EntitiesRpc\\EntitiesRpcControllerFactory',
+        ),
+    ),
+    'zf-rpc' => array(
+        'plate\\V1\\Rpc\\EntitiesRpc\\Controller' => array(
+            'service_name' => 'entitiesRpc',
+            'http_methods' => array(
+                0 => 'GET',
+                1 => 'POST',
+            ),
+            'route_name' => 'plate.rpc.entities-rpc',
+        ),
+    ),
 );

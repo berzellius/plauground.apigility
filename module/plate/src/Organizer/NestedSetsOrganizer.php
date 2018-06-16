@@ -11,6 +11,7 @@ use Iterator;
 use plate\EntitySupport\collection\Collection;
 use plate\EntitySupport\entity\Entity;
 use plate\Organizer\exceptions\EntityFieldsOrganizerException;
+use plate\Organizer\exceptions\OrderingOrganizerException;
 use plate\Organizer\exceptions\OrganizerException;
 
 class NestedSetsOrganizer extends Organizer
@@ -37,9 +38,12 @@ class NestedSetsOrganizer extends Organizer
         foreach ($iterator as $item) {
             $this->checkFieldsExists($fields, $item);
 
-
             $currentLevel = $item->{$fields->levelFieldName};
             $container = $item->{$fields->containerFieldName};
+            $lkey = $item->{$fields->lkeyFieldName};
+            $rkey = $item->{$fields->rkeyFieldName};
+
+            $this->checkConsistency($path, $currentLevel, $lkey, $rkey);
 
             if($initLevel == null){
                 $initLevel = $currentLevel;
@@ -48,17 +52,17 @@ class NestedSetsOrganizer extends Organizer
             $lastLevel = $this->getPathLastLevel($path);
             if($lastLevel == null || $lastLevel <= $currentLevel){
                 // идем вглубь иерархиий
-                $this->addToPath($path, $item, $currentLevel, $container);
+                $this->addToPath($path, $item, $currentLevel, $container, $lkey);
             }
             else{
                 // возврат на уровень $currentLevel
                 $this->wrapPath($path, $currentLevel);
-                $this->addToPath($path, $item, $currentLevel, $container);
+                $this->addToPath($path, $item, $currentLevel, $container, $lkey);
 
                 if($currentLevel == $initLevel){
                     $res[] = $path[0]->e;
                     $path = [];
-                    $this->addToPath($path, $item, $currentLevel, $container);
+                    $this->addToPath($path, $item, $currentLevel, $container, $lkey);
                 }
             }
         }
@@ -125,12 +129,14 @@ class NestedSetsOrganizer extends Organizer
      * @param $element - элемент
      * @param $level - уровень
      * @param $container - имя контейнера
+     * @param $lkey - левый ключ
      */
-    protected function addToPath(&$path, $element, $level, $container){
+    protected function addToPath(&$path, $element, $level, $container, $lkey){
         $e = new \stdClass();
         $e->e = $element;
         $e->level = $level;
         $e->container = $container;
+        $e->lkey = $lkey;
 
         $path[] = $e;
     }
@@ -166,5 +172,34 @@ class NestedSetsOrganizer extends Organizer
     protected function getPathLastLevel(&$path)
     {
         return sizeof($path) > 0 ? end($path)->level : null;
+    }
+
+    /**
+     * @param $path
+     * @return null|mixed
+     */
+    protected function getPathLastLkey(&$path)
+    {
+        return sizeof($path) > 0 ? end($path)->lkey : null;
+    }
+
+    /**
+     * Проверим корректность структуры NestedSets на очередном элементе
+     * помним предыдущие элементы - $path
+     * @param $path
+     * @param $currentLevel
+     * @param $lkey
+     * @param $rkey
+     * @throws OrderingOrganizerException
+     */
+    protected function checkConsistency(&$path, $currentLevel, $lkey, $rkey)
+    {
+        //echo("lkey = $lkey , last lkey = " . $this->getPathLastLkey($path) . PHP_EOL);
+        // следующий элемент должен иметь больший lkey
+        if(!(
+            $this->getPathLastLkey($path) < $lkey
+        )){
+            throw new OrderingOrganizerException("NestedSet MUST be ordered by lkey!");
+        }
     }
 }

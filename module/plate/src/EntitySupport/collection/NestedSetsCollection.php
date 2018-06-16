@@ -11,7 +11,9 @@ namespace plate\EntitySupport\collection;
 
 use plate\EntitySupport\collection\Collection;
 use Zend\Db\ResultSet\AbstractResultSet;
+use Zend\Db\Sql\Predicate\Expression;
 use Zend\Db\Sql\Select;
+use Zend\Db\Sql\Where;
 use Zend\Json\Json;
 
 abstract class NestedSetsCollection extends Collection
@@ -41,6 +43,23 @@ abstract class NestedSetsCollection extends Collection
     public static $containerFieldName = 'container';
 
     /**
+     * поле, определяющее тип элемента
+     * @var string
+     */
+    public static $typeFieldName = 'type';
+
+    /**
+     * имя таблицы, содержащей узлы иерархии наименьшего уровня для каждого элемента
+     * @var string
+     */
+    public static $minimalLevelsTable = null;
+
+    /**
+     * имя поля таблицы $minimalLevelsTable, по которому производится поиск элемента
+     */
+    public static $minimalLevelsTableIdField = null;
+
+    /**
      * Обработка select - если нужна
      * @param Select $select
      * @return Select
@@ -55,6 +74,100 @@ abstract class NestedSetsCollection extends Collection
 
         $select
             ->order($order);
+
+        return $select;
+    }
+
+    /**
+     * Отбор подчиненных элементов
+     * Родительский элемент определяем по id сущности, входящей в иерархию
+     * @param Select $select
+     * @param $rootId
+     * @param $levelDepth
+     * @param array $typeList
+     * @return null|Select
+     */
+    public static function selectByRootElementIdAndMaxLevelDepthAndTypeList(Select $select, $rootId, $levelDepth = null, array $typeList = [])
+    {
+        $cc = get_called_class();
+
+        $select = self::selectByRootElementIdAndMaxLevelDepthWithJoiningTable(
+            $select, $cc::$minimalLevelsTable, $cc::$minimalLevelsTableIdField, $rootId, $levelDepth
+        );
+        $select = self::selectTypes($select, $typeList);
+
+        return $select;
+    }
+
+    /**
+     * Отбор подчиненных элементов
+     * Родительский элемент определяем по полю $idField в таблице $tableName
+     * @param Select $select
+     * @param $tableName
+     * @param $idField
+     * @param array $rootId
+     * @param $levelDepth
+     * @param array $typeList
+     * @return Select
+     */
+    public static function selectByRootNodeIdAndMaxLevelDepthAndTypeList(Select $select, $tableName, $idField, $rootId, $levelDepth, array $typeList = [])
+    {
+        $select = self::selectByRootElementIdAndMaxLevelDepthWithJoiningTable(
+            $select, $tableName, $idField, $rootId, $levelDepth
+        );
+        $select = self::selectTypes($select, $typeList);
+        return $select;
+    }
+
+    /**
+     * @param Select $select
+     * @param $typeList
+     * @return Select
+     */
+    protected static function selectTypes(Select $select, $typeList){
+        $cc = get_called_class();
+        if(count($typeList) > 0){
+            $select
+                ->where("t." . $cc::$typeFieldName . " in (" . implode(',', $typeList) . ")");
+        }
+
+        return $select;
+    }
+
+    /**
+     * @param Select $select
+     * @param $joinTable
+     * @param $joinField
+     * @param $rootId
+     * @param null $levelDepth
+     * @return Select
+     */
+    protected static function selectByRootElementIdAndMaxLevelDepthWithJoiningTable(
+        Select $select, $joinTable, $joinField, $rootId, $levelDepth = null
+    ){
+        $cc = get_called_class();
+
+        $select
+            ->join(
+                ['mt' => $joinTable],
+                new Expression("mt. " . $joinField . " = " . $rootId),
+                []
+            );
+
+
+        $select
+            ->where(
+                "t." . $cc::$lkeyFieldName . " >= mt." . $cc::$lkeyFieldName .
+                " and t. " . $cc::$rkeyFieldName . " <= mt." . $cc::$rkeyFieldName, Where::OP_AND
+            )
+        ;
+
+        if($levelDepth != null || $levelDepth === 0){
+            $select
+                ->where(
+                    "t." . $cc::$levelFieldName . " <= (mt. "  . $cc::$levelFieldName . " + " . $levelDepth .")", Where::OP_AND
+                );
+        }
 
         return $select;
     }

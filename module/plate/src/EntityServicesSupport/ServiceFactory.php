@@ -32,7 +32,7 @@ class ServiceFactory
     public function __invoke(ContainerInterface $services, $serviceClass, $serviceFactory)
     {
         /**
-         * сторим фабрику аналогично фабрике ресурсов
+         * строим фабрику аналогично фабрике ресурсов
          * т.е. мы должны получить запрашиваемый класс и сгенерить его
          */
 

@@ -8,6 +8,17 @@ use Zend\Paginator\Paginator;
 class BasicHierarchyCollection extends NestedSetsCollection
 {
     /**
+     * имя таблицы, содержащей узлы иерархии наименьшего уровня для каждого элемента
+     * @var string
+     */
+    public static $minimalLevelsTable = 'basic_hierarchy_by_type_id';
+
+    /**
+     * имя поля таблицы $minimalLevelsTable, по которому производится поиск элемента
+     */
+    public static $minimalLevelsTableIdField = 'type_id';
+
+    /**
      * BasicHierarchyCollection constructor.
      * @param \Zend\Paginator\Adapter\AdapterInterface|\Zend\Paginator\AdapterAggregateInterface $adapter
      */

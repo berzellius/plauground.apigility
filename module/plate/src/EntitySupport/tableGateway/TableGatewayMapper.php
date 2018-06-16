@@ -83,6 +83,50 @@ class TableGatewayMapper implements MapperInterface
     }
 
     /**
+     * @param $rootId
+     * @param null $levelDepth
+     * @param array|null $typeList
+     * @return Select
+     * @throws \Exception
+     * @internal param Select $select
+     */
+    public function generateSelectByRootElementIdAndMaxLevelDepthAndTypeList($rootId, $levelDepth = null, array $typeList = null){
+        $selectMethodInCollection = "selectByRootElementIdAndMaxLevelDepthAndTypeList";
+
+        if(method_exists($this->getCollectionClass(), $selectMethodInCollection)){
+            $select = $this->generateBasicSelect();
+
+            $cs = $this->getCollectionClass();
+            $select = $cs::$selectMethodInCollection($select, $rootId, $levelDepth, $typeList);
+
+            return $select;
+        }
+        else throw new \Exception("method " . $selectMethodInCollection . " not exists in " . $this->getCollectionClass());
+    }
+
+    /**
+     * @param $rootId
+     * @param null $levelDepth
+     * @param array|null $typeList
+     * @return Select
+     * @throws \Exception
+     * @internal param Select $select
+     */
+    public function generateSelectByRootNodeIdAndMaxLevelDepthAndTypeList($rootId, $levelDepth = null, array $typeList = []){
+        $selectMethodInCollection = "selectByRootNodeIdAndMaxLevelDepthAndTypeList";
+
+        if(method_exists($this->getCollectionClass(), $selectMethodInCollection)){
+            $select = $this->generateBasicSelect();
+
+            $cs = $this->getCollectionClass();
+            $select = $cs::$selectMethodInCollection($select, $this->getTable()->table, $this->getIdField(), $rootId, $levelDepth, $typeList);
+
+            return $select;
+        }
+        else throw new \Exception("method " . $selectMethodInCollection . " not exists in " . $this->getCollectionClass());
+    }
+
+    /**
      * @return Select
      */
     public function generateBasicSelect(){
@@ -92,9 +136,11 @@ class TableGatewayMapper implements MapperInterface
 
         if(is_array($this->referenceTables)){
             foreach ($this->referenceTables as $referenceTable){
+                $foreignTable = isset($referenceTable['foreignTable'])? $referenceTable['foreignTable'] : "t";
+
                 $select->join(
                     [$referenceTable['referenceConfig'] => $referenceTable['table']],
-                    "t." . $referenceTable['foreignColumn'] . " = " . $referenceTable['referenceConfig'] . "." . $referenceTable['idField'],
+                    $foreignTable . "." . $referenceTable['foreignColumn'] . " = " . $referenceTable['referenceConfig'] . "." . $referenceTable['idField'],
                     [Select::SQL_STAR],
                     Join::JOIN_LEFT
                 );
