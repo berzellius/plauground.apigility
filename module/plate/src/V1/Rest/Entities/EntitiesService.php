@@ -58,9 +58,10 @@ class EntitiesService extends EntityService
      * Выбор элементов, принадлежащих элементу $rootId, с ограничением по типам - $types == [<id типа>, [...]]
      * глубиной не более $levelDepth
      * @param $rootId
-     * @param array $types
      * @param $levelDepth
+     * @param array $types
      * @return Select|null
+     * @throws \Exception
      */
     public function selectByParentNodeAndTypesSetAndMaxDepth($rootId, $levelDepth = null, array $types = []){
         return $this->getTableMapper()->generateSelectByRootNodeIdAndMaxLevelDepthAndTypeList($rootId, $levelDepth, $types);
@@ -70,13 +71,15 @@ class EntitiesService extends EntityService
      * Выбор элементов, принадлежащих элементу $rootId, с ограничением по типам - $types == [<id типа>, [...]]
      * глубиной не более $levelDepth
      * @param $rootId
-     * @param array $types
      * @param $levelDepth
+     * @param array $types
      * @return CustomHydratingResultSet|null
+     * @throws \Exception
      */
     public function findByParentEntityAndTypesSetAndMaxDepth($rootId, $levelDepth = null, array $types = []){
         $select = $this->getTableMapper()->generateSelectByRootElementIdAndMaxLevelDepthAndTypeList($rootId, $levelDepth, $types);
 
+        //die($select->getSqlString($this->getAdapter()->platform));
         /**
          * @var CustomHydratingResultSet
          */
@@ -91,9 +94,25 @@ class EntitiesService extends EntityService
      * @param array $types
      * @param $levelDepth
      * @return CustomHydratingResultSet|null
+     * @throws \Exception
      */
     public function findByParentNodeAndTypesSetAndMaxDepth($rootId, $levelDepth = null, array $types = []){
         $select = $this->getTableMapper()->generateSelectByRootNodeIdAndMaxLevelDepthAndTypeList($rootId, $levelDepth, $types);
+
+        /**
+         * @var CustomHydratingResultSet
+         */
+        $res = $this->getTableMapper()->getTable()->selectWith($select);
+        return $res;
+    }
+
+
+    /**
+     * Выбор всех элементов
+     * @return CustomHydratingResultSet|null
+     */
+    public function findAll(){
+        $select = $this->getTableMapper()->generateBasicSelect();
 
         /**
          * @var CustomHydratingResultSet

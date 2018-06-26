@@ -128,7 +128,7 @@ abstract class NestedSetsCollection extends Collection
         $cc = get_called_class();
         if(count($typeList) > 0){
             $select
-                ->where("t." . $cc::$typeFieldName . " in (" . implode(',', $typeList) . ")");
+                ->where($cc::$typeFieldName . " in (" . implode(',', $typeList) . ")");
         }
 
         return $select;

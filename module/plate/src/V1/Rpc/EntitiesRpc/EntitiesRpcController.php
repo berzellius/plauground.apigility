@@ -18,12 +18,16 @@ class EntitiesRpcController extends AbstractActionController
      */
     protected $entitiesService;
 
+    /**
+     * @return null|JsonModel
+     * @throws \Exception
+     */
     public function entitiesRpcAction()
     {
         $filteredData = $this->getInputFilter()->getValues();
         ControllerSupportUtils::
-            assertOnlyOneParameterIsSet($filteredData, ['entity_root', 'node_root'],
-            'One and only one of variables `entity_root` and `node_root` must be set!');
+            assertOneOrZeroParamatersIsSet($filteredData, ['ent_id', 'ns_id'],
+            'only one of variables `ent_id` and `ns_id` can be set!');
 
         $types = [];
         if(isset($filteredData['types'])){
@@ -33,8 +37,8 @@ class EntitiesRpcController extends AbstractActionController
         $level_depth = isset($filteredData['level_depth'])? $filteredData['level_depth'] : null;
 
 
-        if(isset($filteredData['entity_root'])){
-            $entity_root = $filteredData['entity_root'];
+        if(isset($filteredData['ent_id'])){
+            $entity_root = $filteredData['ent_id'];
 
             $res = $this->getEntitiesService()->findByParentEntityAndTypesSetAndMaxDepth(
                 $entity_root, $level_depth, $types
@@ -43,8 +47,8 @@ class EntitiesRpcController extends AbstractActionController
             return new JsonModel($res->toObjectsArray());
         }
 
-        if(isset($filteredData['node_root'])){
-            $node_root = $filteredData['node_root'];
+        if(isset($filteredData['ns_id'])){
+            $node_root = $filteredData['ns_id'];
 
             $res = $this->getEntitiesService()->findByParentNodeAndTypesSetAndMaxDepth(
                 $node_root, $level_depth, $types
@@ -53,7 +57,9 @@ class EntitiesRpcController extends AbstractActionController
             return new JsonModel($res->toObjectsArray());
         }
 
-        return null;
+
+        $res = $this->getEntitiesService()->findAll();
+        return new JsonModel($res->toObjectsArray());
     }
 
     /**

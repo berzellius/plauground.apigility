@@ -33,6 +33,17 @@ class ControllerSupportUtils
             throw new Exception($message);
     }
 
+    public static function assertOneOrZeroParamatersIsSet(array $params, array $names, $message){
+        $c = 0;
+
+        foreach ($names as $k){
+            if(isset($params[$k])){
+                $c++;
+                if($c > 1) throw new Exception($message);
+            }
+        }
+    }
+
     public static function getArrayFromCommaDelimitedString($types)
     {
         return explode(',', $types);

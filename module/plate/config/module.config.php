@@ -1604,27 +1604,6 @@ return array(
                     0 => array(
                         'name' => 'Zend\\Validator\\Regex',
                         'options' => array(
-                            'breakchainonfailure' => true,
-                            'pattern' => '/^[0-9]+$/',
-                        ),
-                    ),
-                ),
-                'filters' => array(
-                    0 => array(
-                        'name' => 'Zend\\Filter\\ToInt',
-                        'options' => array(),
-                    ),
-                ),
-                'name' => 'entity_root',
-                'field_type' => 'Integer',
-                'description' => 'Корневой элемент (поле ent_id)',
-            ),
-            1 => array(
-                'required' => false,
-                'validators' => array(
-                    0 => array(
-                        'name' => 'Zend\\Validator\\Regex',
-                        'options' => array(
                             'pattern' => '/^((|,)[\\d]+)+$/',
                             'breakchainonfailure' => true,
                         ),
@@ -1638,21 +1617,7 @@ return array(
                 ),
                 'name' => 'types',
             ),
-            2 => array(
-                'required' => false,
-                'validators' => array(
-                    0 => array(
-                        'name' => 'Zend\\Validator\\Regex',
-                        'options' => array(
-                            'pattern' => '/^[\\d]+$/',
-                            'breakchainonfailure' => true,
-                        ),
-                    ),
-                ),
-                'filters' => array(),
-                'name' => 'node_root',
-            ),
-            3 => array(
+            1 => array(
                 'required' => false,
                 'validators' => array(
                     0 => array(
@@ -1665,6 +1630,44 @@ return array(
                 ),
                 'filters' => array(),
                 'name' => 'level_depth',
+            ),
+            2 => array(
+                'required' => false,
+                'validators' => array(
+                    0 => array(
+                        'name' => 'Zend\\Validator\\Regex',
+                        'options' => array(
+                            'breakchainonfailure' => true,
+                            'pattern' => '/^[0-9]+$/',
+                        ),
+                    ),
+                ),
+                'filters' => array(
+                    0 => array(
+                        'name' => 'Zend\\Filter\\ToInt',
+                        'options' => array(),
+                    ),
+                ),
+                'name' => 'ent_id',
+            ),
+            3 => array(
+                'required' => false,
+                'validators' => array(
+                    0 => array(
+                        'name' => 'Zend\\Validator\\Regex',
+                        'options' => array(
+                            'breakchainonfailure' => true,
+                            'pattern' => '/^[0-9]+$/',
+                        ),
+                    ),
+                ),
+                'filters' => array(
+                    0 => array(
+                        'name' => 'Zend\\Filter\\ToInt',
+                        'options' => array(),
+                    ),
+                ),
+                'name' => 'ns_id',
             ),
         ),
     ),

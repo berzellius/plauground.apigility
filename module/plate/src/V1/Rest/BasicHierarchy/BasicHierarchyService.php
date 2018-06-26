@@ -38,6 +38,7 @@ class BasicHierarchyService extends EntityService
      * @param array $types
      * @param $levelDepth
      * @return Select|null
+     * @throws \Exception
      */
     public function selectByParentAndTypesSetAndMaxDepth($rootId, $levelDepth = null, array $types = []){
 

@@ -34,6 +34,7 @@ class NestedSetsOrganizerTest extends \PHPUnit_Framework_TestCase
         $collectionClass = CollectionStub1::class;
         $organizer = Organizer::getOrganizer($collectionClass);
 
+
         $res = $organizer->organize(
             EntitiesGenerator::getInstance($collectionClass)
                 ->add(LevelOneEntityStub::class, 1, 4, 1)
