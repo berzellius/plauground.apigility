@@ -92,6 +92,7 @@
       <path value="$PROJECT_DIR$/vendor/zendframework/zend-db" />
       <path value="$PROJECT_DIR$/vendor/zfcampus/zf-rest" />
       <path value="$PROJECT_DIR$/vendor/seld/jsonlint" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-ctype" />
     </include_path>
   </component>
   <component name="PhpUnit">

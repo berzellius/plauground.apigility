@@ -12,8 +12,10 @@ namespace plate\Hydrator;
 use plate\EntitySupport\collection\Collection;
 use plate\EntitySupport\entity\Entity;
 use plate\Organizer\Organizer;
+use Rhumsaa\Uuid\Console\Exception;
 use Zend\Db\ResultSet\HydratingResultSet;
 use Zend\Hydrator\HydratorInterface;
+use ZF\ApiProblem\ApiProblem;
 
 class CustomHydratingResultSet extends HydratingResultSet
 {
@@ -35,7 +37,8 @@ class CustomHydratingResultSet extends HydratingResultSet
     }
 
     public function toObjectsArray(){
-        return Organizer::getOrganizer($this->collectionPrototypeClass)->organize($this);
+        $organized = Organizer::getOrganizer($this->collectionPrototypeClass)->organize($this);
+        return ['response' => $organized];
     }
 
     public function toArray()

@@ -121,6 +121,22 @@ abstract class NestedSetsCollection extends Collection
 
     /**
      * @param Select $select
+     * @param $tableName
+     * @param $idField
+     * @param $levelDepth
+     * @param array $typeList
+     * @return Select
+     */
+    public static function selectByMaxLevelDepthAndTypeList(Select $select, $tableName, $idField, $levelDepth, array $typeList = []){
+        $select = self::selectByMaxLevelDepthWithJoiningTable(
+            $select, $tableName, $idField, $levelDepth
+        );
+        $select = self::selectTypes($select, $typeList);
+        return $select;
+    }
+
+    /**
+     * @param Select $select
      * @param $typeList
      * @return Select
      */
@@ -166,6 +182,27 @@ abstract class NestedSetsCollection extends Collection
             $select
                 ->where(
                     "t." . $cc::$levelFieldName . " <= (mt. "  . $cc::$levelFieldName . " + " . $levelDepth .")", Where::OP_AND
+                );
+        }
+
+        return $select;
+    }
+
+    /**
+     * @param $select
+     * @param $tableName
+     * @param $idField
+     * @param $levelDepth
+     * @return Select
+     */
+    protected static function selectByMaxLevelDepthWithJoiningTable($select, $tableName, $idField, $levelDepth)
+    {
+        $cc = get_called_class();
+
+        if($levelDepth != null || $levelDepth === 0){
+            $select
+                ->where(
+                    "t." . $cc::$levelFieldName . " <= (". $levelDepth .")", Where::OP_AND
                 );
         }
 

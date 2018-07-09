@@ -106,7 +106,7 @@ class TableGatewayMapper implements MapperInterface
 
     /**
      * @param $rootId
-     * @param null $levelDepth
+     * @param int $levelDepth
      * @param array|null $typeList
      * @return Select
      * @throws \Exception
@@ -120,6 +120,27 @@ class TableGatewayMapper implements MapperInterface
 
             $cs = $this->getCollectionClass();
             $select = $cs::$selectMethodInCollection($select, $this->getTable()->table, $this->getIdField(), $rootId, $levelDepth, $typeList);
+
+            return $select;
+        }
+        else throw new \Exception("method " . $selectMethodInCollection . " not exists in " . $this->getCollectionClass());
+    }
+
+
+    /**
+     * @param int $levelDepth
+     * @param array $typeList
+     * @return Select
+     * @throws \Exception
+     */
+    public function generateSelectByMaxLevelDepthAndTypeList($levelDepth = null, array $typeList = []){
+        $selectMethodInCollection = "selectByMaxLevelDepthAndTypeList";
+
+        if(method_exists($this->getCollectionClass(), $selectMethodInCollection)){
+            $select = $this->generateBasicSelect();
+
+            $cs = $this->getCollectionClass();
+            $select = $cs::$selectMethodInCollection($select, $this->getTable()->table, $this->getIdField(), $levelDepth, $typeList);
 
             return $select;
         }

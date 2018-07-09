@@ -106,6 +106,21 @@ class EntitiesService extends EntityService
         return $res;
     }
 
+    /**
+     * @param null $levelDepth
+     * @param array $types
+     * @return \Zend\Db\ResultSet\ResultSetInterface
+     * @throws \Exception
+     */
+    public function findByTypesSetAndMaxDepth($levelDepth = null, array $types = []){
+        $select = $this->getTableMapper()->generateSelectByMaxLevelDepthAndTypeList($levelDepth, $types);
+
+        //die($select->getSqlString($this->getAdapter()->platform));
+
+        $res = $this->getTableMapper()->getTable()->selectWith($select);
+        return $res;
+    }
+
 
     /**
      * Выбор всех элементов

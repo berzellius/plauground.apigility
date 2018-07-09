@@ -1,17 +1,14 @@
 <?php
 namespace plate\V1\Rpc\EntitiesRpc;
 
-use Herrera\Json\Exception\Exception;
-use Interop\Container\ContainerInterface;
 use plate\ControllerSupport\ControllerSupportUtils;
-use plate\Hydrator\CustomHydratingResultSet;
+use plate\ControllerSupport\RpcController;
 use plate\V1\Rest\Entities\EntitiesService;
-use Zend\InputFilter\InputFilter;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
-use ZF\Apigility\Documentation\Controller;
+use ZF\ApiProblem\ApiProblem;
 
-class EntitiesRpcController extends AbstractActionController
+class EntitiesRpcController extends RpcController
 {
     /**
      * @var EntitiesService
@@ -58,17 +55,8 @@ class EntitiesRpcController extends AbstractActionController
         }
 
 
-        $res = $this->getEntitiesService()->findAll();
+        $res = $this->getEntitiesService()->findByTypesSetAndMaxDepth($level_depth, $types);
         return new JsonModel($res->toObjectsArray());
-    }
-
-    /**
-     * EntitiesRpcController constructor.
-     * @param EntitiesService $entitiesService
-     */
-    public function __construct(EntitiesService $entitiesService)
-    {
-        $this->entitiesService = $entitiesService;
     }
 
     /**
