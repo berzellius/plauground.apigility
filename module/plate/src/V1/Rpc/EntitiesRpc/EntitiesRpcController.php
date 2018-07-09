@@ -31,7 +31,7 @@ class EntitiesRpcController extends RpcController
             $types = ControllerSupportUtils::getArrayFromCommaDelimitedString($filteredData['types']);
         }
 
-        $level_depth = isset($filteredData['level_depth'])? $filteredData['level_depth'] : null;
+        $level_depth = isset($filteredData['level'])? $filteredData['level'] : null;
 
 
         if(isset($filteredData['ent_id'])){

@@ -1669,6 +1669,21 @@ return array(
                 ),
                 'name' => 'ns_id',
             ),
+            4 => array(
+                'required' => false,
+                'validators' => array(
+                    0 => array(
+                        'name' => 'Zend\\Validator\\Regex',
+                        'options' => array(
+                            'pattern' => '/^[0-9]+$/',
+                            'breakchainonfailure' => true,
+                        ),
+                    ),
+                ),
+                'filters' => array(),
+                'name' => 'level',
+                'field_type' => 'r',
+            ),
         ),
     ),
     'zf-mvc-auth' => array(
