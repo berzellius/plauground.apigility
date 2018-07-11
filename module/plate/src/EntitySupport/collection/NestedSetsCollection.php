@@ -137,6 +137,18 @@ abstract class NestedSetsCollection extends Collection
 
     /**
      * @param Select $select
+     * @param $tableName
+     * @param $idField
+     * @param array $typeList
+     * @return Select
+     */
+    public static function selectByTypesOnly(Select $select, $tableName, $idField, array $typeList = []){
+        $select = self::selectTypes($select, $typeList);
+        return $select;
+    }
+
+    /**
+     * @param Select $select
      * @param $typeList
      * @return Select
      */
@@ -213,7 +225,7 @@ abstract class NestedSetsCollection extends Collection
     {
         $this->setItemCountPerPage(-1);
         $currentItems = $this->getCurrentItems();
-        die(get_class($currentItems));
+        //die(get_class($currentItems));
 
         if ($currentItems instanceof AbstractResultSet) {
             return Json::encode($currentItems->toArray());

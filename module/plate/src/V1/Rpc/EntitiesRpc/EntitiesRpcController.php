@@ -54,6 +54,14 @@ class EntitiesRpcController extends RpcController
             return new JsonModel($res->toObjectsArray());
         }
 
+        // случай, когда у нас не выбран узел и не задана глубина, но указаны типы
+        if(null === $level_depth && count($types) > 0){
+            $res = $this->getEntitiesService()->findByTypesOnly(
+                $types
+            );
+            return new JsonModel($res->toObjectsArray());
+        }
+
 
         $res = $this->getEntitiesService()->findByTypesSetAndMaxDepth($level_depth, $types);
         return new JsonModel($res->toObjectsArray());

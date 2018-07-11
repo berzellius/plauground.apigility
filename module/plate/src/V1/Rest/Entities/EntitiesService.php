@@ -115,8 +115,29 @@ class EntitiesService extends EntityService
     public function findByTypesSetAndMaxDepth($levelDepth = null, array $types = []){
         $select = $this->getTableMapper()->generateSelectByMaxLevelDepthAndTypeList($levelDepth, $types);
 
-        //die($select->getSqlString($this->getAdapter()->platform));
+        $res = $this->getTableMapper()->getTable()->selectWith($select);
+        return $res;
+    }
 
+    /**
+     * Отбор только по типам элементов
+     * @param $types
+     * @return CustomHydratingResultSet
+     * @throws \Exception
+     */
+    public function findByTypesOnly(array $types)
+    {
+        if(!in_array(0, $types)){
+            // здесь обязателен нулевой тип в списке
+            $types[] = 0;
+        }
+
+        sort($types);
+
+        $select = $this->getTableMapper()->generateSelectByTypesOnly($types);
+        /**
+         * @var CustomHydratingResultSet
+         */
         $res = $this->getTableMapper()->getTable()->selectWith($select);
         return $res;
     }
@@ -135,4 +156,5 @@ class EntitiesService extends EntityService
         $res = $this->getTableMapper()->getTable()->selectWith($select);
         return $res;
     }
+
 }

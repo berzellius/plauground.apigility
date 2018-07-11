@@ -7,6 +7,7 @@
 namespace plate\EntitySupport\collection;
 
 
+use Exception;
 use Zend\Db\ResultSet\AbstractResultSet;
 use Zend\Db\Sql\Select;
 use Zend\Json\Json;
@@ -54,23 +55,25 @@ class Collection extends Paginator
      * @param $rootId
      * @param $levelDepth
      * @param array $typeList
-     * @return null|Select
-     * @throws \Exception
+     * @return void
+     * @throws Exception
      */
     public static function selectByRootElementIdAndMaxLevelDepthAndTypeList(Select $select, $rootId, $levelDepth, array $typeList){
-        throw new \Exception("method selectByRootElementIdAndMaxLevelDepthAndTypeList must be implemented in child classes of " . Collection::class);
+        throw new Exception("method selectByRootElementIdAndMaxLevelDepthAndTypeList must be implemented in child classes of " . Collection::class);
     }
 
     /**
      * @param Select $select
+     * @param $tableName
+     * @param $idField
      * @param $rootId
      * @param $levelDepth
      * @param array $typeList
-     * @return null|Select
-     * @throws \Exception
+     * @return void
+     * @throws Exception
      */
     public static function selectByRootNodeIdAndMaxLevelDepthAndTypeList(Select $select, $tableName, $idField, $rootId, $levelDepth, array $typeList){
-        throw new \Exception("method selectByRootNodeIdAndMaxLevelDepthAndTypeList must be implemented in child classes of " . Collection::class);
+        throw new Exception("method selectByRootNodeIdAndMaxLevelDepthAndTypeList must be implemented in child classes of " . Collection::class);
     }
 
     /**
@@ -79,10 +82,21 @@ class Collection extends Paginator
      * @param $idField
      * @param $levelDepth
      * @param array $typeList
-     * @throws \Exception
+     * @throws Exception
      */
     public static function  selectByMaxLevelDepthAndTypeList(Select $select, $tableName, $idField, $levelDepth, array $typeList){
-        throw new \Exception("method selectByMaxLevelDepthAndTypeList must be implemented in child classes of " . Collection::class);
+        throw new Exception("method selectByMaxLevelDepthAndTypeList must be implemented in child classes of " . Collection::class);
+    }
+
+    /**
+     * @param Select $select
+     * @param $tableName
+     * @param $idField
+     * @param array $typeList
+     * @throws Exception
+     */
+    public static function selectByTypesOnly(Select $select, $tableName, $idField, array $typeList = []){
+        throw new  Exception("method selectByTypesOnly must be implemented in child classes of " . Collection::class);
     }
 
     /**

@@ -147,6 +147,27 @@ class TableGatewayMapper implements MapperInterface
         else throw new \Exception("method " . $selectMethodInCollection . " not exists in " . $this->getCollectionClass());
     }
 
+
+    /**
+     * @param $typesList
+     * @return Select
+     * @throws \Exception
+     */
+    public function generateSelectByTypesOnly($typesList)
+    {
+        $selectMethodInCollection = "selectByTypesOnly";
+
+        if(method_exists($this->getCollectionClass(), $selectMethodInCollection)){
+            $select = $this->generateBasicSelect();
+
+            $cs = $this->getCollectionClass();
+            $select = $cs::$selectMethodInCollection($select, $this->getTable()->table, $this->getIdField(), $typesList);
+
+            return $select;
+        }
+        else throw new \Exception("method " . $selectMethodInCollection . " not exists in " . $this->getCollectionClass());
+    }
+
     /**
      * @return Select
      */
@@ -303,7 +324,7 @@ class TableGatewayMapper implements MapperInterface
      * Обновить сущность с id = $id
      * @param string $id
      * @param array|Traversable|\stdClass $data
-     * @return Entity
+     * @return array|\ArrayObject|null
      */
     public function update($id, $data)
     {
@@ -404,4 +425,5 @@ class TableGatewayMapper implements MapperInterface
     {
         $this->entityClass = $entityClass;
     }
+
 }
