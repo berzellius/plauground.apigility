@@ -98,7 +98,6 @@ class EntitiesService extends EntityService
      */
     public function findByParentNodeAndTypesSetAndMaxDepth($rootId, $levelDepth = null, array $types = []){
         $select = $this->getTableMapper()->generateSelectByRootNodeIdAndMaxLevelDepthAndTypeList($rootId, $levelDepth, $types);
-
         /**
          * @var CustomHydratingResultSet
          */

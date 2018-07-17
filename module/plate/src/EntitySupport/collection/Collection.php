@@ -44,9 +44,11 @@ class Collection extends Paginator
     /**
      * Обработка select - если нужна
      * @param Select $select
+     * @param $clientId - идентификатор пользователя, если есть
+     * @param bool $isAdmin - является ли пользователь админом
      * @return Select
      */
-    public static function processSelect(Select $select){
+    public static function processSelect(Select $select, $clientId = null, $isAdmin = false){
         return $select;
     }
 

@@ -62,10 +62,12 @@ abstract class NestedSetsCollection extends Collection
     /**
      * Обработка select - если нужна
      * @param Select $select
+     * @param $clientId - идентификатор пользователя, если есть
+     * @param $isAdmin
      * @return Select
      */
-    public static function processSelect(Select $select){
-        $select = parent::processSelect($select);
+    public static function processSelect(Select $select, $clientId = null, $isAdmin = false){
+        $select = parent::processSelect($select, $clientId);
 
         $cc = get_called_class();
         $order = [

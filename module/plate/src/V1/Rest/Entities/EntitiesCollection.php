@@ -3,6 +3,9 @@ namespace plate\V1\Rest\Entities;
 
 use plate\EntitySupport\collection\Collection;
 use plate\EntitySupport\collection\NestedSetsCollection;
+use Zend\Db\Sql\Expression;
+use Zend\Db\Sql\Join;
+use Zend\Db\Sql\Select;
 use Zend\Paginator\Paginator;
 
 /**
@@ -17,6 +20,8 @@ class EntitiesCollection extends NestedSetsCollection
      * @var string
      */
     public static $minimalLevelsTable = 'entity_hierarchy_by_ent_id';
+
+    public static $userContextProperitesTable = 'entities_user_context';
 
     /**
      * имя поля таблицы $minimalLevelsTable, по которому производится поиск элемента
@@ -34,5 +39,26 @@ class EntitiesCollection extends NestedSetsCollection
         $this->setCollectionEntityName('entity');
     }
 
+    /**
+     * @param Select $select
+     * @param $clientId
+     * @param bool $isAdmin
+     * @return Select
+     */
+    public static function processSelect(Select $select, $clientId = null, $isAdmin = false){
+        $select = parent::processSelect($select, $clientId);
 
+        if(! $isAdmin) {
+            $select
+                ->join(
+                    ['uc' => self::$userContextProperitesTable],
+                    't.ent_id = uc.ent_id',
+                    ['isFavorite' => new Expression('case when uc.isFavorite is null then 0 else uc.isFavorite end')],
+                    Join::JOIN_LEFT
+                )
+                ->where(new \Zend\Db\Sql\Predicate\Expression("uc.user = '" .$clientId . "' or uc.user is null" ));
+        }
+
+        return $select;
+    }
 }

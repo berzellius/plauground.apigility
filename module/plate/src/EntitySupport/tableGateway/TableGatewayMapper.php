@@ -9,6 +9,7 @@ namespace plate\EntitySupport\tableGateway;
 use DomainException;
 use InvalidArgumentException;
 use PHPUnit\Framework\Assert;
+use plate\Auth\AuthUtils;
 use plate\ConfigSupport\ConfigReadHelper;
 use plate\EntitySupport\collection\Collection;
 use plate\EntitySupport\entity\Entity;
@@ -56,6 +57,11 @@ class TableGatewayMapper implements MapperInterface
      *
      */
     protected $referenceTables = [];
+
+    /**
+     * @var AuthUtils
+     */
+    protected $authUtils;
 
     /**
      * @param TableGateway $table
@@ -190,8 +196,12 @@ class TableGatewayMapper implements MapperInterface
         }
 
         if(method_exists($this->getCollectionClass(), 'processSelect')){
+            $clientId =  $this->getAuthUtils()->getClientId();
+            $isAdmin = (null !== $this->getAuthUtils()->checkAdminPrivileges() && $this->getAuthUtils()->checkAdminPrivileges());
+
             $cs = $this->getCollectionClass();
-            $select = $cs::processSelect($select);
+            $select = (null !== $clientId)?
+                $cs::processSelect($select, $clientId, $isAdmin) : $cs::processSelect($select);
         }
 
         return $select;
@@ -208,7 +218,7 @@ class TableGatewayMapper implements MapperInterface
 
     /**
      * @param array|Traversable|\stdClass $data
-     * @return Entity
+     * @return array|\ArrayObject|null
      */
     public function create($data)
     {
@@ -239,7 +249,7 @@ class TableGatewayMapper implements MapperInterface
 
     /**
      * @param string $id
-     * @return Entity
+     * @return array|\ArrayObject|null
      */
     public function fetch($id)
     {
@@ -426,4 +436,19 @@ class TableGatewayMapper implements MapperInterface
         $this->entityClass = $entityClass;
     }
 
+    /**
+     * @return AuthUtils
+     */
+    public function getAuthUtils()
+    {
+        return $this->authUtils;
+    }
+
+    /**
+     * @param AuthUtils $authUtils
+     */
+    public function setAuthUtils($authUtils)
+    {
+        $this->authUtils = $authUtils;
+    }
 }

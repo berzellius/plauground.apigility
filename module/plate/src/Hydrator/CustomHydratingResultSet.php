@@ -38,6 +38,11 @@ class CustomHydratingResultSet extends HydratingResultSet
 
     public function toObjectsArray(){
         $organized = Organizer::getOrganizer($this->collectionPrototypeClass)->organize($this);
+
+        if(is_array($organized) && count($organized) == 1){
+            $organized = $organized[0];
+        }
+
         return ['response' => $organized];
     }
 

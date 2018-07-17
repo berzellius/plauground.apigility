@@ -36,7 +36,7 @@ class AuthUtils
     }
 
     /**
-     * @param AbstractRole $authentificatedIdentity
+     * @param AuthenticatedIdentity $authentificatedIdentity
      */
     public function setAuthentificatedIdentity(AuthenticatedIdentity $authentificatedIdentity)
     {

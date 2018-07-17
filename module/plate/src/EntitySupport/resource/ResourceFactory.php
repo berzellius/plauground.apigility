@@ -10,6 +10,8 @@ namespace plate\EntitySupport\resource;
 
 use DomainException;
 use Interop\Container\ContainerInterface;
+use plate\Auth\AuthUtils;
+use plate\Auth\GetAuthUtils;
 use plate\ConfigSupport\ConfigReadHelper;
 use plate\EntityServicesSupport\EntityService;
 use plate\EntityServicesSupport\GetITableService;
@@ -29,7 +31,7 @@ use plate\V1\Rest\BasicHierarchy\HierarchyTypes;
  */
 class ResourceFactory
 {
-    use GetITableService, ConfigReadHelper;
+    use GetITableService, ConfigReadHelper, GetAuthUtils;
 
     /**
      * Порождающий метод
@@ -37,6 +39,9 @@ class ResourceFactory
      * @param $resourceClass
      * @param $resourceFactory
      * @return DataRetrievingResource
+     * @throws \Exception
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function __invoke(ContainerInterface $services, $resourceClass, $resourceFactory){
         // определяем класс контроллера
@@ -116,8 +121,13 @@ class ResourceFactory
         ContainerInterface $services, $configName, $resourceClass, $idField,
         $collectionClass = false, $entityClass = false)
     {
+
+
         $tableGateway = $this->getTableGateway($services, $configName, $collectionClass, $entityClass);
         $tableGatewayMapper = new TableGatewayMapper($tableGateway);
+
+        $authUtils = $this->getAuthUtils($services);
+        $tableGatewayMapper->setAuthUtils($authUtils);
 
         $tableGatewayMapper->setIdField($idField);
 
