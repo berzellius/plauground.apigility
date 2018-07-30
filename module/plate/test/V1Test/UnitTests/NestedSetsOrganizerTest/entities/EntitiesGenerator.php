@@ -27,17 +27,20 @@ class EntitiesGenerator
         $this->setCollectionClass($collectionClass);
     }
 
-    public function add($class, $lkey, $rkey, $level){
+    public function add($class, $lkey, $rkey, $level, $allowed = 1){
         $entity = new $class;
         $collectionClass = $this->getCollectionClass();
 
         $lkeyField = $collectionClass::$lkeyField;
         $rkeyField = $collectionClass::$rkeyField;
         $levelField = $collectionClass::$levelField;
+        $allowedField = $collectionClass::$passInNodeFieldName;
 
         $entity->{$lkeyField} = $lkey;
         $entity->{$rkeyField} = $rkey;
         $entity->{$levelField} = $level;
+        $entity->{$allowedField} = $allowed;
+
 
         $this->entities[] = $entity;
 

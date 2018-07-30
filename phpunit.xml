@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--phpunit colors="true" bootstrap="./vendor/autoload.php"-->
+<phpunit colors="true" bootstrap="./phpunit/bootstrap.php">
+    <testsuites>
+        <!--<testsuite name="plate-api-v1-test">
+            <directory>./module/plate/test</directory>
+        </testsuite>-->
+        <testsuite name="plate-api-v1-controllercall-1">
+            <directory>./module/plate/test/V1Test/ControllerCallTests</directory>
+        </testsuite>
+        <testsuite name="plate-api-v1-unit-nestedsetsorganizer-1">
+            <directory>./module/plate/test/V1Test/UnitTests/NestedSetsOrganizerTest</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

@@ -14,4 +14,5 @@ class CollectionStub1 extends NestedSetsCollection{
     public static $rkeyField = 'rkey';
     public static $levelField = 'level';
     public static $containerField = 'container';
+    public static $passInNodeFieldName = 'allowed';
 }

@@ -13,6 +13,7 @@ use plate\EntitySupport\entity\Entity;
 use plate\Organizer\exceptions\EntityFieldsOrganizerException;
 use plate\Organizer\exceptions\OrderingOrganizerException;
 use plate\Organizer\exceptions\OrganizerException;
+use SebastianBergmann\CodeCoverage\Report\PHP;
 
 class NestedSetsOrganizer extends Organizer
 {
@@ -43,6 +44,13 @@ class NestedSetsOrganizer extends Organizer
             $lkey = $item->{$fields->lkeyFieldName};
             $rkey = $item->{$fields->rkeyFieldName};
 
+            if(isset($fields->passInNodeFieldName)){
+                $passInNode = $item->{$fields->passInNodeFieldName};
+            }
+            else{
+                $passInNode = 1;
+            }
+
             $this->checkConsistency($path, $currentLevel, $lkey, $rkey);
 
             if($initLevel == null){
@@ -52,17 +60,17 @@ class NestedSetsOrganizer extends Organizer
             $lastLevel = $this->getPathLastLevel($path);
             if($lastLevel == null || $lastLevel <= $currentLevel){
                 // идем вглубь иерархиий
-                $this->addToPath($path, $item, $currentLevel, $container, $lkey);
+                $this->addToPath($path, $item, $currentLevel, $container, $lkey, $passInNode);
             }
             else{
                 // возврат на уровень $currentLevel
                 $this->wrapPath($path, $currentLevel);
-                $this->addToPath($path, $item, $currentLevel, $container, $lkey);
+                $this->addToPath($path, $item, $currentLevel, $container, $lkey, $passInNode);
 
                 if($currentLevel == $initLevel){
                     $res[] = $path[0]->e;
                     $path = [];
-                    $this->addToPath($path, $item, $currentLevel, $container, $lkey);
+                    $this->addToPath($path, $item, $currentLevel, $container, $lkey, $passInNode);
                 }
             }
         }
@@ -73,8 +81,10 @@ class NestedSetsOrganizer extends Organizer
         }
 
         // остался необработанный path, уже свернут
-        if(count($path) == 1){
-            $res[] = $path[0]->e;
+        foreach ($path as $pe){
+            if( 1 == $pe->passInNode ) {
+                $res[] = $pe->e;
+            }
         }
 
         return $res;
@@ -95,7 +105,7 @@ class NestedSetsOrganizer extends Organizer
     }
 
     /**
-     * получить имена полей level, (left/right)key, container
+     * получить имена полей level, (left/right)key, container, ...
      * @param $collectionPrototypeClass
      * @return \stdClass
      * @throws \Exception
@@ -120,6 +130,16 @@ class NestedSetsOrganizer extends Organizer
             $res->$field = $collectionPrototypeClass::$$field;
         }
 
+        //опциональные поля
+        $optionalFields = ['passInNodeFieldName'];
+
+        foreach ($optionalFields as $optionalField) {
+            if (property_exists($collectionPrototypeClass, $optionalField)) {
+                $res->$optionalField = $collectionPrototypeClass::$$optionalField;
+            }
+        }
+
+
         return $res;
     }
 
@@ -130,13 +150,15 @@ class NestedSetsOrganizer extends Organizer
      * @param $level - уровень
      * @param $container - имя контейнера
      * @param $lkey - левый ключ
+     * @param int $passInNode
      */
-    protected function addToPath(&$path, $element, $level, $container, $lkey){
+    protected function addToPath(&$path, $element, $level, $container, $lkey, $passInNode = 1){
         $e = new \stdClass();
         $e->e = $element;
         $e->level = $level;
         $e->container = $container;
         $e->lkey = $lkey;
+        $e->passInNode = $passInNode;
 
         $path[] = $e;
     }
@@ -158,7 +180,10 @@ class NestedSetsOrganizer extends Organizer
                     // $elem перетаскиваем снизу в родительский объект
                     $elem = array_pop($path);
                     $container = $elem->e->container;
-                    $path[$kkey]->e->{$container}[] = $elem->e;
+
+                    if(1 == $elem->passInNode) {
+                        $path[$kkey]->e->{$container}[] = $elem->e;
+                    }
                     break;
                 }
             }

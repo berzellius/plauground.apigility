@@ -114,6 +114,8 @@ class EntitiesService extends EntityService
     public function findByTypesSetAndMaxDepth($levelDepth = null, array $types = []){
         $select = $this->getTableMapper()->generateSelectByMaxLevelDepthAndTypeList($levelDepth, $types);
 
+        //die($select->getSqlString($this->getAdapter()->getPlatform()));
+
         $res = $this->getTableMapper()->getTable()->selectWith($select);
         return $res;
     }
@@ -148,7 +150,6 @@ class EntitiesService extends EntityService
      */
     public function findAll(){
         $select = $this->getTableMapper()->generateBasicSelect();
-
         /**
          * @var CustomHydratingResultSet
          */

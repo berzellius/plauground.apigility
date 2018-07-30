@@ -5,6 +5,7 @@ use plate\EntitySupport\collection\Collection;
 use plate\EntitySupport\collection\NestedSetsCollection;
 use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Join;
+use Zend\Db\Sql\Predicate\Predicate;
 use Zend\Db\Sql\Select;
 use Zend\Paginator\Paginator;
 
@@ -21,12 +22,23 @@ class EntitiesCollection extends NestedSetsCollection
      */
     public static $minimalLevelsTable = 'entity_hierarchy_by_ent_id';
 
+    /**
+     * свойства элементов в контексте пользователя. например, "данный элемент добавлен пользователем в избранное"
+     * @var string
+     */
     public static $userContextProperitesTable = 'entities_user_context';
 
     /**
      * имя поля таблицы $minimalLevelsTable, по которому производится поиск элемента
+     * @var string
      */
     public static $minimalLevelsTableIdField = 'ent_id';
+
+    /**
+     * имя поля, содержащего флаг "заходить внутрь узла"
+     * @var string
+     */
+    public static $passInNodeFieldName = 'isAllowed';
 
     /**
      * EntitiesCollection constructor.
@@ -53,10 +65,15 @@ class EntitiesCollection extends NestedSetsCollection
                 ->join(
                     ['uc' => self::$userContextProperitesTable],
                     't.ent_id = uc.ent_id',
-                    ['isFavorite' => new Expression('case when uc.isFavorite is null then 0 else uc.isFavorite end')],
+                    [
+                        'isFavorite' => new Expression('case when uc.isFavorite is null then 0 else uc.isFavorite end'),
+                        'isAllowed' => new Expression('case when uc.isAllowed is null then 0 else uc.isAllowed end')
+                    ],
                     Join::JOIN_LEFT
                 )
-                ->where(new \Zend\Db\Sql\Predicate\Expression("uc.user = '" .$clientId . "' or uc.user is null" ));
+                ->where(new \Zend\Db\Sql\Predicate\Expression("uc.user = '" .$clientId . "'" ))
+                //->where(new \Zend\Db\Sql\Predicate\Expression("uc.isAllowed = 1"), Predicate::COMBINED_BY_AND)
+            ;
         }
 
         return $select;

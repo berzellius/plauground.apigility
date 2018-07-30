@@ -114,6 +114,60 @@ class NestedSetsOrganizerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testNestedSetsOrganizerWithNotAllowedNodes(){
+        $collectionClass = CollectionStub1::class;
+        $organizer = Organizer::getOrganizer($collectionClass);
+
+        $res = $organizer->organize(
+            EntitiesGenerator::getInstance($collectionClass)
+                // 1й уровень
+                ->add(LevelOneEntityStub::class, /* lkey: */1, 4, 1, 1)
+                // а прав на этот узел у нас нет (allowed == 0), а значит, в результате мы не должны видеть ни его, ни его потомков!
+                ->add(LevelOneEntityStub::class, /* lkey: */2, 10, 1, 0)
+                // 2й уровень - как видно, сортировки по lkey нет: 1-5-2-8-6
+                ->add(LevelTwoEntityStub::class, /* lkey: */3, 4, 2)
+                ->add(LevelTwoEntityStub::class, /* lkey: */6, 7, 2)
+                ->add(LevelTwoEntityStub::class, /* lkey: */8, 9, 2)
+                ->add(LevelOneEntityStub::class, 11, 16, 1)
+                ->add(LevelTwoEntityStub::class, 12,13, 2)
+                ->add(LevelTwoEntityStub::class, 14,15,2)
+                ->iterator()
+        );
+
+        // результат должен содержать всего 2 корневых элемента - 1 элемент нам не доступен
+        Assert::assertTrue(count($res) == 2, "Must be 2 elements, " . count($res) . " irl");
+
+        foreach ($res as $node){
+            Assert::assertTrue(
+                in_array($node->lkey,
+                [1,11,12,14]
+                ),
+                "Hidden elements must not be here!"
+            );
+        }
+    }
+
+    public function testNestedSetsOrganizerFlatList(){
+        $collectionClass = CollectionStub1::class;
+        $organizer = Organizer::getOrganizer($collectionClass);
+
+        $res = $organizer->organize(
+            EntitiesGenerator::getInstance($collectionClass)
+                // 1й уровень
+                ->add(LevelOneEntityStub::class, /* lkey: */1, 2, 1)
+                ->add(LevelOneEntityStub::class, /* lkey: */2, 3, 1)
+                ->add(LevelOneEntityStub::class, /* lkey: */4, 5, 1)
+                ->add(LevelOneEntityStub::class, /* lkey: */6, 7, 1)
+                ->add(LevelOneEntityStub::class, /* lkey: */8, 9, 1)
+                ->add(LevelOneEntityStub::class, 11, 12, 1)
+                ->add(LevelOneEntityStub::class, 13,14, 1)
+                ->add(LevelOneEntityStub::class, 15,16,1)
+                ->iterator()
+        );
+
+        Assert::assertTrue(count($res) == 8);
+    }
+
     protected function getEntityStub($entityClass, $lkey, $rkey, $level, $lkeyField = 'lkey', $rkeyField = 'rkey', $levelField = 'level', $containerField = 'devices'){
         $ent = new $entityClass();
         $ent->$lkeyField = $lkey;

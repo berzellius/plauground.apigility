@@ -16,4 +16,5 @@ abstract class EntityStub1 extends Entity{
     public $rkey;
     public $level;
     public $container = 'entities';
+    public $allowed;
 }
