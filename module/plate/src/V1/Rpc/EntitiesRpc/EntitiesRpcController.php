@@ -55,19 +55,19 @@ class EntitiesRpcController extends RpcController
         }
 
         // случай, когда у нас не выбран узел и не задана глубина, но указаны типы
-        if(null === $level_depth && count($types) > 0){
+        if(null === $level_depth && count($types) > 0 && ! isset($filteredData['favorite'])){
             $res = $this->getEntitiesService()->findByTypesOnly(
                 $types
             );
             return new JsonModel($res->toObjectsArray());
         }
 
+
         // вывод избранного
         if(isset($filteredData['favorite']) && $filteredData['favorite'] == 1){
             $res = $this->getEntitiesService()->findFavoritesByTypesAndMaxLevelDepth($types, 3);
             return new JsonModel($res->toObjectsArray());
         }
-
 
         $res = $this->getEntitiesService()->findByTypesSetAndMaxDepth($level_depth, $types);
         return new JsonModel($res->toObjectsArray());
