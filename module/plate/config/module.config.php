@@ -1628,7 +1628,12 @@ return array(
                         ),
                     ),
                 ),
-                'filters' => array(),
+                'filters' => array(
+                    0 => array(
+                        'name' => 'Zend\\Filter\\ToInt',
+                        'options' => array(),
+                    ),
+                ),
                 'name' => 'level_depth',
             ),
             2 => array(
@@ -1680,9 +1685,35 @@ return array(
                         ),
                     ),
                 ),
-                'filters' => array(),
+                'filters' => array(
+                    0 => array(
+                        'name' => 'Zend\\Filter\\ToInt',
+                        'options' => array(),
+                    ),
+                ),
                 'name' => 'level',
-                'field_type' => 'r',
+                'field_type' => '',
+            ),
+            5 => array(
+                'required' => false,
+                'validators' => array(
+                    0 => array(
+                        'name' => 'Zend\\Validator\\Regex',
+                        'options' => array(
+                            'breakchainonfailure' => true,
+                            'pattern' => '/^[0|1]$/',
+                        ),
+                    ),
+                ),
+                'filters' => array(
+                    0 => array(
+                        'name' => 'Zend\\Filter\\ToInt',
+                        'options' => array(),
+                    ),
+                ),
+                'name' => 'favorite',
+                'description' => 'вывод только избранного',
+                'field_type' => 'Integer',
             ),
         ),
     ),

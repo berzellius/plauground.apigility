@@ -62,6 +62,12 @@ class EntitiesRpcController extends RpcController
             return new JsonModel($res->toObjectsArray());
         }
 
+        // вывод избранного
+        if(isset($filteredData['favorite']) && $filteredData['favorite'] == 1){
+            $res = $this->getEntitiesService()->findFavoritesByTypesAndMaxLevelDepth($types, 3);
+            return new JsonModel($res->toObjectsArray());
+        }
+
 
         $res = $this->getEntitiesService()->findByTypesSetAndMaxDepth($level_depth, $types);
         return new JsonModel($res->toObjectsArray());

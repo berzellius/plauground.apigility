@@ -155,6 +155,28 @@ class TableGatewayMapper implements MapperInterface
 
 
     /**
+     * @param $levelDepth
+     * @param $types
+     * @return Select
+     * @throws \Exception
+     */
+    public function generateSelectFavoritesByMaxLevelDepthAndTypeList($levelDepth, $types)
+    {
+        $selectMethodInCollection = "selectFavoritesByMaxLevelDepthAndTypeList";
+
+        if(method_exists($this->getCollectionClass(), $selectMethodInCollection)){
+            $select = $this->generateBasicSelect();
+
+            $cs = $this->getCollectionClass();
+            $select = $cs::$selectMethodInCollection($select, $this->getTable()->table, $this->getIdField(), $levelDepth, $types);
+
+            return $select;
+        }
+        else throw new \Exception("method " . $selectMethodInCollection . " not exists in " . $this->getCollectionClass());
+    }
+
+
+    /**
      * @param $typesList
      * @return Select
      * @throws \Exception

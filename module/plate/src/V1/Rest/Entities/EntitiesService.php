@@ -121,6 +121,21 @@ class EntitiesService extends EntityService
     }
 
     /**
+     * Поиск по Избранному
+     * @param array $types
+     * @param null $levelDepth
+     * @return \Zend\Db\ResultSet\ResultSetInterface
+     * @throws \Exception
+     */
+    public function findFavoritesByTypesAndMaxLevelDepth(array $types = [], $levelDepth = null)
+    {
+        $select = $this->getTableMapper()->generateSelectFavoritesByMaxLevelDepthAndTypeList($levelDepth, $types);
+
+        $res = $this->getTableMapper()->getTable()->selectWith($select);
+        return $res;
+    }
+
+    /**
      * Отбор только по типам элементов
      * @param $types
      * @return CustomHydratingResultSet
@@ -156,5 +171,4 @@ class EntitiesService extends EntityService
         $res = $this->getTableMapper()->getTable()->selectWith($select);
         return $res;
     }
-
 }

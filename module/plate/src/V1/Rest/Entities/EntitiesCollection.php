@@ -7,6 +7,7 @@ use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Join;
 use Zend\Db\Sql\Predicate\Predicate;
 use Zend\Db\Sql\Select;
+use Zend\Db\Sql\Where;
 use Zend\Paginator\Paginator;
 
 /**
@@ -75,6 +76,38 @@ class EntitiesCollection extends NestedSetsCollection
                 //->where(new \Zend\Db\Sql\Predicate\Expression("uc.isAllowed = 1"), Predicate::COMBINED_BY_AND)
             ;
         }
+
+        return $select;
+    }
+
+    /**
+     * @param Select $select
+     * @param $tableName
+     * @param $idField
+     * @param $levelDepth
+     * @param array $typeList
+     * @return Select
+     */
+    public static function selectFavoritesByMaxLevelDepthAndTypeList(Select $select, $tableName, $idField, $levelDepth, array $typeList = []){
+        $select = self::selectByMaxLevelDepthWithJoiningTable(
+            $select, $tableName, $idField, $levelDepth
+        );
+
+        $select = self::selectTypes($select, $typeList);
+
+        $select = self::selectFavorites($select);
+
+        return $select;
+    }
+
+    /**
+     * @param $select
+     * @return Select
+     */
+    protected static function selectFavorites(Select $select)
+    {
+        $select
+            ->where("uc.isFavorite = 1", Where::OP_AND);
 
         return $select;
     }
