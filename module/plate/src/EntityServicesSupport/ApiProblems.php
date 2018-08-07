@@ -7,6 +7,7 @@
  */
 
 namespace plate\EntityServicesSupport;
+use plate\Exception\ApiException;
 use ZF\ApiProblem\ApiProblem;
 
 trait ApiProblems
@@ -17,5 +18,13 @@ trait ApiProblems
      */
     protected function notAllowed($problem = "Method not allowed!"){
         return new ApiProblem(403, $problem);
+    }
+
+    /**
+     * @param $message
+     * @throws ApiException
+     */
+    protected function notAllowedException($message){
+        throw new ApiException($message, 403);
     }
 }

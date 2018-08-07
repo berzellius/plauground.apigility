@@ -7,10 +7,13 @@
  */
 namespace plate\EntityServicesSupport;
 
+use Interop\Container\ContainerInterface;
 use plate\Auth\AuthUtils;
 use plate\EntityServicesSupport\ITableService;
 use plate\EntitySupport\tableGateway\TableGatewayMapper;
 use plate\EntityServicesSupport\IEntityService;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Adapter\Driver\ConnectionInterface;
 
@@ -32,6 +35,20 @@ abstract class EntityService implements IEntityService{
         $this->setAuthUtils($authUtils);
         $this->setITableService($iTableService);
         $this->setTableMapper($mapper);
+    }
+
+    /**
+     * Получить другой сервис
+     * @param $serviceClass
+     * @return mixed
+     */
+    public function getService($serviceClass){
+        try {
+            return $this->getServices()->get($serviceClass);
+        } catch (NotFoundExceptionInterface $e) {
+        } catch (ContainerExceptionInterface $e) {
+        }
+        return null;
     }
 
     /**

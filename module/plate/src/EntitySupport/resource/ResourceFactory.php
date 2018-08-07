@@ -22,6 +22,8 @@ use plate\EntitySupport\tableGateway\TableGatewayMapper;
 use plate\Hydrator\CustomHydratingResultSet;
 use plate\Hydrator\CustomHydrator;
 use plate\V1\Rest\BasicHierarchy\HierarchyTypes;
+use plate\V1\Rest\Entities\EntitiesResource;
+use plate\V1\Rest\EntitiesUserContext\EntitiesUserContextResource;
 
 /**
  * Class ResourceFactory
@@ -94,6 +96,7 @@ class ResourceFactory
              */
             $DAOService = $services->get($serviceClass);
             $DAOService->setTableMapper($tableGatewayMapper);
+
             $resource = new $resourceClass($DAOService, $tableGatewayMapper);
         }
         else{

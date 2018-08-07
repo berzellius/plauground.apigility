@@ -9,6 +9,8 @@
 namespace plate\EntitySupport\entity;
 
 
+use SebastianBergmann\CodeCoverage\Report\PHP;
+
 abstract class MappedSuperClassEntity extends Entity
 {
     /**

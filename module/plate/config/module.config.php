@@ -10,6 +10,8 @@ return array(
             'plate\\V1\\Rest\\Entities\\EntitiesResource' => 'plate\\EntitySupport\\resource\\ResourceFactory',
             'plate\\V1\\Rest\\BasicHierarchy\\BasicHierarchyService' => 'plate\\EntityServicesSupport\\ServiceFactory',
             'plate\\V1\\Rest\\BasicHierarchy\\BasicHierarchyResource' => 'plate\\EntitySupport\\resource\\ResourceFactory',
+            'plate\\V1\\Rest\\EntitiesUserContext\\EntitiesUserContextResource' => 'plate\\EntitySupport\\resource\\ResourceFactory',
+            'plate\\V1\\Rest\\EntitiesUserContext\\EntitiesUserContextService' => 'plate\\EntityServicesSupport\\ServiceFactory',
         ),
     ),
     'router' => array(
@@ -60,6 +62,25 @@ return array(
                     ),
                 ),
             ),
+            'plate.rpc.favorites-rpc' => array(
+                'type' => 'Segment',
+                'options' => array(
+                    'route' => '/favorites',
+                    'defaults' => array(
+                        'controller' => 'plate\\V1\\Rpc\\FavoritesRpc\\Controller',
+                        'action' => 'favoritesRpc',
+                    ),
+                ),
+            ),
+            'plate.rest.entities-user-context' => array(
+                'type' => 'Segment',
+                'options' => array(
+                    'route' => '/entities-user-context[/:entities_user_context_id]',
+                    'defaults' => array(
+                        'controller' => 'plate\\V1\\Rest\\EntitiesUserContext\\Controller',
+                    ),
+                ),
+            ),
         ),
     ),
     'zf-versioning' => array(
@@ -69,6 +90,8 @@ return array(
             0 => 'plate.rest.entities',
             10 => 'plate.rest.basic-hierarchy',
             11 => 'plate.rpc.entities-rpc',
+            12 => 'plate.rpc.favorites-rpc',
+            13 => 'plate.rest.entities-user-context',
         ),
     ),
     'zf-rest' => array(
@@ -193,6 +216,29 @@ return array(
                 ),
             ),
         ),
+        'plate\\V1\\Rest\\EntitiesUserContext\\Controller' => array(
+            'listener' => 'plate\\V1\\Rest\\EntitiesUserContext\\EntitiesUserContextResource',
+            'route_name' => 'plate.rest.entities-user-context',
+            'route_identifier_name' => 'entities_user_context_id',
+            'collection_name' => 'entities_user_context',
+            'entity_http_methods' => array(
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+            ),
+            'collection_http_methods' => array(
+                0 => 'GET',
+                1 => 'POST',
+            ),
+            'collection_query_whitelist' => array(),
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => 'plate\\V1\\Rest\\EntitiesUserContext\\EntitiesUserContextEntity',
+            'collection_class' => 'plate\\V1\\Rest\\EntitiesUserContext\\EntitiesUserContextCollection',
+            'service_name' => 'EntitiesUserContext',
+            'dao_service' => 'plate\\V1\\Rest\\EntitiesUserContext\\EntitiesUserContextService',
+        ),
     ),
     'zf-content-negotiation' => array(
         'controllers' => array(
@@ -201,6 +247,8 @@ return array(
             'plate\\V1\\Rest\\Entities\\Controller' => 'JsonAlt',
             'plate\\V1\\Rest\\BasicHierarchy\\Controller' => 'JsonAlt',
             'plate\\V1\\Rpc\\EntitiesRpc\\Controller' => 'JsonAlt',
+            'plate\\V1\\Rpc\\FavoritesRpc\\Controller' => 'JsonAlt',
+            'plate\\V1\\Rest\\EntitiesUserContext\\Controller' => 'JsonAlt',
         ),
         'accept_whitelist' => array(
             'plate\\V1\\Rest\\Oauth_users_control\\Controller' => array(
@@ -228,6 +276,16 @@ return array(
                 1 => 'application/json',
                 2 => 'application/*+json',
             ),
+            'plate\\V1\\Rpc\\FavoritesRpc\\Controller' => array(
+                0 => 'application/vnd.plate.v1+json',
+                1 => 'application/json',
+                2 => 'application/*+json',
+            ),
+            'plate\\V1\\Rest\\EntitiesUserContext\\Controller' => array(
+                0 => 'application/vnd.plate.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ),
         ),
         'content_type_whitelist' => array(
             'plate\\V1\\Rest\\Oauth_users_control\\Controller' => array(
@@ -247,6 +305,14 @@ return array(
                 1 => 'application/json',
             ),
             'plate\\V1\\Rpc\\EntitiesRpc\\Controller' => array(
+                0 => 'application/vnd.plate.v1+json',
+                1 => 'application/json',
+            ),
+            'plate\\V1\\Rpc\\FavoritesRpc\\Controller' => array(
+                0 => 'application/vnd.plate.v1+json',
+                1 => 'application/json',
+            ),
+            'plate\\V1\\Rest\\EntitiesUserContext\\Controller' => array(
                 0 => 'application/vnd.plate.v1+json',
                 1 => 'application/json',
             ),
@@ -316,6 +382,18 @@ return array(
                 'route_identifier_name' => 'basic_hierarchy_id',
                 'is_collection' => true,
             ),
+            'plate\\V1\\Rest\\EntitiesUserContext\\EntitiesUserContextEntity' => array(
+                'entity_identifier_name' => 'id',
+                'route_name' => 'plate.rest.entities-user-context',
+                'route_identifier_name' => 'entities_user_context_id',
+                'hydrator' => 'Zend\\Hydrator\\ArraySerializable',
+            ),
+            'plate\\V1\\Rest\\EntitiesUserContext\\EntitiesUserContextCollection' => array(
+                'entity_identifier_name' => 'id',
+                'route_name' => 'plate.rest.entities-user-context',
+                'route_identifier_name' => 'entities_user_context_id',
+                'is_collection' => true,
+            ),
         ),
     ),
     'zf-content-validation' => array(
@@ -331,6 +409,9 @@ return array(
         'plate\\V1\\Rpc\\EntitiesRpc\\Controller' => array(
             'input_filter' => 'plate\\V1\\Rpc\\EntitiesRpc\\Validator',
             'GET' => 'plate\\V1\\Rpc\\EntitiesRpc\\Validator',
+        ),
+        'plate\\V1\\Rpc\\FavoritesRpc\\Controller' => array(
+            'input_filter' => 'plate\\V1\\Rpc\\FavoritesRpc\\Validator',
         ),
     ),
     'input_filter_specs' => array(
@@ -1716,6 +1797,42 @@ return array(
                 'field_type' => 'Integer',
             ),
         ),
+        'plate\\V1\\Rpc\\FavoritesRpc\\Validator' => array(
+            0 => array(
+                'required' => true,
+                'validators' => array(
+                    0 => array(
+                        'name' => 'Zend\\Validator\\Regex',
+                        'options' => array(
+                            'breakchainonfailure' => true,
+                            'pattern' => '/^[\\d]+$/',
+                        ),
+                    ),
+                ),
+                'filters' => array(
+                    0 => array(
+                        'name' => 'Zend\\Filter\\ToInt',
+                        'options' => array(),
+                    ),
+                ),
+                'name' => 'entity_id',
+            ),
+            1 => array(
+                'required' => true,
+                'validators' => array(
+                    0 => array(
+                        'name' => 'Zend\\Validator\\Regex',
+                        'options' => array(
+                            'breakchainonfailure' => true,
+                            'pattern' => '/^(like|dislike)$/',
+                        ),
+                    ),
+                ),
+                'filters' => array(),
+                'name' => 'do',
+                'description' => 'what to do? like/dislike',
+            ),
+        ),
     ),
     'zf-mvc-auth' => array(
         'authorization' => array(
@@ -1794,6 +1911,17 @@ return array(
                     ),
                 ),
             ),
+            'plate\\V1\\Rpc\\FavoritesRpc\\Controller' => array(
+                'actions' => array(
+                    'FavoritesRpc' => array(
+                        'GET' => true,
+                        'POST' => true,
+                        'PUT' => false,
+                        'PATCH' => false,
+                        'DELETE' => false,
+                    ),
+                ),
+            ),
         ),
     ),
     'zf-apigility' => array(
@@ -1802,6 +1930,7 @@ return array(
     'controllers' => array(
         'factories' => array(
             'plate\\V1\\Rpc\\EntitiesRpc\\Controller' => 'plate\\V1\\Rpc\\EntitiesRpc\\EntitiesRpcControllerFactory',
+            'plate\\V1\\Rpc\\FavoritesRpc\\Controller' => 'plate\\V1\\Rpc\\FavoritesRpc\\FavoritesRpcControllerFactory',
         ),
     ),
     'zf-rpc' => array(
@@ -1812,6 +1941,13 @@ return array(
                 1 => 'POST',
             ),
             'route_name' => 'plate.rpc.entities-rpc',
+        ),
+        'plate\\V1\\Rpc\\FavoritesRpc\\Controller' => array(
+            'service_name' => 'FavoritesRpc',
+            'http_methods' => array(
+                0 => 'POST',
+            ),
+            'route_name' => 'plate.rpc.favorites-rpc',
         ),
     ),
 );

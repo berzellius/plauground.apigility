@@ -50,5 +50,9 @@ return array(
     'types' => array(
         'db' => 'oauth2_users',
         'table' => 'hierarchy_types'
-    )
+    ),
+    'entities_user_context' => [
+        'db' => 'oauth2_users',
+        'table' => 'entities_user_context'
+    ]
 );

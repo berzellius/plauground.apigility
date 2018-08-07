@@ -36,7 +36,7 @@ class ServiceFactory
          * т.е. мы должны получить запрашиваемый класс и сгенерить его
          */
 
-        // определяем класс контроллера
+
         $controllerPath = $this->getControllerByService($serviceClass);
         $zfRestEntityProperties = $this->getZfRestControllerSectionByControllerName($controllerPath);
         $resourceClass = $zfRestEntityProperties['listener'];
@@ -45,6 +45,8 @@ class ServiceFactory
         // получить зарегистрированный mapper. Так мы можем получать мапперы любых объектов
         $mapper = $iTableService->getTableMapperByKey($resourceClass);
         $authUtils = $this->getAuthUtils($services);
+
+        // определяем класс контроллера
 
         return new $serviceClass($authUtils, $iTableService, $mapper);
     }

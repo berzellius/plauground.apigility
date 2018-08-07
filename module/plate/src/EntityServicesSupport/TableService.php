@@ -3,8 +3,6 @@
 namespace plate\EntityServicesSupport;
 use Interop\Container\ContainerInterface;
 use plate\EntityServicesSupport\ITableService;
-use plate\V1\Rest\Scheduled_tasks\Scheduled_tasksResource;
-use plate\V1\Rest\Scheduled_tasks_timetable\Scheduled_tasks_timetableResource;
 
 /**
  * Created by PhpStorm.
@@ -82,6 +80,8 @@ class TableService implements ITableService
      * Получить зарегистрированный mapper по ключу
      * @param $key
      * @return \plate\EntitySupport\tableGateway\TableGatewayMapper
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function getTableMapperByKey($key)
     {
@@ -99,6 +99,8 @@ class TableService implements ITableService
      * Получить имя таблицы по ключу mapper'а
      * @param $key
      * @return string
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function getTableNameByKey($key)
     {
@@ -114,6 +116,8 @@ class TableService implements ITableService
      * Получить имя поля идентификатора сущности по ключу
      * @param $key
      * @return string
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function getTableIdFieldName($key)
     {

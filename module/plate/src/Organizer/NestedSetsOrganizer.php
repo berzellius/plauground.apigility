@@ -98,6 +98,7 @@ class NestedSetsOrganizer extends Organizer
     protected function checkFieldsExists(\stdClass $fields, Entity $item){
         foreach ($fields as $field){
             if(!property_exists($item, $field) || !isset($item->$field) || $item->$field === ""){
+
                 throw new EntityFieldsOrganizerException(
                     "entity of class " . get_class($item) . " has not field " . $field . " or field not filled");
             }

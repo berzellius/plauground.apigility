@@ -375,6 +375,17 @@ class TableGatewayMapper implements MapperInterface
     }
 
     /**
+     * @param array $set
+     * @param Where $where
+     */
+    public function updateWhere(
+        array $set,
+        Where $where
+    ){
+
+    }
+
+    /**
      * Удалить сущность с id == $id. В ответ не возвращает данных
      * @param string $id
      * @return bool

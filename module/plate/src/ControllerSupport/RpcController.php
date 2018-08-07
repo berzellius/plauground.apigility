@@ -8,6 +8,7 @@
  */
 namespace plate\ControllerSupport;
 
+use plate\Exception\ApiException;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Mvc\MvcEvent;
 use ZF\ApiProblem\ApiProblem;
@@ -37,6 +38,11 @@ class RpcController extends AbstractActionController
         catch (\Exception $exception){
             $result = new ViewModel(["error" => $exception->getMessage()]);
             $e->setResult($result);
+
+            if($exception instanceof ApiException){
+                $e->getResponse()->setStatusCode($exception->getHttpCode());
+            }
+
             return $result;
         }
     }

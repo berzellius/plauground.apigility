@@ -12,6 +12,7 @@ namespace plate\V1\Rest\Entities;
 use plate\EntityServicesSupport\EntityService;
 use plate\Hydrator\CustomHydratingResultSet;
 use plate\Json\JsonModelAlt;
+use plate\V1\Rest\Entities_uc\Entities_ucService;
 use Zend\Db\ResultSet\HydratingResultSet;
 use Zend\Db\Sql\Select;
 use Zend\View\Helper\ViewModel;
@@ -23,7 +24,6 @@ use Zend\View\Helper\ViewModel;
  */
 class EntitiesService extends EntityService
 {
-
     /**
      * @param $params
      * @return HydratingResultSet|\ZF\ApiProblem\ApiProblem
@@ -113,10 +113,8 @@ class EntitiesService extends EntityService
      */
     public function findByTypesSetAndMaxDepth($levelDepth = null, array $types = []){
         $select = $this->getTableMapper()->generateSelectByMaxLevelDepthAndTypeList($levelDepth, $types);
-
-        //die($select->getSqlString($this->getAdapter()->getPlatform()));
-
         $res = $this->getTableMapper()->getTable()->selectWith($select);
+
         return $res;
     }
 
@@ -171,4 +169,22 @@ class EntitiesService extends EntityService
         $res = $this->getTableMapper()->getTable()->selectWith($select);
         return $res;
     }
+
+    /**
+     * @param $entityId
+     * @return CustomHydratingResultSet
+     * @throws \Exception
+     */
+    public function getEntityById($entityId)
+    {
+        $select = $this->getTableMapper()->generateSelectByRootElementIdAndMaxLevelDepthAndTypeList($entityId, 0, []);
+
+        /**
+         * @var CustomHydratingResultSet
+         */
+        $res = $this->getTableMapper()->getTable()->selectWith($select);
+        return $res;
+    }
+
+
 }
