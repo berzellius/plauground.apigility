@@ -21,4 +21,20 @@ class EntitiesEntity extends MappedSuperClassEntity
     public static $mappingClassesCollection = [
         DeviceEntity::class, FloorEntity::class, GroupEntity::class, RoomEntity::class, ScheduledEntity::class
     ];
+
+    public static function getFieldsMap(){
+        return [
+            'NAME' => 'name',
+            'DESCRIPTION' => 'description',
+            'NS_ID' => 'ns_id',
+            'ENT_ID' => 'ent_id',
+            'LEVEL' => 'level',
+            'TYPE_NAME' => 'type_name',
+            'LKEY' => 'lkey',
+            'RKEY' => 'rkey',
+            'CONTAINER' => 'container',
+            'IS_ALLOWED' => 'isAllowed',
+            'IS_FAVORITE' => 'isFavorite'
+        ];
+    }
 }

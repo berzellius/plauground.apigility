@@ -12,4 +12,13 @@ use plate\V1\Rest\Entities\EntitiesEntity;
 class GroupEntity extends EntitiesEntity
 {
     public static $type_enum = 'group';
+
+    public static function getFieldsMap(){
+        return array_merge(
+            parent::getFieldsMap(),
+            [
+                'LAST_COMMAND' => 'last_command'
+            ]
+        );
+    }
 }

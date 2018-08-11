@@ -25,8 +25,24 @@ class CustomHydrator extends ObjectProperty
      * @return object
      */
     public function hydrate(array $data, $object){
-        $prototype = ($object instanceof Entity)?
-            EntityMapperFactory::getEntityObject($data, $object) : $object;
+
+        if($object instanceof Entity){
+            $prototype = EntityMapperFactory::getEntityObject($data, $object);
+
+            // у каждого класса свой набор полей
+            if(method_exists($prototype, 'getFieldsMap')){
+                $map = $prototype::getFieldsMap();
+
+                foreach ($data as $k => $v){
+                    if(!in_array($k, $map)){
+                        unset($data[$k]);
+                    }
+                }
+            }
+        }
+        else {
+            $prototype = $object;
+        }
 
         $result = parent::hydrate($data, $prototype);
         return $result;
