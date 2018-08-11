@@ -30,6 +30,7 @@ class EntitiesEntity extends MappedSuperClassEntity
             'ENT_ID' => 'ent_id',
             'LEVEL' => 'level',
             'TYPE_NAME' => 'type_name',
+            'TYPE' => 'type',
             'LKEY' => 'lkey',
             'RKEY' => 'rkey',
             'CONTAINER' => 'container',
