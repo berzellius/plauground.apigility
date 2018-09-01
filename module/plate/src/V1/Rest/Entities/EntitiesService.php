@@ -9,10 +9,12 @@
 namespace plate\V1\Rest\Entities;
 
 
+use plate\Auth\AuthUtils;
 use plate\EntityServicesSupport\EntityService;
+use plate\EntityServicesSupport\ITableService;
+use plate\EntitySupport\tableGateway\TableGatewayMapper;
 use plate\Hydrator\CustomHydratingResultSet;
 use plate\Json\JsonModelAlt;
-use plate\V1\Rest\Entities_uc\Entities_ucService;
 use Zend\Db\ResultSet\HydratingResultSet;
 use Zend\Db\Sql\Select;
 use Zend\View\Helper\ViewModel;
@@ -24,48 +26,6 @@ use Zend\View\Helper\ViewModel;
  */
 class EntitiesService extends EntityService
 {
-    /**
-     * @param $params
-     * @return HydratingResultSet|\ZF\ApiProblem\ApiProblem
-     *
-    public function fetchAll($params)
-    {
-        // работа с Entities напрямую - только админу
-        if(!$this->getAuthUtils()->checkAdminPrivileges() && false){
-            return $this->notAllowed();
-        }
-
-        if(isset($params['root_entity_id'])){
-            $root_entity_id = (int) $params['root_entity_id'];
-            $type_ids_list = isset($params['type_ids_list'])? explode(',', $params['type_ids_list']) : [];
-            foreach ($type_ids_list as &$value) $value = (int) $value;
-            $level_depth = isset($params['level_depth'])? (int)$params['level_depth'] : null;
-
-            $select = $this->selectByParentAndTypesSetAndMaxDepth($root_entity_id, $level_depth, $type_ids_list);
-        }
-        else{
-            $select = $this->getTableMapper()->generateBasicSelect();
-        }
-
-        /**
-         * @var HydratingResultSet
-         *
-        $res = $this->getTableMapper()->getTable()->selectWith($select);
-        return $res;
-    }*/
-
-    /**
-     * Выбор элементов, принадлежащих элементу $rootId, с ограничением по типам - $types == [<id типа>, [...]]
-     * глубиной не более $levelDepth
-     * @param $rootId
-     * @param $levelDepth
-     * @param array $types
-     * @return Select|null
-     * @throws \Exception
-     */
-    public function selectByParentNodeAndTypesSetAndMaxDepth($rootId, $levelDepth = null, array $types = []){
-        return $this->getTableMapper()->generateSelectByRootNodeIdAndMaxLevelDepthAndTypeList($rootId, $levelDepth, $types);
-    }
 
     /**
      * Выбор элементов, принадлежащих элементу $rootId, с ограничением по типам - $types == [<id типа>, [...]]
@@ -77,12 +37,15 @@ class EntitiesService extends EntityService
      * @throws \Exception
      */
     public function findByParentEntityAndTypesSetAndMaxDepth($rootId, $levelDepth = null, array $types = []){
-        $select = $this->getTableMapper()->generateSelectByRootElementIdAndMaxLevelDepthAndTypeList($rootId, $levelDepth, $types);
 
-        //die($select->getSqlString($this->getAdapter()->platform));
-        /**
-         * @var CustomHydratingResultSet
-         */
+        $select = EntitiesSelectHelper::selectByRootElementIdAndMaxLevelDepthAndTypeList(
+            $this->generateBasicSelect(),
+            $rootId,
+            $levelDepth,
+            $types
+        );
+
+        /** @var CustomHydratingResultSet $res */
         $res = $this->getTableMapper()->getTable()->selectWith($select);
         return $res;
     }
@@ -97,10 +60,18 @@ class EntitiesService extends EntityService
      * @throws \Exception
      */
     public function findByParentNodeAndTypesSetAndMaxDepth($rootId, $levelDepth = null, array $types = []){
-        $select = $this->getTableMapper()->generateSelectByRootNodeIdAndMaxLevelDepthAndTypeList($rootId, $levelDepth, $types);
-        /**
-         * @var CustomHydratingResultSet
-         */
+
+        $select =
+            EntitiesSelectHelper::selectByRootNodeIdAndMaxLevelDepthAndTypeList(
+                $this->generateBasicSelect(),
+                $this->getTableMapper()->getTable()->table,
+                $this->getTableMapper()->getIdField(),
+                $rootId,
+                $levelDepth,
+                $types
+            );
+
+        /** @var CustomHydratingResultSet $res */
         $res = $this->getTableMapper()->getTable()->selectWith($select);
         return $res;
     }
@@ -112,8 +83,12 @@ class EntitiesService extends EntityService
      * @throws \Exception
      */
     public function findByTypesSetAndMaxDepth($levelDepth = null, array $types = []){
-        $select = $this->getTableMapper()->generateSelectByMaxLevelDepthAndTypeList($levelDepth, $types);
-        $res = $this->getTableMapper()->getTable()->selectWith($select);
+
+        $res = $this->getTableMapper()->getTable()->selectWith(
+            EntitiesSelectHelper::selectByMaxLevelDepthAndTypeList(
+                $this->generateBasicSelect(),
+                $levelDepth, $types)
+        );
 
         return $res;
     }
@@ -121,13 +96,18 @@ class EntitiesService extends EntityService
     /**
      * Поиск по Избранному
      * @param array $types
-     * @param null $levelDepth
      * @return \Zend\Db\ResultSet\ResultSetInterface
      * @throws \Exception
      */
-    public function findFavoritesByTypesAndMaxLevelDepth(array $types = [], $levelDepth = null)
+    public function findFavoritesByTypes(array $types = [])
     {
-        $select = $this->getTableMapper()->generateSelectFavoritesByMaxLevelDepthAndTypeList($levelDepth, $types);
+
+        $select = $this->generateBasicSelect();
+        $select = EntitiesSelectHelper::selectTypes($select, $types);
+        $select = EntitiesSelectHelper::selectFavorites($select);
+        // нам нужны элементы на минимальном уровне
+        $select
+            ->where("t.surrogate_level = 0");
 
         $res = $this->getTableMapper()->getTable()->selectWith($select);
         return $res;
@@ -145,13 +125,12 @@ class EntitiesService extends EntityService
             // здесь обязателен нулевой тип в списке
             $types[] = 0;
         }
-
         sort($types);
 
-        $select = $this->getTableMapper()->generateSelectByTypesOnly($types);
-        /**
-         * @var CustomHydratingResultSet
-         */
+        $select = EntitiesSelectHelper::selectTypes(
+            $this->generateBasicSelect(), $types);
+
+        /** @var CustomHydratingResultSet $res */
         $res = $this->getTableMapper()->getTable()->selectWith($select);
         return $res;
     }
@@ -177,14 +156,12 @@ class EntitiesService extends EntityService
      */
     public function getEntityById($entityId)
     {
-        $select = $this->getTableMapper()->generateSelectByRootElementIdAndMaxLevelDepthAndTypeList($entityId, 0, []);
+        $select = EntitiesSelectHelper::selectByRootElementIdAndMaxLevelDepthAndTypeList(
+            $this->generateBasicSelect(),
+            $entityId, 0, []);
 
-        /**
-         * @var CustomHydratingResultSet
-         */
+        /** @var CustomHydratingResultSet $res */
         $res = $this->getTableMapper()->getTable()->selectWith($select);
         return $res;
     }
-
-
 }

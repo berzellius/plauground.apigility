@@ -25,7 +25,9 @@ class FavoritesRpcController extends RpcController
      */
     public function favoritesRpcAction()
     {
+
         $filteredData = $this->getInputFilter()->getValues();
+
         $entityId = ControllerSupportUtils::assertParameterSet($filteredData,
             'entity_id',
             'you must send entity_id - id of entity you want to like/dislike');

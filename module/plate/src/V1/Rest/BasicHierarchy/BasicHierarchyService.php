@@ -43,7 +43,7 @@ class BasicHierarchyService extends EntityService
     public function selectByParentAndTypesSetAndMaxDepth($rootId, $levelDepth = null, array $types = []){
 
         //return $this->getTableMapper()->generateSelectByRootElementIdAndMaxLevelDepthAndTypeList($rootId, $levelDepth, $types);
-        return $this->getTableMapper()->generateSelectByRootNodeIdAndMaxLevelDepthAndTypeList($rootId, $levelDepth, $types);
+        return BasicHierarchyCollection::selectByRootElementIdAndMaxLevelDepthAndTypeList($rootId, $levelDepth, $types);
         /*$select = $this->selectByParentAndLevelDepth($rootId, $levelDepth);
 
         if(count($types) > 0){
@@ -108,7 +108,9 @@ class BasicHierarchyService extends EntityService
             foreach ($type_ids_list as &$value) $value = (int) $value;
             $level_depth = isset($params['level_depth'])? (int)$params['level_depth'] : null;
 
-            $select = $this->selectByParentAndTypesSetAndMaxDepth($root_entity_id, $level_depth, $type_ids_list);
+            //$select = $this->selectByParentAndTypesSetAndMaxDepth($root_entity_id, $level_depth, $type_ids_list);
+            $select = BasicHierarchyCollection::selectByRootElementIdAndMaxLevelDepthAndTypeList(
+                $this->generateBasicSelect(), $root_entity_id, $level_depth, $type_ids_list);
         }
 
         /**

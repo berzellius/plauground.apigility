@@ -123,28 +123,14 @@ abstract class NestedSetsCollection extends Collection
 
     /**
      * @param Select $select
-     * @param $tableName
-     * @param $idField
      * @param $levelDepth
      * @param array $typeList
      * @return Select
      */
-    public static function selectByMaxLevelDepthAndTypeList(Select $select, $tableName, $idField, $levelDepth, array $typeList = []){
+    public static function selectByMaxLevelDepthAndTypeList(Select $select, $levelDepth, array $typeList = []){
         $select = self::selectByMaxLevelDepthWithJoiningTable(
-            $select, $tableName, $idField, $levelDepth
+            $select, $levelDepth
         );
-        $select = self::selectTypes($select, $typeList);
-        return $select;
-    }
-
-    /**
-     * @param Select $select
-     * @param $tableName
-     * @param $idField
-     * @param array $typeList
-     * @return Select
-     */
-    public static function selectByTypesOnly(Select $select, $tableName, $idField, array $typeList = []){
         $select = self::selectTypes($select, $typeList);
         return $select;
     }
@@ -154,7 +140,7 @@ abstract class NestedSetsCollection extends Collection
      * @param $typeList
      * @return Select
      */
-    protected static function selectTypes(Select $select, $typeList){
+    public static function selectTypes(Select $select, $typeList){
         $cc = get_called_class();
         if(count($typeList) > 0){
             $select
@@ -205,11 +191,9 @@ abstract class NestedSetsCollection extends Collection
     /**
      * @param $select
      * @param $tableName
-     * @param $idField
-     * @param $levelDepth
      * @return Select
      */
-    protected static function selectByMaxLevelDepthWithJoiningTable($select, $tableName, $idField, $levelDepth)
+    protected static function selectByMaxLevelDepthWithJoiningTable($select, $levelDepth)
     {
         $cc = get_called_class();
 
@@ -227,7 +211,6 @@ abstract class NestedSetsCollection extends Collection
     {
         $this->setItemCountPerPage(-1);
         $currentItems = $this->getCurrentItems();
-        //die(get_class($currentItems));
 
         if ($currentItems instanceof AbstractResultSet) {
             return Json::encode($currentItems->toArray());

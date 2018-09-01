@@ -82,18 +82,6 @@ class Collection extends Paginator
      * @param Select $select
      * @param $tableName
      * @param $idField
-     * @param $levelDepth
-     * @param array $typeList
-     * @throws Exception
-     */
-    public static function  selectByMaxLevelDepthAndTypeList(Select $select, $tableName, $idField, $levelDepth, array $typeList){
-        throw new Exception("method selectByMaxLevelDepthAndTypeList must be implemented in child classes of " . Collection::class);
-    }
-
-    /**
-     * @param Select $select
-     * @param $tableName
-     * @param $idField
      * @param array $typeList
      * @throws Exception
      */

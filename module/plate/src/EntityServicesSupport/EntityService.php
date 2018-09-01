@@ -52,6 +52,13 @@ abstract class EntityService implements IEntityService{
     }
 
     /**
+     * @return \Zend\Db\Sql\Select
+     */
+    public function generateBasicSelect(){
+        return $this->getTableMapper()->generateBasicSelect();
+    }
+
+    /**
      * Коммит
      */
     protected function commitTransaction(){

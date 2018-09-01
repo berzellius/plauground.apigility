@@ -3,6 +3,7 @@ namespace plate\V1\Rest\Entities;
 
 use plate\EntitySupport\collection\Collection;
 use plate\EntitySupport\collection\NestedSetsCollection;
+use Rhumsaa\Uuid\Console\Exception;
 use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Join;
 use Zend\Db\Sql\Predicate\Predicate;
@@ -67,47 +68,14 @@ class EntitiesCollection extends NestedSetsCollection
                     ['uc' => self::$userContextProperitesTable],
                     't.ent_id = uc.ent_id',
                     [
-                        'isFavorite' => new Expression('case when uc.isFavorite is null then 0 else uc.isFavorite end'),
-                        'isAllowed' => new Expression('case when uc.isAllowed is null then 0 else uc.isAllowed end')
+                        'isFavorite' => new Expression('COALESCE(uc.isFavorite, 0) | types.force_favorite'),
+                        'isAllowed' => new Expression('COALESCE(uc.isAllowed, 0) | types.force_allowed')
                     ],
                     Join::JOIN_LEFT
                 )
                 ->where(new \Zend\Db\Sql\Predicate\Expression("uc.user = '" .$clientId . "'" ))
-                //->where(new \Zend\Db\Sql\Predicate\Expression("uc.isAllowed = 1"), Predicate::COMBINED_BY_AND)
             ;
         }
-
-        return $select;
-    }
-
-    /**
-     * @param Select $select
-     * @param $tableName
-     * @param $idField
-     * @param $levelDepth
-     * @param array $typeList
-     * @return Select
-     */
-    public static function selectFavoritesByMaxLevelDepthAndTypeList(Select $select, $tableName, $idField, $levelDepth, array $typeList = []){
-        $select = self::selectByMaxLevelDepthWithJoiningTable(
-            $select, $tableName, $idField, $levelDepth
-        );
-
-        $select = self::selectTypes($select, $typeList);
-
-        $select = self::selectFavorites($select);
-
-        return $select;
-    }
-
-    /**
-     * @param $select
-     * @return Select
-     */
-    protected static function selectFavorites(Select $select)
-    {
-        $select
-            ->where("uc.isFavorite = 1", Where::OP_AND);
 
         return $select;
     }
