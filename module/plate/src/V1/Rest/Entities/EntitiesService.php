@@ -142,9 +142,8 @@ class EntitiesService extends EntityService
      */
     public function findAll(){
         $select = $this->getTableMapper()->generateBasicSelect();
-        /**
-         * @var CustomHydratingResultSet
-         */
+
+        /** @var CustomHydratingResultSet $res */
         $res = $this->getTableMapper()->getTable()->selectWith($select);
         return $res;
     }

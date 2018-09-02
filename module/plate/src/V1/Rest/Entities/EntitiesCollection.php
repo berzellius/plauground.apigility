@@ -66,14 +66,15 @@ class EntitiesCollection extends NestedSetsCollection
             $select
                 ->join(
                     ['uc' => self::$userContextProperitesTable],
-                    't.ent_id = uc.ent_id',
+                    //'t.ent_id = uc.ent_id',
+                    new \Zend\Db\Sql\Predicate\Expression("uc.user = '" .$clientId . "' and t.ent_id = uc.ent_id" ),
                     [
                         'isFavorite' => new Expression('COALESCE(uc.isFavorite, 0) | types.force_favorite'),
                         'isAllowed' => new Expression('COALESCE(uc.isAllowed, 0) | types.force_allowed')
                     ],
                     Join::JOIN_LEFT
                 )
-                ->where(new \Zend\Db\Sql\Predicate\Expression("uc.user = '" .$clientId . "'" ))
+                //->where(new \Zend\Db\Sql\Predicate\Expression("uc.user = '" .$clientId . "'" ))
             ;
         }
 

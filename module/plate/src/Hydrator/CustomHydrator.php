@@ -39,6 +39,11 @@ class CustomHydrator extends ObjectProperty
                     }
                 }
             }
+
+            // преобразования на лету
+            if(method_exists($prototype, 'transform')){
+                $data = $prototype::transform($data);
+            }
         }
         else {
             $prototype = $object;

@@ -8,6 +8,7 @@ use plate\V1\Rest\Entities\inheritance\FloorEntity;
 use plate\V1\Rest\Entities\inheritance\GroupEntity;
 use plate\V1\Rest\Entities\inheritance\RoomEntity;
 use plate\V1\Rest\Entities\inheritance\ScheduledEntity;
+use plate\V1\Rest\Entities\inheritance\ScheduledTimingEntity;
 
 /**
  * Класс для маппинга сущностей (обязателен для REST API сервисов Apigility)
@@ -19,7 +20,7 @@ class EntitiesEntity extends MappedSuperClassEntity
     public static $mapperFieldName = 'type_enum';
 
     public static $mappingClassesCollection = [
-        DeviceEntity::class, FloorEntity::class, GroupEntity::class, RoomEntity::class, ScheduledEntity::class
+        DeviceEntity::class, FloorEntity::class, GroupEntity::class, RoomEntity::class, ScheduledEntity::class, ScheduledTimingEntity::class
     ];
 
     public static function getFieldsMap(){
