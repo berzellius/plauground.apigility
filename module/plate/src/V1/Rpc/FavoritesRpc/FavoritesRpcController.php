@@ -35,7 +35,6 @@ class FavoritesRpcController extends RpcController
             'do', ['like', 'dislike'],
             'you must tell what to do - like or dislike entity. set `do` parameter to `like` or `dislike`');
 
-
         switch ($do){
             case 'like':
                 $this->getEntitiesUserContextService()->likeEntity($entityId);

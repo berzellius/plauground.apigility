@@ -11,6 +11,8 @@ namespace plate\V1\Rest\EntitiesUserContext;
 
 use plate\EntityServicesSupport\EntityService;
 use plate\Hydrator\CustomHydratingResultSet;
+use plate\V1\Rest\Entities\EntitiesService;
+use plate\V1\Rest\Entities\inheritance\ScheduledEntity;
 use Rhumsaa\Uuid\Console\Exception;
 use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Select;
@@ -75,6 +77,7 @@ class EntitiesUserContextService extends EntityService
      * @param $favorite integer
      * @return void
      * @throws \plate\Exception\ApiException
+     * @throws \Exception
      */
     protected function toggleFavorite(
         $entityID, $favorite
@@ -85,6 +88,29 @@ class EntitiesUserContextService extends EntityService
             $this->rollbackTransaction();
             $this->notAllowedException("user has not rights for entity#" . $entityID);
         };
+
+
+        // todo быдлокод activated
+        /** @var EntitiesService $srv */
+        $srv = $this->getITableService()->getTableMapperByKey(EntitiesService::class);
+        $entity = $srv->getEntityById($entityID)->toObjectsArray()['response'];
+
+        if($entity instanceof ScheduledEntity){
+            // работаем с будильником - нужно лайкнуть или дизлайкнуть расписания!
+            $timingsRes = $srv->findByParentEntityAndTypesSetAndMaxDepth($entityID, 4, [6]);
+            $timings = $timingsRes->toObjectsArray()['response'];
+
+            foreach ($timings as $timing){
+                $entId = $timing->ent_id;
+
+                $update = new Update($this->getTableName());
+                $update
+                    ->set(["isFavorite" => $favorite])
+                    ->where($this->buildWhereByEntityIdAndCurrentUser($entId));
+                $this->getTableMapper()->getTable()->updateWith($update);
+            }
+
+        }
 
         $update = new Update($this->getTableName());
         $update

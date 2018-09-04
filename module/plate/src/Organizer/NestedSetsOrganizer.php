@@ -37,6 +37,7 @@ class NestedSetsOrganizer extends Organizer
         $res = [];
 
         foreach ($iterator as $item) {
+
             $this->checkFieldsExists($fields, $item);
 
             $currentLevel = $item->{$fields->levelFieldName};
@@ -67,9 +68,11 @@ class NestedSetsOrganizer extends Organizer
                 $this->wrapPath($path, $currentLevel);
                 $this->addToPath($path, $item, $currentLevel, $container, $lkey, $passInNode);
 
+
                 if($currentLevel == $initLevel){
-                    $res[] = $path[0]->e;
-                    $path = [];
+                    $p = array_shift($path);
+                    $res[] = $p->e;
+
                     $this->addToPath($path, $item, $currentLevel, $container, $lkey, $passInNode);
                 }
             }

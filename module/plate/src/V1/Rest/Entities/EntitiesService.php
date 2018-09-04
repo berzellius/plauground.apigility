@@ -17,6 +17,7 @@ use plate\Hydrator\CustomHydratingResultSet;
 use plate\Json\JsonModelAlt;
 use plate\V1\Rest\Entities\inheritance\DeviceEntity;
 use plate\V1\Rest\Entities\inheritance\GroupEntity;
+use plate\V1\Rest\EntitiesUserContext\EntitiesUserContextService;
 use Zend\Db\ResultSet\HydratingResultSet;
 use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Select;
@@ -107,13 +108,14 @@ class EntitiesService extends EntityService
      */
     public function findFavoritesByTypes(array $types = [])
     {
-
         $select = $this->generateBasicSelect();
         $select = EntitiesSelectHelper::selectTypes($select, $types);
         $select = EntitiesSelectHelper::selectFavorites($select);
+
         // нам нужны элементы на минимальном уровне
         $select
             ->where("t.surrogate_level = 0");
+        //die($select->getSqlString($this->getAdapter()->getPlatform()));
 
         $res = $this->getTableMapper()->getTable()->selectWith($select);
         return $res;

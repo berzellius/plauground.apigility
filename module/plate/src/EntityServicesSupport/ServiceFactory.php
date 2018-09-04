@@ -47,6 +47,9 @@ class ServiceFactory
         $authUtils = $this->getAuthUtils($services);
 
         // определяем класс контроллера
-        return new $serviceClass($authUtils, $iTableService, $mapper);
+        $serv = new $serviceClass($authUtils, $iTableService, $mapper);
+        $this->getITableService($services)->registerTableMapper($serviceClass, $serv);
+
+        return $serv;
     }
 }
