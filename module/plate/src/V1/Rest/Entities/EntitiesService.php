@@ -15,9 +15,15 @@ use plate\EntityServicesSupport\ITableService;
 use plate\EntitySupport\tableGateway\TableGatewayMapper;
 use plate\Hydrator\CustomHydratingResultSet;
 use plate\Json\JsonModelAlt;
+use plate\V1\Rest\Entities\inheritance\DeviceEntity;
+use plate\V1\Rest\Entities\inheritance\GroupEntity;
 use Zend\Db\ResultSet\HydratingResultSet;
+use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Select;
+use Zend\Db\Sql\Update;
+use Zend\Db\Sql\Where;
 use Zend\View\Helper\ViewModel;
+use Zend\View\Model\JsonModel;
 
 /**
  * Бизнес-логика работы с Entities
@@ -162,5 +168,44 @@ class EntitiesService extends EntityService
         /** @var CustomHydratingResultSet $res */
         $res = $this->getTableMapper()->getTable()->selectWith($select);
         return $res;
+    }
+
+    /**
+     * @param $entityID
+     * @param $command
+     * @return JsonModel
+     * @throws \plate\Exception\ApiException|\Exception
+     */
+    public function sendCommandToEntity($entityID, $command)
+    {
+        $this->beginTransaction();
+        $entity = $this->getEntityById($entityID)->toObjectsArray()['response'];
+
+        /**
+         * todo разбыдлокодить этот пиздец
+         */
+        $table = 'entities';
+
+        if(!(
+            $entity instanceof DeviceEntity || $entity instanceof GroupEntity
+        )){
+            $this->rollbackTransaction();
+            $this->notAllowedException("commands can be sent to Devices or Groups, but this entity is " . get_class($entity));
+        }
+
+        $update = new Update($table);
+        $update
+            ->set(["last_command" => $command])
+            ->where(
+                new Expression("id = ?", $entityID)
+            );
+
+        /**
+         * todo с этим тоже разобраться, муть какая-то получилась
+         */
+        $this->getConnectionObjectFromTableMapper()->execute($update->getSqlString($this->getAdapter()->getPlatform()));
+        $this->commitTransaction();
+
+        return new JsonModel($this->getEntityById($entityID));
     }
 }

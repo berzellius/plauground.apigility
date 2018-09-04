@@ -36,6 +36,16 @@ class CustomHydratingResultSet extends HydratingResultSet
         parent::__construct($hydrator, $objectPrototype);
     }
 
+    public function getOneObject(){
+        $objects = $this->toObjectsArray();
+
+        if(is_array($objects) && count($objects) > 0){
+            return $objects[0];
+        }
+
+        return null;
+    }
+
     public function toObjectsArray(){
         $organized = Organizer::getOrganizer($this->collectionPrototypeClass)->organize($this);
 
